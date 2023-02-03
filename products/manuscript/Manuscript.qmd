@@ -22,6 +22,9 @@ This uses MS Word as output format. [See here](https://quarto.org/docs/output-fo
 # load a few R packages
 library(here)
 library(knitr)
+library(tidyverse)
+library(broom)
+library(ggtext)
 ```
 
 
@@ -37,7 +40,7 @@ _Write a summary of your project._
 
 ## General Background Information
 _Provide enough background on your topic that others can understand the why and how of your analysis_ 
-
+Foodborne pathogens typically cause serious gastrointestinal infections. In the U.S., one in six Americans has been reported to acquire foodborne illness annually, along with approximately 128,000 hospitalizations and 3,000 deaths (U.S. Food and Drug Administration, 2022). Economic loss associated with foodborne illnesses is estimated to be greater than $50 billion a year.  Investigating this dataset containing foodborne outbreak information in the 17-year period may reveal the frequent sources and the common etiologic agents that are related to foodborne illnesses. Ultimately, measures can be conducted or adjusted based on analysis for prevention of outbreaks.
 ## Description of data and data source
 _Describe what the data is, what it contains, where it is from, etc. Eventually this might be part of a methods section._
 
@@ -54,6 +57,11 @@ Examples of reproducible research projects can for instance be found in [@mckay2
 # Methods 
 
 _Describe your methods. That should describe the data, the cleaning processes, and the analysis approaches. You might want to provide a shorter description here and all the details in the supplement._
+1. Data wrangling: handling the missing values and cleaning inconsistent data.
+2. Selecting the interested predictors and outcomes to plot their relationships.
+3. If the graphs indicate any significant or interesting trend, we will conduct a general linear model and omnibus test.
+4. Post-hoc test to identify the significant difference between levels.
+5. Mapping cases with different predictors across the states.
 
 
 ## Data aquisition
