@@ -16,11 +16,12 @@ library(dplyr) #for data processing/cleaning
 library(tidyr) #for data processing/cleaning
 library(skimr) #for nice visualization of data 
 library(here) #to set paths
+library(tidyverse) # General Data Pre-Processing/Cleaning
 
 ## ---- loaddata --------
 #path to data
 #note the use of the here() package and not absolute paths
-data_location <- here::here("data","raw_data","exampledata.xlsx")
+data_location <- here::here("data","raw_data","foodborne outbreaks from 2009-2015.csv")
 
 #load data. 
 #note that for functions that come from specific packages (instead of base R)
@@ -28,7 +29,7 @@ data_location <- here::here("data","raw_data","exampledata.xlsx")
 #package::function() that's not required one could just call the function
 #specifying the package makes it clearer where the function "lives",
 #but it adds typing. You can do it either way.
-rawdata <- readxl::read_excel(data_location)
+rawdata <- read_csv(data_location)
 
 ## ---- exploredata --------
 #take a look at the data
@@ -43,11 +44,10 @@ head(rawdata)
 #this is a nice way to look at data
 skimr::skim(rawdata)
 
-# looks like we have the following data
-# height (seems like it's in centimeters) 
-# weight (seems to be in kilogram)
-# Sex
-
+# We Have 12 Variables Total
+colnames(rawdata)
+## So those are year, month, state, location, food, ingredient, species,
+## serotype/genotype, status, illnesses, hospitalizations, and fatalities.
 
 
 ## ---- cleandata1 --------
