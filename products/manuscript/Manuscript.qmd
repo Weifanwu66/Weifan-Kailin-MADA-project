@@ -43,26 +43,30 @@ library(ggtext)
 
 ## General Background Information
 
-*Provide enough background on your topic that others can understand the why and how of your analysis* Foodborne pathogens typically cause serious gastrointestinal infections.
-In the U.S., one in six Americans has been reported to acquire foodborne illness annually, along with approximately 128,000 hospitalizations and 3,000 deaths @centerforfoodsafetyandappliednutrition2022.
+*Provide enough background on your topic that others can understand the why and how of your analysis.*
+
+Foodborne pathogens typically cause serious gastrointestinal infections. In the U.S., one in six Americans has been reported to acquire foodborne illness annually, along with approximately 128,000 hospitalizations and 3,000 deaths @centerforfoodsafetyandappliednutrition2022.
 Economic loss associated with foodborne illnesses is estimated to be greater than \$50 billion a year.
-Investigating this dataset containing foodborne outbreak information in the 17-year period may reveal the frequent sources and the common etiologic agents that are related to foodborne illnesses.
-Ultimately, measures can be conducted or adjusted based on analysis for prevention of outbreaks.
+Investigating this dataset containing foodborne outbreak information in the 17-year period may reveal the frequent sources and the common etiologic agents that are related to foodborne illnesses. Ultimately, measures can be conducted or adjusted based on analysis for prevention of outbreaks.
 
 ## Description of data and data source
 
 *Describe what the data is, what it contains, where it is from, etc. Eventually this might be part of a methods section.*
 
-This dataset was uploaded onto Kaggle in 2017 and contains data from the Centers for Disease Control and Prevention (CDC) on foodborne disease outbreaks from 1998 to 2015 @centersfordiseasecontrolandprevention2017. There are 12 variables and 16,950+ observations.
+This dataset was uploaded onto Kaggle in 2017 and contains data from the Centers for Disease Control and Prevention (CDC) on foodborne disease outbreaks from 1998 to 2015 @centersfordiseasecontrolandprevention2017.
+There are 12 variables and 16,950+ observations.
 The raw data may be viewed within the repository of this project.
 
 ## Questions/Hypotheses to be addressed
 
-*State the research questions you plan to answer with this analysis.* We have several questions we would like this data to answer: (1) do foodborne disease outbreaks occur more often in restaurants or in private residences, (2) what pathogen species are most frequently associated with foodborne outbreaks, and (3) what type of food is most commonly involved in foodborne outbreaks. The outcomes of interest would therefore be location (for whether more outbreaks occur in restaurants/homes), species of pathogen, and food type most often associated with outbreaks.
+*State the research questions you plan to answer with this analysis.*
 
-We expect to see that outbreaks occur most often in homes rather than restaurants, the pathogen most commonly seen to be E. coli, and for the food most often associated with outbreaks to be some form of salad.
+We have several questions we would like this data to answer: (1) do foodborne disease outbreaks occur more often in restaurants or in private residences, (2) what pathogen species are most frequently associated with foodborne outbreaks, and (3) what type of food is most commonly involved in foodborne outbreaks. The outcomes of interest would therefore be location (for whether more outbreaks occur in restaurants/homes), species of pathogen, and food type most often associated with outbreaks.
+
+We expect to see that outbreaks occur most often in homes rather than restaurants, the pathogen most commonly seen to be *E. coli*, and for the food most often associated with outbreaks to be some form of salad.
 
 ### Reminder
+
 To cite other work (important everywhere, but likely happens first in introduction), make sure your references are in the bibtex file specified in the YAML header above (here `dataanalysis_template_references.bib`) and have the right bibtex key.
 Then you can include like this:
 
@@ -72,16 +76,19 @@ Examples of reproducible research projects can for instance be found in [@mckay2
 
 # Methods
 
-*Describe your methods. That should describe the data, the cleaning processes, and the analysis approaches. You might want to provide a shorter description here and all the details in the supplement.* 1.
-1. Data wrangling: handling the missing values and cleaning inconsistent data.
-2. Selecting the interested predictors and outcomes to plot their relationships.
-3. If the graphs indicate any significant or interesting trend, we will conduct a general linear model and omnibus test.
-4. Post-hoc test to identify the significant difference between levels.
-5. Mapping cases with different predictors across the states.
+*Describe your methods. That should describe the data, the cleaning processes, and the analysis approaches. You might want to provide a shorter description here and all the details in the supplement.*
 
-## Data aquisition
+1.  Data wrangling: handling the missing values and cleaning inconsistent data.
+2.  Selecting the interested predictors and outcomes to plot their relationships.
+3.  If the graphs indicate any significant or interesting trend, we will conduct a general linear model and omnibus test.
+4.  Post-hoc test to identify the significant difference between levels.
+5.  Mapping cases with different predictors across the states.
+
+## Data acquisition
 
 *As applicable, explain where and how you got the data. If you directly import the data from an online source, you can combine this section with the next.*
+
+As previously mentioned, the data was acquired from [Kaggle](https://www.kaggle.com/datasets/cdc/foodborne-diseases).
 
 ## Data import and cleaning
 
