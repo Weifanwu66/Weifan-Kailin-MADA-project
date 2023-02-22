@@ -30,6 +30,12 @@ Load needed packages. Instead of having R commands here, this just pulls in the 
 
 
 ```{r, packages, message = FALSE, warning = FALSE}
+library(readxl) #for loading excel files
+library(dplyr) #for data processing/cleaning
+library(tidyr) #for data processing/cleaning
+library(skimr) #for nice visualization of data 
+library(here) #to set paths
+library(dlookr)
 ```
 
 
@@ -40,6 +46,9 @@ package::function() that's not required one could just call the function specify
 but it adds typing. You can do it either way.
 
 ```{r, loaddata}
+data_location<-here("data","raw_data","NationalOutbreakPublicDataTool.xlsx")
+rawdata2=read_excel(data_location)
+
 ```
 
 
@@ -47,11 +56,12 @@ but it adds typing. You can do it either way.
 
 Several ways of looking at the data
 
-```{r, exploredata}
-dplyr::glimpse(rawdata)
-summary(rawdata)
-head(rawdata)
-skimr::skim(rawdata)
+```{r, exploredata, fig.height=8, fig.width=8}
+glimpse(rawdata2)
+summary(rawdata2)
+head(rawdata2)
+skim(rawdata2)
+plot_na_pareto(rawdata2)
 ```
 
 Looks like we have the following data:
@@ -69,7 +79,10 @@ First, there is an entry for height which says "sixty" instead of a number.
 Does that mean it should be a numeric 60? It somehow doesn't make sense since the weight is 60kg, which can't happen for a 60cm person (a baby).
 Since we don't know how to fix this, we might decide to remove the person. This "sixty" entry also turned all Height entries into characters instead of numeric. That conversion to character also means that our summary function isn't very meaningful. So let's fix that first.
 
-```{r, cleandata1}
+```{r, cleandata1,fig.height=8, fig.width=8}
+d2=rawdata2%>%
+  filter(`Primary Mode`=="Food")
+plot_na_pareto(d2)
 ```
 
 Now we see that there is one person with a height of 6. That could be a typo, or someone mistakenly entered their height in feet. Since we unfortunately don't know, we might need to remove this person, which we'll do here.
