@@ -1,71 +1,196 @@
 ---
-title: "cleaning script for foodborne_outbreaks.csv"
+title: "Data Pre-Processing/Cleaning Script"
 author: "Andreas Handel"
 date: "2023-01-03"
 output: html_document
 ---
 
-
-# Setup
+# Load Libraries
 ```{r}
+# General Pre-Processing
 library(tidyverse)
-library(readr) #for loading csv files
-library(dplyr) #for data processing/cleaning
-library(tidyr) #for data processing/cleaning
-library(skimr) #for nice visualization of data 
-library(here) #to set paths
+library(dplyr)
+
+# Data Structure Visualization
+library(skimr)
+
+# Setting Paths
+library(here)
+
+# Information About NAs
 library(dlookr)
 ```
 
 
-# Data loading
-
-Note that for functions that come from specific packages (instead of base R), I often specify both package and function like so:
-package::function() that's not required one could just call the function specifying the package makes it clearer where the function "lives",
-but it adds typing. You can do it either way.
+# Loading Data
 
 ```{r}
-# path to data
-# note the use of the here() package and not absolute paths
-data_location <- here::here("data","raw_data","foodborne_outbreaks.csv")
-rawdata1 <- read_csv(data_location)
+# Path to Data
+data_location <- here("data","raw_data","foodborne_outbreaks.csv")
+training_data <- read_csv(data_location)
+
+data_location <- here(
+  "data","raw_data","NationalOutbreakPublicDataTool.xlsx")
+analysis_data <- readxl::read_excel(data_location)
 ```
 
-# Check data
+# Check Data
 
-Several ways of looking at the data
+There are several ways we can look at the datasets' structures.
+
+## Training Data
+```{r}
+str(training_data)
+summary(training_data)
+
+# Closer Look at Training Data
+head(training_data)
+skim(training_data)
+
+# Plotting NAs of Training Data
+plot_na_pareto(training_data)
+```
+
+It appears that the training data contains the following variables:
+General
+-   Year, Month (Time)
+-   State (Location)
+-   Food, Ingredient (Vehicle of Transmission)
+-   Species
+-   Status
+Health Outcomes
+-   Illnesses
+-   Hospitalizations
+-   Fatalities
+
+## Analysis Data
+```{r}
+str(analysis_data)
+summary(analysis_data)
+
+# Closer Look at Training Data
+head(analysis_data)
+skim(analysis_data)
+
+# Plotting NAs of Training Data
+plot_na_pareto(analysis_data)
+```
+
+It appears that the training data contains the following variables:
+General
+-   Year, Month (Time)
+-   State (Location)
+-   Primary Mode (Vehicle of Transmission)
+-   Food Vehicle
+-   Food Contaminated Ingredient
+-   Water Exposure
+-   Water Type
+-   Water Status
+-   Animal Type
+-   Animal Type Specify
+-   Etiology
+-   Serotype or Genotype
+-   Etiology Status
+-   Setting
+-   IFSAC Category
+Health Outcomes
+-   Illnesses
+-   Hospitalizations
+-   Info on Hospitalizations
+-   Deaths
+-   Info on Deaths
+
+Because the analysis dataset contains more than just foodborne outbreaks, we want to specify it to just foodborne illnesses.
 
 ```{r}
-str(rawdata1)
-summary(rawdata1)
-head(rawdata1)
-skim(rawdata1)
-plot_na_pareto(rawdata1)
+# Plot of NAs After Limiting to Analysis Data to Food
+plot_na_pareto(analysis_data %>% filter(`Primary Mode` == "Food"))
+```
+## Checking Etiologies
+```{r}
+# Training Data
+unique(training_data$Status)
+
+# Analysis Data
+unique(analysis_data$`Etiology Status`)
 ```
 
-Looks like we have the following predictor variables:
-
-* Year, Month (numeric)
-* State, Location (geographic information)
-* Food, -Ingredient
-*Species, -Serotype/Genotype
-*Status
-
-Following variables are outcomes:
-*illnesses
-*Hospitalizations
-*Fatalities
-main outcome: illnesses
+Given that "Status" and "Etiology Status" refer to laboratory confirmations, we will filter our case definitions to be only laboratory-confirmed pathogens.
 
 # Cleaning
 
-By inspecting the data as done above, we find some problems that need addressing:
+Based on the data inspections completed above, we want to remove "Ingredient" and "Serotype/Genotype" from the training dataset (> 80% data missing), and we want to remove all variables unrelated to foodborne illness for the analysis dataset (ex: animal type, water type, etc.) in addition to columns with many NAs.
 
-First, we will remove the variable "ingredient" and "serotype" since over 80% of data is missing. 
-Does that mean it should be a numeric 60? It somehow doesn't make sense since the weight is 60kg, which can't happen for a 60cm person (a baby).
-Since we don't know how to fix this, we might decide to remove the person. This "sixty" entry also turned all Height entries into characters instead of numeric. That conversion to character also means that our summary function isn't very meaningful. So let's fix that first.
+## Training Data
+```{r}
+training_data_fin <- training_data %>%
+  select(!c(Ingredient, `Serotype/Genotype`)) %>%
+  filter(grepl("Confirmed", Status))
+```
+
+## Analysis Data
+```{r}
+analysis_data_fin <- analysis_data %>%
+  select(!c(`Animal Type`, `Animal Type Specify`, 
+            `Water Exposure`, `Water Type`, `Water Status`, 
+            `Food Contaminated Ingredient`)) %>%
+  filter(grepl("Confirmed", `Etiology Status`))
+```
+
 #potential code for EDA
-#change month to numeric data
+
+## Data Manipulation
+### Separate Rows to Address Coinfections
+```{r}
+analysis_data_fin <- analysis_data_fin %>%
+  separate_rows(Etiology, sep = "; ")
+```
+
+### Column for Type of Pathogen
+```{r}
+Pathogen_Bacteria <- c("Bacillus", "Brucella", "Campylobacter", "Clostridium", "Staphylococcus", "Escherichia coli", "Listeria", "Salmonella", "Vibrio", "Cholera", "Enterococcus", "Bacterium", "Shigella", "Yersinia")
+Pathogen_Parasite <- c("Cryptosporidium", "Cyclospora", "Entamoeba", "Giardia", "Parasite", "Toxoplasma", "Trichinella")
+Pathogen_Virus <- c("Atrovirus", "Norovirus", "Rotavirus")
+Pathogen_Poison <- c("Poison", "Toxin", "Heavy Metal")
+
+analysis_data_fin %>%
+  mutate(Pathogen_Type = case_when(
+    grepl(paste(Pathogen_Bacteria, 
+                collapse = "|"), Etiology) ~ "Bacteria",
+    grepl(paste(Pathogen_Parasite, 
+                collapse = "|"), Etiology) ~ "Parasite",
+    grepl(paste(Pathogen_Virus, 
+                collapse = "|"), Etiology) ~ "Virus",
+    grepl(paste(Pathogen_Poison, 
+                collapse = "|"), Etiology) ~ "Poison")) %>%
+  mutate(Etiology = case_when(
+    Pathogen_Type == "Bacteria" ~ 
+      
+      grepl(paste(Pathogen_Bacteria, collapse = "| "), Etiology)
+  ))
+
+```
+
+### Add Month as Numeric Column
+```{r}
+training_data_fin <- training_data_fin %>%
+  mutate(Numeric_Month = case_when(
+    Month == "January" ~ 1,
+    Month == "February" ~ 2,
+    Month == "March" ~ 3,
+    Month == "April" ~ 4,
+    Month == "May" ~ 5,
+    Month == "June" ~ 6,
+    Month == "July" ~ 7,
+    Month == "August" ~ 8,
+    Month == "September" ~ 9,
+    Month == "October" ~ 10,
+    Month == "November" ~ 11,
+    Month == "December" ~ 12)) %>%
+  relocate(Numeric_Month, .after = Month)
+```
+
+
 ```{r}
 rawdata1%>%filter(grepl("Confirmed", Status))
 unique(rawdata1$Food)
@@ -83,40 +208,6 @@ d3=rawdata1%>%
   arrange(desc(n))
 d3
 ```
-
-Now we see that there is one person with a height of 6. That could be a typo, or someone mistakenly entered their height in feet. Since we unfortunately don't know, we might need to remove this person, which we'll do here.
-
-```{r}
-d2 <- d1 %>% dplyr::filter(Height != 6)
-skimr::skim(d2)
-```
-
-Height values seem ok now.
-
-Now let's look at the `Weight` variable. There is a person with weight of 7000, which is impossible, and one person with missing weight.
-To be able to analyze the data, we'll remove those individuals as well.
-
-```{r}
-d3 <- d2 %>%  dplyr::filter(Weight != 7000) %>% tidyr::drop_na()
-skimr::skim(d3)
-```
-
-Now checking the `Sex` variable. Sex should be a categorical/factor variable but is loaded as character. We can fix that with simple base R code to mix things up.
-
-```{r}
-d3$Sex <- as.factor(d3$Sex)  
-skimr::skim(d3)
-```
-
-
-Now we see that there is another NA, but it's not `NA` from R, instead it was loaded as character and is now considered as a category.
-Well proceed here by removing that individual with that NA entry. Since this keeps an empty category for Sex, I'm also using droplevels() to get rid of it.
-
-```{r}
-d4 <- d3 %>% dplyr::filter(Sex != "NA") %>% droplevels()
-skimr::skim(d4)
-```
-
 
 All done, data is clean now. 
 
