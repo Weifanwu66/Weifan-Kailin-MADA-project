@@ -164,7 +164,7 @@ analysis_data_fin %>%
     grepl(paste(Pathogen_Poison, 
                 collapse = "|"), Etiology) ~ "Poison")) %>%
   mutate(Etiology = case_when(
-    Pathogen_Type == "Bacteria" ~ 
+    Pathogen_Type == "Bacteria" ~ which(Etiology %in% )
       
       grepl(paste(Pathogen_Bacteria, collapse = "| "), Etiology)
   ))
