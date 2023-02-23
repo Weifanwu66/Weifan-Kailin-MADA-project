@@ -8,6 +8,7 @@ output: html_document
 
 # Setup
 ```{r}
+library(tidyverse)
 library(readr) #for loading csv files
 library(dplyr) #for data processing/cleaning
 library(tidyr) #for data processing/cleaning
@@ -44,17 +45,17 @@ plot_na_pareto(rawdata1)
 
 Looks like we have the following predictor variables:
 
-* Year, Month (date)
-* Sate, Location (geographic information)
-* Food, Ingredient
-*Species, Serotype/Genotype
+* Year, Month (numeric)
+* State, Location (geographic information)
+* Food, -Ingredient
+*Species, -Serotype/Genotype
 *Status
 
 Following variables are outcomes:
 *illnesses
 *Hospitalizations
 *Fatalities
-
+main outcome: illnesses
 
 # Cleaning
 
@@ -63,9 +64,24 @@ By inspecting the data as done above, we find some problems that need addressing
 First, we will remove the variable "ingredient" and "serotype" since over 80% of data is missing. 
 Does that mean it should be a numeric 60? It somehow doesn't make sense since the weight is 60kg, which can't happen for a 60cm person (a baby).
 Since we don't know how to fix this, we might decide to remove the person. This "sixty" entry also turned all Height entries into characters instead of numeric. That conversion to character also means that our summary function isn't very meaningful. So let's fix that first.
-
+#potential code for EDA
+#change month to numeric data
 ```{r}
-d1=
+rawdata1%>%filter(grepl("Confirmed", Status))
+unique(rawdata1$Food)
+d2=rawdata1%>%
+  filter(!is.na(Food))%>%
+  mutate(Food=fct_lump(Food,10))%>%
+  count(Food)%>%
+  arrange(desc(n))
+d2
+d3=rawdata1%>%
+  filter(!is.na(Species))%>%
+  mutate(Food=fct_collapse(Food,Norovirus=c("Norovirus","Norovirus genogroup I","Norovirus genogroup II")))%>%
+  mutate(Food=fct_lump(Species,10))%>%
+  count(Species)%>%
+  arrange(desc(n))
+d3
 ```
 
 Now we see that there is one person with a height of 6. That could be a typo, or someone mistakenly entered their height in feet. Since we unfortunately don't know, we might need to remove this person, which we'll do here.
