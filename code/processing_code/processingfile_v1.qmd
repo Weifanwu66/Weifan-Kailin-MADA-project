@@ -5,7 +5,7 @@ date: "2023-01-03"
 output: html_document
 ---
 
-
+install.packages("impute")
 # Setup
 ```{r}
 library(tidyverse)
@@ -15,6 +15,8 @@ library(tidyr) #for data processing/cleaning
 library(skimr) #for nice visualization of data 
 library(here) #to set paths
 library(dlookr)
+library(caret)
+library(randomForest)
 ```
 
 
@@ -47,64 +49,83 @@ Looks like we have the following predictor variables:
 
 * Year, Month (numeric)
 * State, Location (geographic information)
-* Food, -Ingredient
-*Species, -Serotype/Genotype
-*Status
+* Food, Ingredient
+* Species, Serotype/Genotype
+* Status
 
 Following variables are outcomes:
-*illnesses
-*Hospitalizations
-*Fatalities
+* illnesses
+* Hospitalizations
+* Fatalities
+
 main outcome: illnesses
 
 # Cleaning
 
 By inspecting the data as done above, we find some problems that need addressing:
 
-First, we will remove the variable "ingredient" and "serotype" since over 80% of data is missing. 
-Does that mean it should be a numeric 60? It somehow doesn't make sense since the weight is 60kg, which can't happen for a 60cm person (a baby).
-Since we don't know how to fix this, we might decide to remove the person. This "sixty" entry also turned all Height entries into characters instead of numeric. That conversion to character also means that our summary function isn't very meaningful. So let's fix that first.
+First, we will remove the variable "ingredient" and "serotype/genotype" since over 80% of data is missing. 
+```{r}
+d1=rawdata1%>%
+  select(-c(Ingredient,`Serotype/Genotype`))
+skim(d1)
+```
+#checking the levels under each variable
+#checking the levels under `Food`
+```{r}
+skim(d1$Food)
+#convert Food to factor
+d1$Food=as.factor(d1$Food)
+str(d1$Food)
+#Since there are over 3000 different levels, we need to combine some food into the same category
+d2=
+```
+#checking the levels under `Species`
+```{r}
+
+```
+#checking the levels under `Location`
+```{r}
+
+```
+
 #potential code for EDA
-#change month to numeric data
 ```{r}
 rawdata1%>%filter(grepl("Confirmed", Status))
-unique(rawdata1$Food)
-d2=rawdata1%>%
+food=rawdata1%>%
   filter(!is.na(Food))%>%
-  mutate(Food=fct_lump(Food,10))%>%
-  count(Food)%>%
-  arrange(desc(n))
-d2
-d3=rawdata1%>%
+  group_by(Food)%>%
+  top_n(n=10)
+food
+species=rawdata1%>%
   filter(!is.na(Species))%>%
-  mutate(Food=fct_collapse(Food,Norovirus=c("Norovirus","Norovirus genogroup I","Norovirus genogroup II")))%>%
-  mutate(Food=fct_lump(Species,10))%>%
+  mutate(Species=fct_collapse(Species,Norovirus=c("Norovirus","Norovirus genogroup I","Norovirus genogroup II","Norovirus unknown")))%>%
+  mutate(Species=fct_lump(Species,11,other_level = NA))%>%
   count(Species)%>%
-  arrange(desc(n))
-d3
+  arrange(desc(n))%>%
+  filter(!is.na(Species))
+species
 ```
-
-Now we see that there is one person with a height of 6. That could be a typo, or someone mistakenly entered their height in feet. Since we unfortunately don't know, we might need to remove this person, which we'll do here.
-
+#predict missing value
 ```{r}
-d2 <- d1 %>% dplyr::filter(Height != 6)
-skimr::skim(d2)
+set.seed(123)
+index=createDataPartition(rawdata1$State,p=0.8,list=FALSE)
+train=rawdata1[index,]
+test=rawdata1[-index,]
+model1=randomForest(State~Year+Illnesses+Food,data=train,na.action = na.roughfix)
+predicted_states <- predict(model, newdata = test)
+actual_states <- test$State
+accuracy <- sum(predicted_states == actual_states) / length(actual_states)
+
+
 ```
 
-Height values seem ok now.
 
 Now let's look at the `Weight` variable. There is a person with weight of 7000, which is impossible, and one person with missing weight.
 To be able to analyze the data, we'll remove those individuals as well.
 
 ```{r}
 d3 <- d2 %>%  dplyr::filter(Weight != 7000) %>% tidyr::drop_na()
-skimr::skim(d3)
-```
-
-Now checking the `Sex` variable. Sex should be a categorical/factor variable but is loaded as character. We can fix that with simple base R code to mix things up.
-
-```{r}
-d3$Sex <- as.factor(d3$Sex)  
 skimr::skim(d3)
 ```
 
@@ -129,16 +150,11 @@ processeddata <- d4
 
 # Save data 
 
-Finally, we save the clean data as RDS file. I suggest you save your processed and cleaned data as RDS or RDA/Rdata files. 
-This preserves coding like factors, characters, numeric, etc.  If you save as CSV, that information would get lost.
-However, CSV is better for sharing with others since it's plain text. If you do CSV, you might want to write down somewhere what each variable is.
-
-See here for some suggestions on how to store your processed data:
-http://www.sthda.com/english/wiki/saving-data-into-r-data-format-rds-and-rdata
+Finally, we save the clean data as RDS file. 
 
 ```{r}
-save_data_location <- here::here("data","processed_data","processeddata.rds")
-saveRDS(processeddata, file = save_data_location)
+save_data_location <- here::here("data","processed_data","processeddata1.rds")
+saveRDS(processeddata1, file = save_data_location)
 ```
 
 
