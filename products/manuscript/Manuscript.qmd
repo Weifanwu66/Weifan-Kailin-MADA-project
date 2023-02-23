@@ -53,6 +53,8 @@ Investigating this dataset containing foodborne outbreak information in the 17-y
 
 *Describe what the data is, what it contains, where it is from, etc. Eventually this might be part of a methods section.*
 
+WRITE STUFF HERE ABOUT NEW DATASET
+
 This dataset was uploaded onto Kaggle in 2017 and contains data from the Centers for Disease Control and Prevention (CDC) on foodborne disease outbreaks from 1998 to 2015 @centersfordiseasecontrolandprevention2017.
 There are 12 variables and 16,950+ observations.
 The raw data may be viewed within the repository of this project.
