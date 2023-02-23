@@ -10,6 +10,7 @@ output: html_document
 # General Pre-Processing
 library(tidyverse)
 library(dplyr)
+library(stringr)
 
 # Data Structure Visualization
 library(skimr)
@@ -134,7 +135,8 @@ analysis_data_fin <- analysis_data %>%
   select(!c(`Animal Type`, `Animal Type Specify`, 
             `Water Exposure`, `Water Type`, `Water Status`, 
             `Food Contaminated Ingredient`)) %>%
-  filter(grepl("Confirmed", `Etiology Status`))
+  filter(grepl("Confirmed", `Etiology Status`)) %>%
+  filter(`Primary Mode` == "Food")
 ```
 
 #potential code for EDA
@@ -148,27 +150,33 @@ analysis_data_fin <- analysis_data_fin %>%
 
 ### Column for Type of Pathogen
 ```{r}
-Pathogen_Bacteria <- c("Bacillus", "Brucella", "Campylobacter", "Clostridium", "Staphylococcus", "Escherichia coli", "Listeria", "Salmonella", "Vibrio", "Cholera", "Enterococcus", "Bacterium", "Shigella", "Yersinia")
+Pathogen_Bacteria <- c("Bacillus", "Brucella", "Campylobacter", "Clostridium", "Staphylococcus", "Escherichia", "Listeria", "Salmonella", "Vibrio", "Cholera", "Enterococcus", "Bacterium", "Shigella", "Yersinia")
 Pathogen_Parasite <- c("Cryptosporidium", "Cyclospora", "Entamoeba", "Giardia", "Parasite", "Toxoplasma", "Trichinella")
-Pathogen_Virus <- c("Atrovirus", "Norovirus", "Rotavirus")
-Pathogen_Poison <- c("Poison", "Toxin", "Heavy Metal")
+Pathogen_Virus <- c("Astrovirus", "Norovirus", "Rotavirus")
+Pathogen_Poison <- c("Poison", "Toxin", "Metal")
 
-analysis_data_fin %>%
+analysis_data_fin <- analysis_data_fin %>%
   mutate(Pathogen_Type = case_when(
+    grepl(paste(Pathogen_Poison, 
+                collapse = "|"), Etiology) ~ "Poison",
     grepl(paste(Pathogen_Bacteria, 
                 collapse = "|"), Etiology) ~ "Bacteria",
     grepl(paste(Pathogen_Parasite, 
                 collapse = "|"), Etiology) ~ "Parasite",
     grepl(paste(Pathogen_Virus, 
-                collapse = "|"), Etiology) ~ "Virus",
-    grepl(paste(Pathogen_Poison, 
-                collapse = "|"), Etiology) ~ "Poison")) %>%
-  mutate(Etiology = case_when(
-    Pathogen_Type == "Bacteria" ~ which(Etiology %in% )
-      
-      grepl(paste(Pathogen_Bacteria, collapse = "| "), Etiology)
-  ))
-
+                collapse = "|"), Etiology) ~ "Virus"
+    )) %>%
+  mutate(Simplified_Etiology = case_when(
+    Pathogen_Type == "Bacteria" ~ str_extract(Etiology, 
+      "Bacillus|Brucella|Campylobacter|Clostridium|Staphylococcus|Escherichia|Listeria|Salmonella|Vibrio|Cholera|Enterococcus|Bacterium|Shigella|Yersinia"),
+    Pathogen_Type == "Parasite" ~ str_extract(Etiology, "Cryptosporidium|Cyclospora|Entamoeba|Giardia|Parasite|Toxoplasma|Trichinella"),
+    Pathogen_Type == "Virus" ~ str_extract(Etiology, "Astrovirus|Norovirus|Rotavirus"),
+    Pathogen_Type == "Poison" ~ str_extract(Etiology, "Poison|Toxin|Heavy")
+    )) %>%
+      mutate(Simplified_Etiology = case_when(
+        Simplified_Etiology == "Escherichia" ~ "E. coli",
+        Simplified_Etiology == "Heavy" ~ "Heavy Metals",
+        TRUE ~ Simplified_Etiology))
 ```
 
 ### Add Month as Numeric Column
