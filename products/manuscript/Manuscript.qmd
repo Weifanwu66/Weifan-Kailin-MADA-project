@@ -86,38 +86,25 @@ We will be building regression models using these predictors and health outcomes
 
 ## Exploratory/Descriptive Analysis
 
-*Use a combination of text/tables/figures to explore and describe your data. Show the most important descriptive results here. Additional ones should go in the supplement. Even more can be in the R and Quarto files that are part of your project.*
+### Training Data
 
-@tbl-summarytable shows a summary of the data.
-
-Note the loading of the data providing a **relative** path using the `../../` notation.
-(Two dots means a folder up).
-You never want to specify an **absolute** path like `C:\ahandel\myproject\results\` because if you share this with someone, it won't work for them since they don't have that path.
-You can also use the `here` R package to create paths.
-See examples of that below.
+![Figure 2: Hospitalizations by Food Type.](images/Food_type_v_hospitalization-01.png)
 
 ```{r}
-#| label: tbl-summarytable
-#| tbl-cap: "Data summary table."
-#| echo: FALSE
-resulttable=readRDS("../../results/summarytable.rds")
-knitr::kable(resulttable)
+rmarkdown::paged_table(readRDS("../../results/state_v_hospitalization_training.rds"))
 ```
 
-## Basic statistical analysis
+### Analysis Data
 
-*To get some further insight into your data, if reasonable you could compute simple statistics (e.g. simple models with 1 predictor) to look for associations between your outcome(s) and each individual predictor variable. Though note that unless you pre-specified the outcome and main exposure, any "p\<0.05 means statistical significance" interpretation is not valid.*
+![Figure 1. Year vs Illnesses Caused by Pathogen Type](images/time_v_illness_pathogen_type.png)
 
-@fig-result shows a scatterplot figure produced by one of the R scripts.
+![Figure 3. Illnesses by outbreak location.](images/Location_v_Illness.png)
 
-```{r}
-#| label: fig-result
-#| fig-cap: "Height and weight stratified by sex."
-#| echo: FALSE
-knitr::include_graphics(here("results","height_weight_stratified.png"))
-```
+![Figure 4. Bacterial etiology by outbreak frequency.](images/bacterial_etiology_v_outbreak_frequency.png)
 
-## Full analysis
+## Basic Statistical Analysis
+
+## Full Analysis
 
 *Use one or several suitable statistical/machine learning methods to analyze your data and to produce meaningful figures, tables, etc. This might again be code that is best placed in one or several separate R scripts that need to be well documented. You want the code to produce figures and data ready for display as tables, and save those. Then you load them here.*
 
