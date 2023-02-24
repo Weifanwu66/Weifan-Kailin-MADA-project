@@ -16,7 +16,7 @@ editor:
 ---
 
 ```{r, echo=FALSE, message=FALSE}
-# load a few R packages
+# Load Libraries
 library(here)
 library(knitr)
 library(tidyverse)
@@ -41,10 +41,10 @@ Ultimately, measures can be conducted or adjusted based on analysis for preventi
 ## Data Description and Sources
 
 We adopted two datasets for this study.
-The first dataset [@cdc2020]was uploaded onto Kaggle in 2017 and contains data from the Centers for Disease Control and Prevention (CDC) on foodborne disease outbreaks from 1998 to 2015 [@cdc2017].
+The first dataset was uploaded onto Kaggle in 2017 and contains data from the Centers for Disease Control and Prevention (CDC) on foodborne disease outbreaks from 1998 to 2015 [@cdc2017].
 There are 12 variables and 16,950+ observations.
 
-The second dataset was collected from the National Outbreak Reporting System (NORS), Centers for Disease Control and Prevention (CDC) website .
+The second dataset was collected from the National Outbreak Reporting System (NORS), Centers for Disease Control and Prevention (CDC) website [@cdc2020].
 This dataset covers the reports of foodborne and waterborne disease outbreaks and enteric (intestinal) disease outbreaks spread by contact with environmental sources, infected people or animals, and other means from 2009 to 2020.
 The raw datasets may be viewed within the repository of this project (data/raw_data/).
 
@@ -112,9 +112,7 @@ rmarkdown::paged_table(readRDS("../../results/state_v_hospitalization_training.r
 
 ## Summary and Interpretation
 
-
 ## Strengths and Limitations
-
 
 ## Conclusions
 
