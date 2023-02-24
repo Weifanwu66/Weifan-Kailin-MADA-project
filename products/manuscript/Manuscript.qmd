@@ -27,44 +27,38 @@ library(ggtext)
 
 # Summary/Abstract
 
-*Write a summary of your project.*
-
 {{< pagebreak >}}
 
 # Introduction
 
 ## General Background Information
 
-
 Foodborne pathogens typically cause serious gastrointestinal infections. In the U.S., one in six Americans has been reported to acquire foodborne illness annually, along with approximately 128,000 hospitalizations and 3,000 deaths @centerforfoodsafetyandappliednutrition2022.
 Economic loss associated with foodborne illnesses is estimated to be greater than \$50 billion a year.
 Investigating this dataset containing foodborne outbreak information in the 17-year period may reveal the frequent sources and the common etiologic agents that are related to foodborne illnesses. Ultimately, measures can be conducted or adjusted based on analysis for prevention of outbreaks.
 
-## Description of data and data source
+## Data Description and Sources
 
+We adopted two datasets for this study. The first dataset was uploaded onto Kaggle in 2017 and contains data from the Centers for Disease Control and Prevention (CDC) on foodborne disease outbreaks from 1998 to 2015 @centersfordiseasecontrolandprevention2017. There are 12 variables and 16,950+ observations.
 
-We adopted two datasets for this study. The first dataset was uploaded onto Kaggle in 2017 and contains data from the Centers for Disease Control and Prevention (CDC) on foodborne disease outbreaks from 1998 to 2015 @centersfordiseasecontrolandprevention2017.
-There are 12 variables and 16,950+ observations.
 The second dataset was collected from National Outbreak Reporting System (NORS), Centers for Disease Control and Prevention (CDC) website. This dataset covers the reports of foodborne and waterborne disease outbreaks and enteric (intestinal) disease outbreaks spread by contact with environmental sources, infected people or animals, and other means from 2009 to 2020.
-The raw datasets may be viewed within the repository of this project.
+The raw datasets may be viewed within the repository of this project (data/raw_data/).
 
-## Questions/Hypotheses to be addressed
+## Questions and Hypotheses to be Addressed
 
-*State the research questions you plan to answer with this analysis.*
+We have several questions we would like our datasets to answer: (1) do foodborne disease outbreaks occur more often in restaurants or in private residences, (2) what pathogen species are most frequently associated with foodborne outbreaks, and (3) what type of food is most commonly involved in foodborne outbreaks. The outcomes of interest would therefore be location (for whether more outbreaks occur in restaurants/homes), species of pathogen, and food type most often associated with outbreaks.
 
-We have several questions we would like this data to answer: (1) do foodborne disease outbreaks occur more often in restaurants or in private residences, (2) what pathogen species are most frequently associated with foodborne outbreaks, and (3) what type of food is most commonly involved in foodborne outbreaks. The outcomes of interest would therefore be location (for whether more outbreaks occur in restaurants/homes), species of pathogen, and food type most often associated with outbreaks.
-
-We expect to see that outbreaks occur most often in homes rather than restaurants, the pathogen most commonly seen to be *E. coli*, and for the food most often associated with outbreaks to be some form of salad.
-Moreover, we want to predict the accuracy of the model trained by first dataset using the second dataset as testing data.
-
-### Reminder
-
-To cite other work (important everywhere, but likely happens first in introduction), make sure your references are in the bibtex file specified in the YAML header above (here `dataanalysis_template_references.bib`) and have the right bibtex key.
-
+We expect to see that outbreaks occur most often in homes rather than restaurants, the pathogen most commonly seen to be *E. coli*, and for the food most often associated with outbreaks to be some form of salad. Moreover, we want to predict the accuracy of the model trained by first dataset using the second dataset as testing data.
 
 # Methods
 
 *Describe your methods. That should describe the data, the cleaning processes, and the analysis approaches. You might want to provide a shorter description here and all the details in the supplement.*
+
+Using the datasets previously identified above, we analyzed the structure of each dataset and how many NA values were present for each column in the datasets. Afterwards, we selected the variables containing less than 80% NA values for each dataset, which included our predictors and outcomes of interest. We then filtered the dataset designated for analysis to include only foodborne disease outbreaks. For both datasets, we separated rows to address coinfections individually, and either created or modified the IFSAC Category variable to categorize salads, desserts, and poultry. We also created a variable for pathogen type (virus, bacteria, parasite, or toxin) and species classification.
+
+Post-preprocessing, we performed an exploratory data analysis to view general relationships between the predictors: time (year), pathogen type and etiology, state, food type, and health outcomes of interest: hospitalizations and illnesses.
+
+We will be building regression models using these predictors and health outcomes as well; we
 
 1.  Data wrangling: handling the missing values and cleaning inconsistent data.
 2.  Selecting the interested predictors and outcomes to plot their relationships.
@@ -73,7 +67,7 @@ To cite other work (important everywhere, but likely happens first in introducti
 5.  Mapping cases with different predictors across the states.
 6.  Applying Machine learning approach to test the model accuracy.
 
-## Data acquisition
+## Data Acquisition
 
 *As applicable, explain where and how you got the data. If you directly import the data from an online source, you can combine this section with the next.*
 
@@ -81,7 +75,11 @@ As previously mentioned, the data was acquired from [Kaggle](https://www.kaggle.
 
 ## Data import and cleaning
 
+For more information, in-depth preprocessing may be viewed in "code/processing_code/processingfile_v1.qmd".
+
 *Write code that reads in the file and cleans it so it's ready for analysis. Since this will be fairly long code for most datasets, it might be a good idea to have it in one or several R scripts. If that is the case, explain here briefly what kind of cleaning/processing you do, and provide more details and well documented code somewhere (e.g. as supplement in a paper). All materials, including files that contain code, should be commented well so everyone can follow along.*
+
+
 ```{r}
 #The detailed cleaning process can be found in the file located in ("code","processing","processingfile_v1.qmd")
 
