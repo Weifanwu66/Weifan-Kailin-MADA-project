@@ -1,5 +1,5 @@
 ---
-title: "Example Manuscript Template for a Data Analysis Project"
+title: "Manuscript for foodborne-outbreak Project"
 subtitle: ""
 author: Andreas Handel
 date: "`r Sys.Date()`"
@@ -15,15 +15,7 @@ editor:
     wrap: sentence
 ---
 
-The structure below is one possible setup for a data analysis project (including the course project).
-For a manuscript, adjust as needed.
-You don't need to have exactly these sections, but the content covering those sections should be addressed.
-
-This uses MS Word as output format.
-[See here](https://quarto.org/docs/output-formats/ms-word.html) for more information.
-You can switch to other formats, like html or pdf.
-See [the Quarto documentation](https://quarto.org/) for other formats.
-
+set up
 ```{r, echo=FALSE, message=FALSE}
 # load a few R packages
 library(here)
@@ -43,7 +35,6 @@ library(ggtext)
 
 ## General Background Information
 
-*Provide enough background on your topic that others can understand the why and how of your analysis.*
 
 Foodborne pathogens typically cause serious gastrointestinal infections. In the U.S., one in six Americans has been reported to acquire foodborne illness annually, along with approximately 128,000 hospitalizations and 3,000 deaths @centerforfoodsafetyandappliednutrition2022.
 Economic loss associated with foodborne illnesses is estimated to be greater than \$50 billion a year.
@@ -51,13 +42,11 @@ Investigating this dataset containing foodborne outbreak information in the 17-y
 
 ## Description of data and data source
 
-*Describe what the data is, what it contains, where it is from, etc. Eventually this might be part of a methods section.*
 
-WRITE STUFF HERE ABOUT NEW DATASET
-
-This dataset was uploaded onto Kaggle in 2017 and contains data from the Centers for Disease Control and Prevention (CDC) on foodborne disease outbreaks from 1998 to 2015 @centersfordiseasecontrolandprevention2017.
+We adopted two datasets for this study. The first dataset was uploaded onto Kaggle in 2017 and contains data from the Centers for Disease Control and Prevention (CDC) on foodborne disease outbreaks from 1998 to 2015 @centersfordiseasecontrolandprevention2017.
 There are 12 variables and 16,950+ observations.
-The raw data may be viewed within the repository of this project.
+The second dataset was collected from National Outbreak Reporting System (NORS), Centers for Disease Control and Prevention (CDC) website. This dataset covers the reports of foodborne and waterborne disease outbreaks and enteric (intestinal) disease outbreaks spread by contact with environmental sources, infected people or animals, and other means from 2009 to 2020.
+The raw datasets may be viewed within the repository of this project.
 
 ## Questions/Hypotheses to be addressed
 
@@ -66,15 +55,12 @@ The raw data may be viewed within the repository of this project.
 We have several questions we would like this data to answer: (1) do foodborne disease outbreaks occur more often in restaurants or in private residences, (2) what pathogen species are most frequently associated with foodborne outbreaks, and (3) what type of food is most commonly involved in foodborne outbreaks. The outcomes of interest would therefore be location (for whether more outbreaks occur in restaurants/homes), species of pathogen, and food type most often associated with outbreaks.
 
 We expect to see that outbreaks occur most often in homes rather than restaurants, the pathogen most commonly seen to be *E. coli*, and for the food most often associated with outbreaks to be some form of salad.
+Moreover, we want to predict the accuracy of the model trained by first dataset using the second dataset as testing data.
 
 ### Reminder
 
 To cite other work (important everywhere, but likely happens first in introduction), make sure your references are in the bibtex file specified in the YAML header above (here `dataanalysis_template_references.bib`) and have the right bibtex key.
-Then you can include like this:
 
-Examples of reproducible research projects can for instance be found in [@mckay2020; @mckay2020a]
-
-{{< pagebreak >}}
 
 # Methods
 
@@ -85,18 +71,19 @@ Examples of reproducible research projects can for instance be found in [@mckay2
 3.  If the graphs indicate any significant or interesting trend, we will conduct a general linear model and omnibus test.
 4.  Post-hoc test to identify the significant difference between levels.
 5.  Mapping cases with different predictors across the states.
+6.  Applying Machine learning approach to test the model accuracy.
 
 ## Data acquisition
 
 *As applicable, explain where and how you got the data. If you directly import the data from an online source, you can combine this section with the next.*
 
-As previously mentioned, the data was acquired from [Kaggle](https://www.kaggle.com/datasets/cdc/foodborne-diseases).
+As previously mentioned, the data was acquired from [Kaggle](https://www.kaggle.com/datasets/cdc/foodborne-diseases) and [CDC] (https://wwwn.cdc.gov/norsdashboard/).
 
 ## Data import and cleaning
 
 *Write code that reads in the file and cleans it so it's ready for analysis. Since this will be fairly long code for most datasets, it might be a good idea to have it in one or several R scripts. If that is the case, explain here briefly what kind of cleaning/processing you do, and provide more details and well documented code somewhere (e.g. as supplement in a paper). All materials, including files that contain code, should be commented well so everyone can follow along.*
 ```{r}
-
+#The detailed cleaning process can be found in the file located in ("code","processing","
 ```
 
 ## Statistical analysis
