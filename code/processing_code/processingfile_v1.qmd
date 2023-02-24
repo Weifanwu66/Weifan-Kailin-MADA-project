@@ -4,13 +4,8 @@ author: "Andreas Handel"
 date: "2023-01-03"
 output: html_document
 ---
-
-<<<<<<< HEAD
-install.packages("impute")
-# Setup
-=======
 # Load Libraries
->>>>>>> master
+
 ```{r}
 # General Pre-Processing
 library(tidyverse)
@@ -25,10 +20,7 @@ library(here)
 
 # Information About NAs
 library(dlookr)
-library(caret)
-library(randomForest)
 ```
-
 
 # Loading Data
 
@@ -114,31 +106,17 @@ Because the analysis dataset contains more than just foodborne outbreaks, we wan
 # Plot of NAs After Limiting to Analysis Data to Food
 plot_na_pareto(analysis_data %>% filter(`Primary Mode` == "Food"))
 ```
+
 ## Checking Etiologies
 ```{r}
 # Training Data
 unique(training_data$Status)
 
-<<<<<<< HEAD
-* Year, Month (numeric)
-* State, Location (geographic information)
-* Food, Ingredient
-* Species, Serotype/Genotype
-* Status
-
-Following variables are outcomes:
-* illnesses
-* Hospitalizations
-* Fatalities
-
-main outcome: illnesses
-=======
 # Analysis Data
 unique(analysis_data$`Etiology Status`)
 ```
 
 Given that "Status" and "Etiology Status" refer to laboratory confirmations, we will filter our case definitions to be only laboratory-confirmed pathogens.
->>>>>>> master
 
 # Cleaning
 
@@ -161,15 +139,10 @@ analysis_data_fin <- analysis_data %>%
   filter(`Primary Mode` == "Food")
 ```
 
-<<<<<<< HEAD
-First, we will remove the variable "ingredient" and "serotype/genotype" since over 80% of data is missing. 
-```{r}
-d1=rawdata1%>%
-  select(-c(Ingredient,`Serotype/Genotype`))
-skim(d1)
-```
-#checking the levels under each variable
-#checking the levels under `Food`
+# checking the levels under each variable
+
+:D
+
 ```{r}
 skim(d1$Food)
 #convert Food to factor
@@ -178,24 +151,37 @@ str(d1$Food)
 #Since there are over 3000 different levels, we need to combine some food into the same category
 d2=
 ```
-#checking the levels under `Species`
+
+checking the levels under `Species`
 ```{r}
 
 ```
-#checking the levels under `Location`
+
+# Checking the levels under `Location`
 ```{r}
 
 ```
-
-#potential code for EDA
-=======
-#potential code for EDA
 
 ## Data Manipulation
 ### Separate Rows to Address Coinfections
 ```{r}
 analysis_data_fin <- analysis_data_fin %>%
   separate_rows(Etiology, sep = "; ")
+```
+
+### Modifying IFSAC Category to Include Salads
+```{r}
+Desserts <- c("cookies", "cake", "chocolate", "brownie")
+
+analysis_data_fin <- analysis_data_fin %>%
+  mutate(`IFSAC Category` = case_when(
+    grepl("Salad", `Food Vehicle`, ignore.case = TRUE) ~ "Salad",
+    grepl(paste(Desserts, 
+                collapse = "|"), `Food Vehicle`) ~ "Dessert",
+    grepl("Chicken", `Food Vehicle`, ignore.case = TRUE) ~ "Poultry",
+    grepl("Turkey", `Food Vehicle`, ignore.case = TRUE) ~ "Poultry",
+    grepl("Poultry", `Food Vehicle`, ignore.case = TRUE) ~ "Poultry",
+    TRUE ~ `IFSAC Category`))
 ```
 
 ### Column for Type of Pathogen
@@ -248,8 +234,13 @@ training_data_fin <- training_data_fin %>%
   relocate(Numeric_Month, .after = Month)
 ```
 
+## Check Data Structure Again
+```{r}
+skim(analysis_data_fin)
+```
 
->>>>>>> master
+
+
 ```{r}
 rawdata1%>%filter(grepl("Confirmed", Status))
 food=rawdata1%>%
@@ -266,42 +257,7 @@ species=rawdata1%>%
   filter(!is.na(Species))
 species
 ```
-#predict missing value
-```{r}
-set.seed(123)
-index=createDataPartition(rawdata1$State,p=0.8,list=FALSE)
-train=rawdata1[index,]
-test=rawdata1[-index,]
-model1=randomForest(State~Year+Illnesses+Food,data=train,na.action = na.roughfix)
-predicted_states <- predict(model, newdata = test)
-actual_states <- test$State
-accuracy <- sum(predicted_states == actual_states) / length(actual_states)
 
-<<<<<<< HEAD
-
-```
-
-
-Now let's look at the `Weight` variable. There is a person with weight of 7000, which is impossible, and one person with missing weight.
-To be able to analyze the data, we'll remove those individuals as well.
-
-```{r}
-d3 <- d2 %>%  dplyr::filter(Weight != 7000) %>% tidyr::drop_na()
-skimr::skim(d3)
-```
-
-
-Now we see that there is another NA, but it's not `NA` from R, instead it was loaded as character and is now considered as a category.
-Well proceed here by removing that individual with that NA entry. Since this keeps an empty category for Sex, I'm also using droplevels() to get rid of it.
-
-```{r}
-d4 <- d3 %>% dplyr::filter(Sex != "NA") %>% droplevels()
-skimr::skim(d4)
-```
-
-
-=======
->>>>>>> master
 All done, data is clean now. 
 
 Let's assign at the end to some final variable, this makes it easier to add further cleaning steps above.
