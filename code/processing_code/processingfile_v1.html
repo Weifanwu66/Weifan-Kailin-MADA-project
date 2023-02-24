@@ -1,0 +1,3742 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.280">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Andreas Handel">
+<meta name="dcterms.date" content="2023-01-03">
+
+<title>Data Pre-Processing/Cleaning Script</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="processingfile_v1_files/libs/clipboard/clipboard.min.js"></script>
+<script src="processingfile_v1_files/libs/quarto-html/quarto.js"></script>
+<script src="processingfile_v1_files/libs/quarto-html/popper.min.js"></script>
+<script src="processingfile_v1_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="processingfile_v1_files/libs/quarto-html/anchor.min.js"></script>
+<link href="processingfile_v1_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="processingfile_v1_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="processingfile_v1_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="processingfile_v1_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="processingfile_v1_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Data Pre-Processing/Cleaning Script</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Andreas Handel </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 3, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="load-libraries" class="level1">
+<h1>Load Libraries</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># General Pre-Processing</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+✔ ggplot2 3.4.1     ✔ purrr   1.0.1
+✔ tibble  3.1.8     ✔ dplyr   1.1.0
+✔ tidyr   1.3.0     ✔ stringr 1.5.0
+✔ readr   2.1.3     ✔ forcats 1.0.0
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Data Structure Visualization</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Setting Paths</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>here() starts at C:/Users/weifa/OneDrive/Documents/GitKraken/MADA/data analysis/Weifan-Kailin-MADA-project</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Information About NAs</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dlookr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dlookr'
+
+The following object is masked from 'package:tidyr':
+
+    extract
+
+The following object is masked from 'package:base':
+
+    transform</code></pre>
+</div>
+</div>
+</section>
+<section id="loading-data" class="level1">
+<h1>Loading Data</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Path to Data</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>data_location <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"data"</span>,<span class="st">"raw_data"</span>,<span class="st">"foodborne_outbreaks.csv"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>training_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(data_location)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 19119 Columns: 12
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (8): Month, State, Location, Food, Ingredient, Species, Serotype/Genotyp...
+dbl (4): Year, Illnesses, Hospitalizations, Fatalities
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>data_location <span class="ot">&lt;-</span> <span class="fu">here</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data"</span>,<span class="st">"raw_data"</span>,<span class="st">"NationalOutbreakPublicDataTool.xlsx"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>analysis_data <span class="ot">&lt;-</span> readxl<span class="sc">::</span><span class="fu">read_excel</span>(data_location)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="check-data" class="level1">
+<h1>Check Data</h1>
+<p>There are several ways we can look at the datasets’ structures.</p>
+<section id="training-data" class="level2">
+<h2 class="anchored" data-anchor-id="training-data">Training Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(training_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>spc_tbl_ [19,119 × 12] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+ $ Year             : num [1:19119] 1998 1998 1998 1998 1998 ...
+ $ Month            : chr [1:19119] "January" "January" "January" "January" ...
+ $ State            : chr [1:19119] "California" "California" "California" "California" ...
+ $ Location         : chr [1:19119] "Restaurant" NA "Restaurant" "Restaurant" ...
+ $ Food             : chr [1:19119] NA "Custard" NA "Fish, Ahi" ...
+ $ Ingredient       : chr [1:19119] NA NA NA NA ...
+ $ Species          : chr [1:19119] NA NA NA "Scombroid toxin" ...
+ $ Serotype/Genotype: chr [1:19119] NA NA NA NA ...
+ $ Status           : chr [1:19119] NA NA NA "Confirmed" ...
+ $ Illnesses        : num [1:19119] 20 112 35 4 26 25 8 4 21 3 ...
+ $ Hospitalizations : num [1:19119] 0 0 0 0 3 3 0 3 NA NA ...
+ $ Fatalities       : num [1:19119] 0 0 0 0 0 0 0 0 NA 0 ...
+ - attr(*, "spec")=
+  .. cols(
+  ..   Year = col_double(),
+  ..   Month = col_character(),
+  ..   State = col_character(),
+  ..   Location = col_character(),
+  ..   Food = col_character(),
+  ..   Ingredient = col_character(),
+  ..   Species = col_character(),
+  ..   `Serotype/Genotype` = col_character(),
+  ..   Status = col_character(),
+  ..   Illnesses = col_double(),
+  ..   Hospitalizations = col_double(),
+  ..   Fatalities = col_double()
+  .. )
+ - attr(*, "problems")=&lt;externalptr&gt; </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(training_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Year         Month              State             Location        
+ Min.   :1998   Length:19119       Length:19119       Length:19119      
+ 1st Qu.:2001   Class :character   Class :character   Class :character  
+ Median :2005   Mode  :character   Mode  :character   Mode  :character  
+ Mean   :2006                                                           
+ 3rd Qu.:2010                                                           
+ Max.   :2015                                                           
+                                                                        
+     Food            Ingredient          Species          Serotype/Genotype 
+ Length:19119       Length:19119       Length:19119       Length:19119      
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    Status            Illnesses       Hospitalizations    Fatalities    
+ Length:19119       Min.   :   2.00   Min.   :  0.000   Min.   : 0.000  
+ Class :character   1st Qu.:   3.00   1st Qu.:  0.000   1st Qu.: 0.000  
+ Mode  :character   Median :   8.00   Median :  0.000   Median : 0.000  
+                    Mean   :  19.54   Mean   :  0.948   Mean   : 0.022  
+                    3rd Qu.:  19.00   3rd Qu.:  1.000   3rd Qu.: 0.000  
+                    Max.   :1939.00   Max.   :308.000   Max.   :33.000  
+                                      NA's   :3625      NA's   :3601    </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Closer Look at Training Data</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(training_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 12
+   Year Month State Locat…¹ Food  Ingre…² Species Serot…³ Status Illne…⁴ Hospi…⁵
+  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+1  1998 Janu… Cali… Restau… &lt;NA&gt;  &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;        20       0
+2  1998 Janu… Cali… &lt;NA&gt;    Cust… &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;       112       0
+3  1998 Janu… Cali… Restau… &lt;NA&gt;  &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;        35       0
+4  1998 Janu… Cali… Restau… Fish… &lt;NA&gt;    Scombr… &lt;NA&gt;    Confi…       4       0
+5  1998 Janu… Cali… Privat… Lasa… &lt;NA&gt;    Salmon… Enteri… Confi…      26       3
+6  1998 Janu… Cali… Restau… &lt;NA&gt;  &lt;NA&gt;    Shigel… &lt;NA&gt;    Confi…      25       3
+# … with 1 more variable: Fatalities &lt;dbl&gt;, and abbreviated variable names
+#   ¹​Location, ²​Ingredient, ³​`Serotype/Genotype`, ⁴​Illnesses, ⁵​Hospitalizations</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(training_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table style="width: auto;" class="table table-condensed">
+<caption>
+Data summary
+</caption>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Name
+</td>
+<td style="text-align:left;">
+training_data
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of rows
+</td>
+<td style="text-align:left;">
+19119
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of columns
+</td>
+<td style="text-align:left;">
+12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+_______________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Column type frequency:
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+character
+</td>
+<td style="text-align:left;">
+8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+________________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Group variables
+</td>
+<td style="text-align:left;">
+None
+</td>
+</tr>
+</tbody>
+
+</table>
+<p><strong>Variable type: character</strong></p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:right;">
+min
+</th>
+<th style="text-align:right;">
+max
+</th>
+<th style="text-align:right;">
+empty
+</th>
+<th style="text-align:right;">
+n_unique
+</th>
+<th style="text-align:right;">
+whitespace
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Month
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+State
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+55
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Location
+</td>
+<td style="text-align:right;">
+2166
+</td>
+<td style="text-align:right;">
+0.89
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+118
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+161
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Food
+</td>
+<td style="text-align:right;">
+8963
+</td>
+<td style="text-align:right;">
+0.53
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+335
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3127
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ingredient
+</td>
+<td style="text-align:right;">
+17243
+</td>
+<td style="text-align:right;">
+0.10
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+95
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+381
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Species
+</td>
+<td style="text-align:right;">
+6619
+</td>
+<td style="text-align:right;">
+0.65
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+271
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+201
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Serotype/Genotype
+</td>
+<td style="text-align:right;">
+15212
+</td>
+<td style="text-align:right;">
+0.20
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+146
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+239
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Status
+</td>
+<td style="text-align:right;">
+6619
+</td>
+<td style="text-align:right;">
+0.65
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+141
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+
+</table>
+<p><strong>Variable type: numeric</strong></p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+p0
+</th>
+<th style="text-align:right;">
+p25
+</th>
+<th style="text-align:right;">
+p50
+</th>
+<th style="text-align:right;">
+p75
+</th>
+<th style="text-align:right;">
+p100
+</th>
+<th style="text-align:left;">
+hist
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+2005.56
+</td>
+<td style="text-align:right;">
+5.16
+</td>
+<td style="text-align:right;">
+1998
+</td>
+<td style="text-align:right;">
+2001
+</td>
+<td style="text-align:right;">
+2005
+</td>
+<td style="text-align:right;">
+2010
+</td>
+<td style="text-align:right;">
+2015
+</td>
+<td style="text-align:left;">
+▇▆▆▃▅
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Illnesses
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+19.54
+</td>
+<td style="text-align:right;">
+49.45
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+1939
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Hospitalizations
+</td>
+<td style="text-align:right;">
+3625
+</td>
+<td style="text-align:right;">
+0.81
+</td>
+<td style="text-align:right;">
+0.95
+</td>
+<td style="text-align:right;">
+5.31
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+308
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fatalities
+</td>
+<td style="text-align:right;">
+3601
+</td>
+<td style="text-align:right;">
+0.81
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+0.39
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+</tbody>
+
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting NAs of Training Data</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_na_pareto</span>(training_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="processingfile_v1_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>It appears that the training data contains the following variables: General - Year, Month (Time) - State (Location) - Food, Ingredient (Vehicle of Transmission) - Species - Status Health Outcomes - Illnesses - Hospitalizations - Fatalities</p>
+</section>
+<section id="analysis-data" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-data">Analysis Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(analysis_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [42,619 × 21] (S3: tbl_df/tbl/data.frame)
+ $ Year                        : num [1:42619] 2009 2009 2009 2009 2009 ...
+ $ Month                       : num [1:42619] 1 1 2 1 1 1 1 1 1 2 ...
+ $ State                       : chr [1:42619] "Minnesota" "Minnesota" "Minnesota" "Minnesota" ...
+ $ Primary Mode                : chr [1:42619] "Person-to-person" "Food" "Person-to-person" "Person-to-person" ...
+ $ Etiology                    : chr [1:42619] "Norovirus Genogroup II" "Norovirus" "Norovirus" "Norovirus unknown" ...
+ $ Serotype or Genotype        : chr [1:42619] "unknown" NA NA NA ...
+ $ Etiology Status             : chr [1:42619] "Confirmed" "Suspected" "Suspected" "Confirmed" ...
+ $ Setting                     : chr [1:42619] "Hotel/motel" "Restaurant - Sit-down dining" "Other, specify" "Restaurant" ...
+ $ Illnesses                   : num [1:42619] 21 2 50 24 16 5 3 21 7 5 ...
+ $ Hospitalizations            : num [1:42619] 0 0 0 0 0 0 0 0 0 0 ...
+ $ Info on Hospitalizations    : num [1:42619] 19 2 0 24 8 5 3 21 7 5 ...
+ $ Deaths                      : num [1:42619] 0 0 0 0 0 0 0 0 0 0 ...
+ $ Info on Deaths              : num [1:42619] 19 2 50 24 16 5 3 21 7 5 ...
+ $ Food Vehicle                : chr [1:42619] NA NA NA NA ...
+ $ Food Contaminated Ingredient: chr [1:42619] NA NA NA NA ...
+ $ IFSAC Category              : chr [1:42619] NA NA NA NA ...
+ $ Water Exposure              : chr [1:42619] NA NA NA NA ...
+ $ Water Type                  : chr [1:42619] NA NA NA NA ...
+ $ Animal Type                 : chr [1:42619] NA NA NA NA ...
+ $ Animal Type Specify         : chr [1:42619] NA NA NA NA ...
+ $ Water Status                : chr [1:42619] NA NA NA NA ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(analysis_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Year          Month           State           Primary Mode      
+ Min.   :2009   Min.   : 1.000   Length:42619       Length:42619      
+ 1st Qu.:2012   1st Qu.: 2.000   Class :character   Class :character  
+ Median :2015   Median : 4.000   Mode  :character   Mode  :character  
+ Mean   :2015   Mean   : 5.473                                        
+ 3rd Qu.:2017   3rd Qu.: 9.000                                        
+ Max.   :2020   Max.   :12.000                                        
+                                                                      
+   Etiology         Serotype or Genotype Etiology Status      Setting         
+ Length:42619       Length:42619         Length:42619       Length:42619      
+ Class :character   Class :character     Class :character   Class :character  
+ Mode  :character   Mode  :character     Mode  :character   Mode  :character  
+                                                                              
+                                                                              
+                                                                              
+                                                                              
+   Illnesses       Hospitalizations  Info on Hospitalizations     Deaths      
+ Min.   :   2.00   Min.   :  0.000   Min.   :   0.00          Min.   : 0.000  
+ 1st Qu.:   7.00   1st Qu.:  0.000   1st Qu.:   3.00          1st Qu.: 0.000  
+ Median :  16.00   Median :  0.000   Median :  11.00          Median : 0.000  
+ Mean   :  26.43   Mean   :  0.781   Mean   :  21.04          Mean   : 0.042  
+ 3rd Qu.:  33.00   3rd Qu.:  1.000   3rd Qu.:  27.00          3rd Qu.: 0.000  
+ Max.   :2500.00   Max.   :204.000   Max.   :2500.00          Max.   :33.000  
+                   NA's   :3550      NA's   :2893             NA's   :3390    
+ Info on Deaths    Food Vehicle       Food Contaminated Ingredient
+ Min.   :   0.00   Length:42619       Length:42619                
+ 1st Qu.:   4.00   Class :character   Class :character            
+ Median :  12.00   Mode  :character   Mode  :character            
+ Mean   :  22.04                                                  
+ 3rd Qu.:  29.00                                                  
+ Max.   :2500.00                                                  
+ NA's   :2774                                                     
+ IFSAC Category     Water Exposure      Water Type        Animal Type       
+ Length:42619       Length:42619       Length:42619       Length:42619      
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+ Animal Type Specify Water Status      
+ Length:42619        Length:42619      
+ Class :character    Class :character  
+ Mode  :character    Mode  :character  
+                                       
+                                       
+                                       
+                                       </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Closer Look at Training Data</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(analysis_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 21
+   Year Month State     Primar…¹ Etiol…² Serot…³ Etiol…⁴ Setting Illne…⁵ Hospi…⁶
+  &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1  2009     1 Minnesota Person-… Norovi… unknown Confir… Hotel/…      21       0
+2  2009     1 Minnesota Food     Norovi… &lt;NA&gt;    Suspec… Restau…       2       0
+3  2009     2 Minnesota Person-… Norovi… &lt;NA&gt;    Suspec… Other,…      50       0
+4  2009     1 Minnesota Person-… Norovi… &lt;NA&gt;    Confir… Restau…      24       0
+5  2009     1 Minnesota Food     Norovi… &lt;NA&gt;    Confir… &lt;NA&gt;         16       0
+6  2009     1 Minnesota Food     Norovi… &lt;NA&gt;    Suspec… Restau…       5       0
+# … with 11 more variables: `Info on Hospitalizations` &lt;dbl&gt;, Deaths &lt;dbl&gt;,
+#   `Info on Deaths` &lt;dbl&gt;, `Food Vehicle` &lt;chr&gt;,
+#   `Food Contaminated Ingredient` &lt;chr&gt;, `IFSAC Category` &lt;chr&gt;,
+#   `Water Exposure` &lt;chr&gt;, `Water Type` &lt;chr&gt;, `Animal Type` &lt;chr&gt;,
+#   `Animal Type Specify` &lt;chr&gt;, `Water Status` &lt;chr&gt;, and abbreviated variable
+#   names ¹​`Primary Mode`, ²​Etiology, ³​`Serotype or Genotype`,
+#   ⁴​`Etiology Status`, ⁵​Illnesses, ⁶​Hospitalizations</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(analysis_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table style="width: auto;" class="table table-condensed">
+<caption>
+Data summary
+</caption>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Name
+</td>
+<td style="text-align:left;">
+analysis_data
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of rows
+</td>
+<td style="text-align:left;">
+42619
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of columns
+</td>
+<td style="text-align:left;">
+21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+_______________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Column type frequency:
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+character
+</td>
+<td style="text-align:left;">
+14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+________________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Group variables
+</td>
+<td style="text-align:left;">
+None
+</td>
+</tr>
+</tbody>
+
+</table>
+<p><strong>Variable type: character</strong></p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:right;">
+min
+</th>
+<th style="text-align:right;">
+max
+</th>
+<th style="text-align:right;">
+empty
+</th>
+<th style="text-align:right;">
+n_unique
+</th>
+<th style="text-align:right;">
+whitespace
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+State
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Primary Mode
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+49
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Etiology
+</td>
+<td style="text-align:right;">
+9549
+</td>
+<td style="text-align:right;">
+0.78
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+273
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+544
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Serotype or Genotype
+</td>
+<td style="text-align:right;">
+30814
+</td>
+<td style="text-align:right;">
+0.28
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+146
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+731
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Etiology Status
+</td>
+<td style="text-align:right;">
+9549
+</td>
+<td style="text-align:right;">
+0.78
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+141
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+45
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Setting
+</td>
+<td style="text-align:right;">
+5728
+</td>
+<td style="text-align:right;">
+0.87
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+237
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+253
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Food Vehicle
+</td>
+<td style="text-align:right;">
+38530
+</td>
+<td style="text-align:right;">
+0.10
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+335
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1726
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Food Contaminated Ingredient
+</td>
+<td style="text-align:right;">
+41151
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+139
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+402
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IFSAC Category
+</td>
+<td style="text-align:right;">
+38530
+</td>
+<td style="text-align:right;">
+0.10
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Water Exposure
+</td>
+<td style="text-align:right;">
+41551
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Water Type
+</td>
+<td style="text-align:right;">
+41580
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+210
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+77
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Animal Type
+</td>
+<td style="text-align:right;">
+42151
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+210
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+56
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Animal Type Specify
+</td>
+<td style="text-align:right;">
+42209
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+146
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+151
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Water Status
+</td>
+<td style="text-align:right;">
+41551
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+
+</table>
+<p><strong>Variable type: numeric</strong></p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+p0
+</th>
+<th style="text-align:right;">
+p25
+</th>
+<th style="text-align:right;">
+p50
+</th>
+<th style="text-align:right;">
+p75
+</th>
+<th style="text-align:right;">
+p100
+</th>
+<th style="text-align:left;">
+hist
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+2014.65
+</td>
+<td style="text-align:right;">
+3.13
+</td>
+<td style="text-align:right;">
+2009
+</td>
+<td style="text-align:right;">
+2012
+</td>
+<td style="text-align:right;">
+2015
+</td>
+<td style="text-align:right;">
+2017
+</td>
+<td style="text-align:right;">
+2020
+</td>
+<td style="text-align:left;">
+▇▆▆▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+5.47
+</td>
+<td style="text-align:right;">
+3.88
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:left;">
+▇▂▂▂▅
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Illnesses
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+26.43
+</td>
+<td style="text-align:right;">
+41.59
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:right;">
+2500
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Hospitalizations
+</td>
+<td style="text-align:right;">
+3550
+</td>
+<td style="text-align:right;">
+0.92
+</td>
+<td style="text-align:right;">
+0.78
+</td>
+<td style="text-align:right;">
+3.70
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+204
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Info on Hospitalizations
+</td>
+<td style="text-align:right;">
+2893
+</td>
+<td style="text-align:right;">
+0.93
+</td>
+<td style="text-align:right;">
+21.04
+</td>
+<td style="text-align:right;">
+34.92
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+2500
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Deaths
+</td>
+<td style="text-align:right;">
+3390
+</td>
+<td style="text-align:right;">
+0.92
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+0.33
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Info on Deaths
+</td>
+<td style="text-align:right;">
+2774
+</td>
+<td style="text-align:right;">
+0.93
+</td>
+<td style="text-align:right;">
+22.04
+</td>
+<td style="text-align:right;">
+35.46
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+2500
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+</tbody>
+
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting NAs of Training Data</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_na_pareto</span>(analysis_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="processingfile_v1_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>It appears that the training data contains the following variables: General - Year, Month (Time) - State (Location) - Primary Mode (Vehicle of Transmission) - Food Vehicle - Food Contaminated Ingredient - Water Exposure - Water Type - Water Status - Animal Type - Animal Type Specify - Etiology - Serotype or Genotype - Etiology Status - Setting - IFSAC Category Health Outcomes - Illnesses - Hospitalizations - Info on Hospitalizations - Deaths - Info on Deaths</p>
+<p>Because the analysis dataset contains more than just foodborne outbreaks, we want to specify it to just foodborne illnesses.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot of NAs After Limiting to Analysis Data to Food</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_na_pareto</span>(analysis_data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Primary Mode</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Food"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="processingfile_v1_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="checking-etiologies-status" class="level2">
+<h2 class="anchored" data-anchor-id="checking-etiologies-status">Checking Etiologies Status</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Training Data</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(training_data<span class="sc">$</span>Status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] NA                                                                                                                                             
+ [2] "Confirmed"                                                                                                                                    
+ [3] "Suspected"                                                                                                                                    
+ [4] "Suspected; Suspected"                                                                                                                         
+ [5] "Confirmed; Confirmed"                                                                                                                         
+ [6] "Confirmed; Suspected"                                                                                                                         
+ [7] "Confirmed; Confirmed; Confirmed"                                                                                                              
+ [8] "Confirmed; Suspected; Suspected"                                                                                                              
+ [9] "Suspected; Suspected; Suspected"                                                                                                              
+[10] "Confirmed; Confirmed; Suspected"                                                                                                              
+[11] "Suspected; Confirmed"                                                                                                                         
+[12] "Confirmed; Confirmed; Confirmed; Confirmed; Confirmed; Confirmed"                                                                             
+[13] "Confirmed; Confirmed; Suspected; Confirmed"                                                                                                   
+[14] "Suspected; Confirmed; Confirmed"                                                                                                              
+[15] "Confirmed; Suspected; Confirmed; Confirmed; Confirmed; Confirmed; Confirmed"                                                                  
+[16] "Confirmed; Confirmed; Confirmed; Confirmed; Suspected"                                                                                        
+[17] "Confirmed; Confirmed; Confirmed; Confirmed; Confirmed; Suspected; Suspected; Suspected; Suspected; Suspected; Suspected; Suspected; Suspected"
+[18] "Confirmed; Suspected; Confirmed"                                                                                                              
+[19] "Suspected; Suspected; Confirmed; Suspected"                                                                                                   
+[20] "Confirmed; Confirmed; Suspected; Suspected"                                                                                                   
+[21] "Suspected; Suspected; Suspected; Suspected"                                                                                                   
+[22] "Suspected; Suspected; Suspected; Suspected; Suspected"                                                                                        
+[23] "Suspected; Suspected; Confirmed; Suspected; Suspected; Confirmed"                                                                             </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Analysis Data</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(analysis_data<span class="sc">$</span><span class="st">`</span><span class="at">Etiology Status</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Confirmed"                                                                                                                                    
+ [2] "Suspected"                                                                                                                                    
+ [3] "Confirmed; Confirmed"                                                                                                                         
+ [4] NA                                                                                                                                             
+ [5] "Suspected; Suspected"                                                                                                                         
+ [6] "Confirmed; Suspected"                                                                                                                         
+ [7] "Confirmed; Confirmed; Confirmed"                                                                                                              
+ [8] "Suspected; Confirmed"                                                                                                                         
+ [9] "Confirmed; Confirmed; Suspected"                                                                                                              
+[10] "Confirmed; Confirmed; Suspected; Confirmed"                                                                                                   
+[11] "Confirmed; Confirmed; Confirmed; Confirmed; Confirmed"                                                                                        
+[12] "Confirmed; Confirmed; Confirmed; Confirmed; Confirmed; Confirmed"                                                                             
+[13] "Confirmed; Suspected; Confirmed"                                                                                                              
+[14] "Confirmed; Confirmed; Confirmed; Confirmed"                                                                                                   
+[15] "Confirmed; Suspected; Suspected"                                                                                                              
+[16] "Suspected; Suspected; Suspected"                                                                                                              
+[17] "Suspected; Suspected; Confirmed"                                                                                                              
+[18] "Confirmed; Suspected; Confirmed; Confirmed; Confirmed; Confirmed; Confirmed"                                                                  
+[19] "Confirmed; Confirmed; Confirmed; Confirmed; Suspected"                                                                                        
+[20] "Confirmed; Suspected; Confirmed; Suspected"                                                                                                   
+[21] "Suspected; Confirmed; Confirmed"                                                                                                              
+[22] "Confirmed; Confirmed; Confirmed; Confirmed; Confirmed; Suspected; Suspected; Suspected; Suspected; Suspected; Suspected; Suspected; Suspected"
+[23] "Suspected; Suspected; Suspected; Suspected"                                                                                                   
+[24] "Suspected; Suspected; Confirmed; Suspected"                                                                                                   
+[25] "Confirmed; Confirmed; Suspected; Suspected"                                                                                                   
+[26] "Suspected; Suspected; Suspected; Suspected; Suspected"                                                                                        
+[27] "Suspected; Suspected; Confirmed; Suspected; Suspected; Confirmed"                                                                             
+[28] "Suspected; Suspected; Suspected; Confirmed"                                                                                                   
+[29] "Confirmed; Suspected; Confirmed; Confirmed"                                                                                                   
+[30] "Suspected; Confirmed; Suspected"                                                                                                              
+[31] "Confirmed; Suspected; Confirmed; Suspected; Suspected"                                                                                        
+[32] "Confirmed; Suspected; Suspected; Confirmed; Suspected"                                                                                        
+[33] "Suspected; Confirmed; Suspected; Confirmed; Confirmed; Confirmed"                                                                             
+[34] "Confirmed; Suspected; Suspected; Confirmed"                                                                                                   
+[35] "Confirmed; Suspected; Suspected; Suspected"                                                                                                   
+[36] "Confirmed; Suspected; Confirmed; Suspected; Suspected; Suspected; Confirmed"                                                                  
+[37] "Confirmed; Confirmed; Confirmed; Suspected"                                                                                                   
+[38] "Confirmed; Confirmed; Suspected; Suspected; Suspected"                                                                                        
+[39] "Confirmed; Confirmed; Confirmed; Suspected; Confirmed"                                                                                        
+[40] "Suspected; Confirmed; Suspected; Suspected; Suspected; Suspected; Confirmed; Confirmed"                                                       
+[41] "Confirmed; Confirmed; Confirmed; Suspected; Suspected; Suspected; Suspected; Suspected; Suspected; Suspected"                                 
+[42] "Confirmed; Confirmed; Confirmed; Suspected; Confirmed; Suspected"                                                                             
+[43] "Suspected; Suspected; Confirmed; Confirmed; Confirmed"                                                                                        
+[44] "Suspected; Confirmed; Suspected; Suspected"                                                                                                   
+[45] "Confirmed; Suspected; Suspected; Confirmed; Suspected; Suspected"                                                                             
+[46] "Suspected; Confirmed; Suspected; Confirmed; Confirmed; Suspected; Suspected; Suspected"                                                       </code></pre>
+</div>
+</div>
+<p>Given that “Status” and “Etiology Status” refer to laboratory confirmations, we will filter our case definitions to be only laboratory-confirmed pathogens.</p>
+</section>
+</section>
+<section id="cleaning" class="level1">
+<h1>Cleaning</h1>
+<p>Based on the data inspections completed above, we want to remove “Ingredient” and “Serotype/Genotype” from the training dataset (&gt; 80% data missing), and we want to remove all variables unrelated to foodborne illness for the analysis dataset (ex: animal type, water type, etc.) in addition to columns with many NAs.</p>
+<section id="training-data-1" class="level2">
+<h2 class="anchored" data-anchor-id="training-data-1">Training Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>training_data_fin <span class="ot">&lt;-</span> training_data <span class="sc">%&gt;%</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span><span class="fu">c</span>(Ingredient, <span class="st">`</span><span class="at">Serotype/Genotype</span><span class="st">`</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">"Confirmed"</span>, Status))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>#Data manipulation ##checking and cleaning the <code>Species</code> column</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(training_data_fin<span class="sc">$</span>Species)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] "Scombroid toxin"                                                                                                                                                                                                                                                                
+  [2] "Salmonella enterica"                                                                                                                                                                                                                                                            
+  [3] "Shigella boydii"                                                                                                                                                                                                                                                                
+  [4] "Campylobacter unknown"                                                                                                                                                                                                                                                          
+  [5] "Vibrio parahaemolyticus"                                                                                                                                                                                                                                                        
+  [6] "Ciguatoxin"                                                                                                                                                                                                                                                                     
+  [7] "Shigella flexneri"                                                                                                                                                                                                                                                              
+  [8] "Hepatitis A"                                                                                                                                                                                                                                                                    
+  [9] "Shigella sonnei"                                                                                                                                                                                                                                                                
+ [10] "Clostridium perfringens"                                                                                                                                                                                                                                                        
+ [11] "Staphylococcus aureus"                                                                                                                                                                                                                                                          
+ [12] "Norovirus genogroup I"                                                                                                                                                                                                                                                          
+ [13] "Yersinia enterocolitica"                                                                                                                                                                                                                                                        
+ [14] "Streptococcus group A"                                                                                                                                                                                                                                                          
+ [15] "Norovirus genogroup II"                                                                                                                                                                                                                                                         
+ [16] "Bacillus cereus"                                                                                                                                                                                                                                                                
+ [17] "Shigella boydii; Shigella sonnei"                                                                                                                                                                                                                                               
+ [18] "Giardia intestinalis"                                                                                                                                                                                                                                                           
+ [19] "Escherichia coli, Shiga toxin-producing"                                                                                                                                                                                                                                        
+ [20] "Cyclospora cayatenensis"                                                                                                                                                                                                                                                        
+ [21] "Escherichia coli, Enteropathogenic"                                                                                                                                                                                                                                             
+ [22] "Salmonella enterica; Salmonella enterica"                                                                                                                                                                                                                                       
+ [23] "Campylobacter jejuni"                                                                                                                                                                                                                                                           
+ [24] "Clostridium botulinum"                                                                                                                                                                                                                                                          
+ [25] "Escherichia coli, Enterotoxigenic"                                                                                                                                                                                                                                              
+ [26] "Mycotoxins"                                                                                                                                                                                                                                                                     
+ [27] "Pesticides"                                                                                                                                                                                                                                                                     
+ [28] "Vibrio cholerae"                                                                                                                                                                                                                                                                
+ [29] "Enterobacter cloacae; Bacillus cereus; Bacterium"                                                                                                                                                                                                                               
+ [30] "Trichinella spiralis"                                                                                                                                                                                                                                                           
+ [31] "Cryptosporidium parvum"                                                                                                                                                                                                                                                         
+ [32] "Listeria monocytogenes"                                                                                                                                                                                                                                                         
+ [33] "Paralytic shellfish poison"                                                                                                                                                                                                                                                     
+ [34] "Salmonella enterica; Salmonella enterica; Salmonella enterica"                                                                                                                                                                                                                  
+ [35] "Vibrio other"                                                                                                                                                                                                                                                                   
+ [36] "Salmonella enterica; Campylobacter jejuni"                                                                                                                                                                                                                                      
+ [37] "Chemical or toxin"                                                                                                                                                                                                                                                              
+ [38] "Anisakis"                                                                                                                                                                                                                                                                       
+ [39] "Bacillus cereus; Clostridium perfringens"                                                                                                                                                                                                                                       
+ [40] "Salmonella enterica; Norovirus genogroup I"                                                                                                                                                                                                                                     
+ [41] "Campylobacter jejuni; Clostridium perfringens"                                                                                                                                                                                                                                  
+ [42] "Rotavirus; Norovirus genogroup I; Clostridium perfringens"                                                                                                                                                                                                                      
+ [43] "Heavy metals"                                                                                                                                                                                                                                                                   
+ [44] "Histamine"                                                                                                                                                                                                                                                                      
+ [45] "Rotavirus"                                                                                                                                                                                                                                                                      
+ [46] "Clostridium perfringens; Bacillus other"                                                                                                                                                                                                                                        
+ [47] "Campylobacter other"                                                                                                                                                                                                                                                            
+ [48] "Clostridium perfringens; Bacillus cereus"                                                                                                                                                                                                                                       
+ [49] "Escherichia coli, Shiga toxin-producing; Norovirus genogroup I"                                                                                                                                                                                                                 
+ [50] "Salmonella enterica; Bacillus cereus"                                                                                                                                                                                                                                           
+ [51] "Shigella unknown"                                                                                                                                                                                                                                                               
+ [52] "Salmonella enterica; Yersinia enterocolitica"                                                                                                                                                                                                                                   
+ [53] "Norovirus unknown"                                                                                                                                                                                                                                                              
+ [54] "Bacillus cereus; Norovirus genogroup I"                                                                                                                                                                                                                                         
+ [55] "Staphylococcus aureus; Bacillus cereus"                                                                                                                                                                                                                                         
+ [56] "Staphylococcus aureus; Streptococcus group B, C or G"                                                                                                                                                                                                                           
+ [57] "Brucella unknown"                                                                                                                                                                                                                                                               
+ [58] "Bacillus cereus; Staphylococcus aureus"                                                                                                                                                                                                                                         
+ [59] "Campylobacter jejuni; Staphylococcus aureus"                                                                                                                                                                                                                                    
+ [60] "Campylobacter jejuni; Salmonella enterica"                                                                                                                                                                                                                                      
+ [61] "Astrovirus"                                                                                                                                                                                                                                                                     
+ [62] "Norovirus genogroup I; Shigella unknown"                                                                                                                                                                                                                                        
+ [63] "Clostridium perfringens; Norovirus genogroup I"                                                                                                                                                                                                                                 
+ [64] "Shigella dysenteriae"                                                                                                                                                                                                                                                           
+ [65] "Staphylococcus aureus; Bacillus cereus; Clostridium perfringens"                                                                                                                                                                                                                
+ [66] "Norovirus genogroup I; Campylobacter other"                                                                                                                                                                                                                                     
+ [67] "Salmonella enterica; Norovirus genogroup II"                                                                                                                                                                                                                                    
+ [68] "Campylobacter coli"                                                                                                                                                                                                                                                             
+ [69] "Salmonella enterica; Salmonella enterica; Norovirus genogroup I"                                                                                                                                                                                                                
+ [70] "Salmonella enterica; Escherichia coli, Enteropathogenic"                                                                                                                                                                                                                        
+ [71] "Salmonella enterica; Campylobacter unknown"                                                                                                                                                                                                                                     
+ [72] "Norovirus unknown; Norovirus genogroup II"                                                                                                                                                                                                                                      
+ [73] "Escherichia coli, Shiga toxin-producing; Campylobacter jejuni"                                                                                                                                                                                                                  
+ [74] "Norovirus genogroup I; Clostridium perfringens"                                                                                                                                                                                                                                 
+ [75] "Vibrio parahaemolyticus; Vibrio other"                                                                                                                                                                                                                                          
+ [76] "Virus"                                                                                                                                                                                                                                                                          
+ [77] "Vibrio parahaemolyticus; Vibrio cholerae; Bacterium"                                                                                                                                                                                                                            
+ [78] "Bacterium"                                                                                                                                                                                                                                                                      
+ [79] "Norovirus genogroup I; Campylobacter jejuni"                                                                                                                                                                                                                                    
+ [80] "Norovirus genogroup I; Norovirus genogroup II"                                                                                                                                                                                                                                  
+ [81] "Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica"                                                                                                                                                   
+ [82] "Clostridium perfringens; Salmonella enterica"                                                                                                                                                                                                                                   
+ [83] "Escherichia coli, Shiga toxin-producing; Cryptosporidium parvum"                                                                                                                                                                                                                
+ [84] "Clostridium perfringens; Streptococcus group A"                                                                                                                                                                                                                                 
+ [85] "Salmonella enterica; Clostridium perfringens; Salmonella enterica"                                                                                                                                                                                                              
+ [86] "Campylobacter jejuni; Bacillus cereus"                                                                                                                                                                                                                                          
+ [87] "Neurotoxic shellfish poison"                                                                                                                                                                                                                                                    
+ [88] "Salmonella unknown"                                                                                                                                                                                                                                                             
+ [89] "Salmonella other"                                                                                                                                                                                                                                                               
+ [90] "Monosodium glutamate (MSG)"                                                                                                                                                                                                                                                     
+ [91] "Listeria unknown"                                                                                                                                                                                                                                                               
+ [92] "Campylobacter fetus"                                                                                                                                                                                                                                                            
+ [93] "Parasite"                                                                                                                                                                                                                                                                       
+ [94] "Plant or herbal toxins"                                                                                                                                                                                                                                                         
+ [95] "Norovirus genogroup I; Norovirus genogroup I"                                                                                                                                                                                                                                   
+ [96] "Norovirus genogroup II; Norovirus genogroup I"                                                                                                                                                                                                                                  
+ [97] "Escherichia coli, Shiga toxin-producing; Cryptosporidium unknown"                                                                                                                                                                                                               
+ [98] "Puffer fish tetrodotoxin"                                                                                                                                                                                                                                                       
+ [99] "Escherichia coli, Shiga toxin-producing; Escherichia coli, Shiga toxin-producing; Escherichia coli, Shiga toxin-producing"                                                                                                                                                      
+[100] "Cryptosporidium unknown"                                                                                                                                                                                                                                                        
+[101] "Campylobacter jejuni; Campylobacter other"                                                                                                                                                                                                                                      
+[102] "Salmonella enterica; Campylobacter jejuni; Campylobacter coli"                                                                                                                                                                                                                  
+[103] "Norovirus genogroup I; Bacillus cereus"                                                                                                                                                                                                                                         
+[104] "Salmonella enterica; Salmonella unknown"                                                                                                                                                                                                                                        
+[105] "Ciguatoxin; Staphylococcus aureus"                                                                                                                                                                                                                                              
+[106] "Bacillus cereus; Bacillus other"                                                                                                                                                                                                                                                
+[107] "Clostridium perfringens; Campylobacter jejuni"                                                                                                                                                                                                                                  
+[108] "Norovirus"                                                                                                                                                                                                                                                                      
+[109] "Norovirus unknown; Staphylococcus unknown"                                                                                                                                                                                                                                      
+[110] "Campylobacter jejuni; Listeria monocytogenes"                                                                                                                                                                                                                                   
+[111] "Enterococcus faecalis"                                                                                                                                                                                                                                                          
+[112] "Salmonella enterica; Clostridium other"                                                                                                                                                                                                                                         
+[113] "Staphylococcus aureus; Bacillus cereus; Enterobacter other"                                                                                                                                                                                                                     
+[114] "Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica"                                                                                                                                                                                             
+[115] "Escherichia coli, Shiga toxin-producing; Escherichia coli, Shiga toxin-producing"                                                                                                                                                                                               
+[116] "Escherichia coli, Enteroaggregative; Escherichia coli, Enterotoxigenic; Shigella sonnei"                                                                                                                                                                                        
+[117] "Staphylococcus aureus; Clostridium perfringens; Salmonella enterica"                                                                                                                                                                                                            
+[118] "Norovirus genogroup II; Norovirus genogroup II"                                                                                                                                                                                                                                 
+[119] "Norovirus genogroup II; Escherichia coli, Shiga toxin-producing"                                                                                                                                                                                                                
+[120] "Campylobacter jejuni; Cryptosporidium parvum"                                                                                                                                                                                                                                   
+[121] "Campylobacter unknown; Escherichia coli, Shiga toxin-producing"                                                                                                                                                                                                                 
+[122] "Escherichia coli, Enteroaggregative; Campylobacter other"                                                                                                                                                                                                                       
+[123] "Staphylococcus aureus; Clostridium perfringens"                                                                                                                                                                                                                                 
+[124] "Norovirus unknown; Clostridium other"                                                                                                                                                                                                                                           
+[125] "Norovirus genogroup II; Norovirus genogroup II; Norovirus genogroup II"                                                                                                                                                                                                         
+[126] "Unknown"                                                                                                                                                                                                                                                                        
+[127] "Clostridium other"                                                                                                                                                                                                                                                              
+[128] "Staphylococcus aureus; Norovirus unknown"                                                                                                                                                                                                                                       
+[129] "Salmonella enterica; Staphylococcus aureus; Bacillus cereus"                                                                                                                                                                                                                    
+[130] "Cryptosporidium unknown; Escherichia coli, Shiga toxin-producing; Escherichia coli, Shiga toxin-producing"                                                                                                                                                                      
+[131] "Campylobacter other; Vibrio other; Vibrio cholerae"                                                                                                                                                                                                                             
+[132] "Escherichia coli, Enteroaggregative"                                                                                                                                                                                                                                            
+[133] "Trichinella unknown"                                                                                                                                                                                                                                                            
+[134] "Norovirus other"                                                                                                                                                                                                                                                                
+[135] "Sapovirus"                                                                                                                                                                                                                                                                      
+[136] "Campylobacter"                                                                                                                                                                                                                                                                  
+[137] "Campylobacter jejuni; Campylobacter unknown"                                                                                                                                                                                                                                    
+[138] "Campylobacter unknown; Campylobacter jejuni"                                                                                                                                                                                                                                    
+[139] "Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica"                                                                                                                              
+[140] "Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica"                                                                                                                                                                        
+[141] "Staphylococcus unknown"                                                                                                                                                                                                                                                         
+[142] "Clostridium perfringens; Staphylococcus aureus; Bacillus cereus"                                                                                                                                                                                                                
+[143] "Salmonella enterica; Escherichia coli, Shiga toxin-producing"                                                                                                                                                                                                                   
+[144] "Campylobacter coli; Campylobacter jejuni"                                                                                                                                                                                                                                       
+[145] "Amnesic shellfish poison"                                                                                                                                                                                                                                                       
+[146] "Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica; Salmonella enterica"
+[147] "Cryptosporidium hominis; Cryptosporidium parvum; Cryptosporidium"                                                                                                                                                                                                               
+[148] "Cryptosporidium parvum; Cryptosporidium unknown"                                                                                                                                                                                                                                
+[149] "Norovirus genogroup IV; Norovirus genogroup II"                                                                                                                                                                                                                                 
+[150] "Sapovirus genogroup I"                                                                                                                                                                                                                                                          
+[151] "Salmonella"                                                                                                                                                                                                                                                                     
+[152] "Clostridium perfringens; Norovirus genogroup II"                                                                                                                                                                                                                                
+[153] "Clostridium perfringens; Clostridium perfringens"                                                                                                                                                                                                                               
+[154] "Campylobacter jejuni; Campylobacter coli"                                                                                                                                                                                                                                       
+[155] "Cyclospora"                                                                                                                                                                                                                                                                     
+[156] "Norovirus genogroup II; Salmonella enterica"                                                                                                                                                                                                                                    
+[157] "Cleaning agents"                                                                                                                                                                                                                                                                
+[158] "Campylobacter jejuni; Escherichia coli, Shiga toxin-producing; Giardia"                                                                                                                                                                                                         
+[159] "Cryptosporidium"                                                                                                                                                                                                                                                                
+[160] "Norovirus unknown; Salmonella enterica"                                                                                                                                                                                                                                         
+[161] "Norovirus; Norovirus genogroup II"                                                                                                                                                                                                                                              
+[162] "Salmonella enterica; Escherichia coli, Shiga toxin-producing; Norovirus genogroup II; Shigella"                                                                                                                                                                                 
+[163] "Norovirus genogroup II; Norovirus"                                                                                                                                                                                                                                              
+[164] "Salmonella enterica; Norovirus; Salmonella enterica"                                                                                                                                                                                                                            
+[165] "Giardia intestinalis; Cryptosporidium parvum"                                                                                                                                                                                                                                   
+[166] "Shigella; Escherichia coli, Shiga toxin-producing; Escherichia coli, Shiga toxin-producing; Salmonella enterica; Salmonella enterica"                                                                                                                                           
+[167] "Yersinia"                                                                                                                                                                                                                                                                       
+[168] "Campylobacter jejuni; Escherichia coli, Shiga toxin-producing"                                                                                                                                                                                                                  
+[169] "Trichinella"                                                                                                                                                                                                                                                                    </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Separate the rows for coninfections</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>training_data_fin<span class="ot">=</span>training_data_fin<span class="sc">%&gt;%</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate_rows</span>(Species,<span class="at">sep=</span><span class="st">";"</span>)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Create lists for pathogen types</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>Pathogen_Bacteria <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Bacillus"</span>, <span class="st">"Brucella"</span>, <span class="st">"Campylobacter"</span>, <span class="st">"Clostridium"</span>, <span class="st">"Staphylococcus"</span>, <span class="st">"Escherichia"</span>, <span class="st">"Listeria"</span>, <span class="st">"Salmonella"</span>, <span class="st">"Vibrio"</span>, <span class="st">"Cholera"</span>, <span class="st">"Enterococcus"</span>, <span class="st">"Bacterium"</span>, <span class="st">"Shigella"</span>, <span class="st">"Yersinia"</span>,<span class="st">"Streptococcus"</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>Pathogen_Parasite <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Cryptosporidium"</span>, <span class="st">"Cyclospora"</span>, <span class="st">"Entamoeba"</span>, <span class="st">"Giardia"</span>, <span class="st">"Parasite"</span>, <span class="st">"Toxoplasma"</span>, <span class="st">"Trichinella"</span>)</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>Pathogen_Virus <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Astrovirus"</span>, <span class="st">"Norovirus"</span>, <span class="st">"Rotavirus"</span>,<span class="st">"Hepatitis"</span>,<span class="st">"Virus"</span>)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>Pathogen_Poison <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Poison"</span>, <span class="st">"Toxin"</span>, <span class="st">"Metal"</span>,<span class="st">"Pesticide"</span>,<span class="st">"Ciguatoxin"</span>,<span class="st">"Scombroidtoxin"</span>)</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co">#simplify "Escherichia coli, Shiga toxin-producing" to "Escherichia coli"</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Create two new columns: Pathogen_type &amp; Simplified_Etiology</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>training_data_fin<span class="ot">=</span>training_data_fin<span class="sc">%&gt;%</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Species=</span><span class="fu">str_replace</span>(Species,<span class="st">"Escherichia coli, Shiga toxin-producing"</span>,<span class="st">"Escherichia"</span>))<span class="sc">%&gt;%</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Pathogen_Type =</span> <span class="fu">case_when</span>(</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Poison, </span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Species,<span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Poison"</span>,</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Bacteria, </span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Species,<span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Bacteria"</span>,</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Parasite, </span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Species,<span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Parasite"</span>,</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Virus, </span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Species,<span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Virus"</span></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">%&gt;%</span></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">case_when</span>(</span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Bacteria"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Species, </span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Bacillus|Brucella|Campylobacter|Clostridium|Staphylococcus|Escherichia|Listeria|Salmonella|Vibrio|Cholera|Enterococcus|Bacterium|Shigella|Yersinia|Streptococcus"</span>),</span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Parasite"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Species, <span class="st">"Cryptosporidium|Cyclospora|Entamoeba|Giardia|Parasite|Toxoplasma|Trichinella"</span>),</span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Virus"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Species, <span class="st">"Astrovirus|Norovirus|Rotavirus|Hepatitis"</span>),</span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Poison"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Species, <span class="st">"Poison|Toxin|Heavy|pesticide|Ciguatoxin|Scombroid"</span>)</span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">%&gt;%</span></span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">case_when</span>(</span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Escherichia"</span> <span class="sc">~</span> <span class="st">"E. coli"</span>,</span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Heavy"</span> <span class="sc">~</span> <span class="st">"Heavy Metals"</span>,</span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> Simplified_Etiology))<span class="sc">%&gt;%</span></span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">view</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="column-for-location" class="level1">
+<h1>Column for <code>Location</code></h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#checking the names of location and separate the collapsed names</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(training_data_fin<span class="sc">$</span>Location)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] "Restaurant"                                                                                                            
+  [2] "Private Home/Residence"                                                                                                
+  [3] NA                                                                                                                      
+  [4] "Restaurant; Catering Service"                                                                                          
+  [5] "Catering Service"                                                                                                      
+  [6] "Restaurant; Private Home/Residence"                                                                                    
+  [7] "Grocery Store"                                                                                                         
+  [8] "School/College/University"                                                                                             
+  [9] "Office/Indoor Workplace"                                                                                               
+ [10] "Prison/Jail"                                                                                                           
+ [11] "Child Daycare"                                                                                                         
+ [12] "Camp"                                                                                                                  
+ [13] "Nursing Home/Assisted Living Facility"                                                                                 
+ [14] "Religious Facility"                                                                                                    
+ [15] "Private Home/Residence; Catering Service"                                                                              
+ [16] "Unknown"                                                                                                               
+ [17] "Fair/Festival"                                                                                                         
+ [18] "Private Home/Residence; Grocery Store"                                                                                 
+ [19] "Hospital"                                                                                                              
+ [20] "Catering Service; School/College/University"                                                                           
+ [21] "School/College/University; Camp"                                                                                       
+ [22] "Grocery Store; Office/Indoor Workplace"                                                                                
+ [23] "Restaurant; Grocery Store"                                                                                             
+ [24] "Restaurant; Nursing Home/Assisted Living Facility"                                                                     
+ [25] "Restaurant; Private Home/Residence; Grocery Store"                                                                     
+ [26] "Restaurant; Grocery Store; School/College/University"                                                                  
+ [27] "Private Home/Residence; Religious Facility"                                                                            
+ [28] "Restaurant; Private Home/Residence; Grocery Store; Nursing Home/Assisted Living Facility"                              
+ [29] "Restaurant; Religious Facility"                                                                                        
+ [30] "Restaurant; Catering Service; Grocery Store"                                                                           
+ [31] "Private Home/Residence; Camp"                                                                                          
+ [32] "Office/Indoor Workplace; Nursing Home/Assisted Living Facility; Hospital"                                              
+ [33] "Restaurant; Private Home/Residence; Grocery Store; Office/Indoor Workplace; Religious Facility"                        
+ [34] "Private Home/Residence; Fair/Festival"                                                                                 
+ [35] "Restaurant; Office/Indoor Workplace"                                                                                   
+ [36] "Catering Service; Grocery Store"                                                                                       
+ [37] "Office/Indoor Workplace; Hospital"                                                                                     
+ [38] "Restaurant; Private Home/Residence; Grocery Store; Religious Facility"                                                 
+ [39] "Private Home/Residence; Grocery Store; Nursing Home/Assisted Living Facility"                                          
+ [40] "Private Home/Residence; Catering Service; School/College/University"                                                   
+ [41] "Private Home/Residence; Catering Service; Grocery Store"                                                               
+ [42] "Banquet Facility"                                                                                                      
+ [43] "Catering Service; Hospital"                                                                                            
+ [44] "Restaurant; Hospital; School/College/University"                                                                       
+ [45] "Restaurant; Catering Service; Fair/Festival"                                                                           
+ [46] "Grocery Store; Religious Facility"                                                                                     
+ [47] "Private Home/Residence; School/College/University"                                                                     
+ [48] "Restaurant; Private Home/Residence; Catering Service; Grocery Store; Nursing Home/Assisted Living Facility; Hospital"  
+ [49] "Catering Service; Religious Facility"                                                                                  
+ [50] "Restaurant; School/College/University"                                                                                 
+ [51] "Restaurant; Office/Indoor Workplace; Hospital"                                                                         
+ [52] "Private Home/Residence; Grocery Store; Child Daycare"                                                                  
+ [53] "Restaurant; Private Home/Residence; Catering Service; Fair/Festival"                                                   
+ [54] "Catering Service; Grocery Store; Office/Indoor Workplace"                                                              
+ [55] "Restaurant; Fair/Festival"                                                                                             
+ [56] "Catering Service; Child Daycare"                                                                                       
+ [57] "Restaurant; Private Home/Residence; Office/Indoor Workplace; Nursing Home/Assisted Living Facility"                    
+ [58] "Office/Indoor Workplace; Camp"                                                                                         
+ [59] "Restaurant; Private Home/Residence; School/College/University"                                                         
+ [60] "Private Home/Residence; Hospital; School/College/University"                                                           
+ [61] "Private Home/Residence; Child Daycare; School/College/University"                                                      
+ [62] "Private Home/Residence; Grocery Store; School/College/University"                                                      
+ [63] "Restaurant; Private Home/Residence; Banquet Facility; Grocery Store"                                                   
+ [64] "Restaurant; Private Home/Residence; Fair/Festival; Grocery Store; School/College/University"                           
+ [65] "Restaurant; Private Home/Residence; Catering Service"                                                                  
+ [66] "Restaurant; Banquet Facility"                                                                                          
+ [67] "Restaurant; Unknown"                                                                                                   
+ [68] "Private Home/Residence; Catering Service; Religious Facility"                                                          
+ [69] "Restaurant; Nursing Home/Assisted Living Facility; Hospital"                                                           
+ [70] "Restaurant; Private Home/Residence; Banquet Facility"                                                                  
+ [71] "Private Home/Residence; Grocery Store; Religious Facility"                                                             
+ [72] "Banquet Facility; Office/Indoor Workplace"                                                                             
+ [73] "Restaurant; Grocery Store; Office/Indoor Workplace"                                                                    
+ [74] "Restaurant; Prison/Jail"                                                                                               
+ [75] "Nursing Home/Assisted Living Facility; Hospital"                                                                       
+ [76] "Banquet Facility; Unknown"                                                                                             
+ [77] "Banquet Facility; Catering Service"                                                                                    
+ [78] "Catering Service; Unknown"                                                                                             
+ [79] "Restaurant; Private Home/Residence; Hospital"                                                                          
+ [80] "Office/Indoor Workplace; School/College/University"                                                                    
+ [81] "Banquet Facility; Catering Service; Grocery Store"                                                                     
+ [82] "Banquet Facility; Grocery Store"                                                                                       
+ [83] "Private Home/Residence; Banquet Facility"                                                                              
+ [84] "Private Home/Residence; Office/Indoor Workplace"                                                                       
+ [85] "Other (Describe In Remarks); Unknown"                                                                                  
+ [86] "Catering Service; Fair/Festival"                                                                                       
+ [87] "Restaurant; Private Home/Residence; Fair/Festival"                                                                     
+ [88] "Child Daycare; Religious Facility"                                                                                     
+ [89] "Restaurant; Nursing Home/Assisted Living Facility; Unknown"                                                            
+ [90] "Private Home/Residence; Banquet Facility; Religious Facility"                                                          
+ [91] "Private Home/Residence; Fair/Festival; Grocery Store"                                                                  
+ [92] "Fast Food Restaurant"                                                                                                  
+ [93] "Fast Food Restaurant; Restaurant"                                                                                      
+ [94] "Fast Food Restaurant; Private Home/Residence"                                                                          
+ [95] "School/College/University; Prison/Jail"                                                                                
+ [96] "Catering Service; Office/Indoor Workplace"                                                                             
+ [97] "Fast Food Restaurant; Catering Service"                                                                                
+ [98] "Fast Food Restaurant; Restaurant; Private Home/Residence"                                                              
+ [99] "Restaurant; Restaurant; Private Home/Residence; Banquet Facility; Catering Service"                                    
+[100] "Fast Food Restaurant; Private Home/Residence; Grocery Store"                                                           
+[101] "Fast Food Restaurant; Fair/Festival; School/College/University"                                                        
+[102] "Restaurant; Office/Indoor Workplace; School/College/University"                                                        
+[103] "Fast Food Restaurant; Grocery Store"                                                                                   
+[104] "Restaurant; Banquet Facility; Grocery Store"                                                                           
+[105] "Fast Food Restaurant; Restaurant; Restaurant; Private Home/Residence"                                                  
+[106] "Private Home/Residence; Grocery Store; Nursing Home/Assisted Living Facility; School/College/University"               
+[107] "Private Home/Residence; Office/Indoor Workplace; Camp"                                                                 
+[108] "Fast Food Restaurant; Restaurant; Restaurant"                                                                          
+[109] "Private Home/Residence; Unknown"                                                                                       
+[110] "Private Home/Residence; Child Daycare"                                                                                 
+[111] "Restaurant; Private Home/Residence; Camp"                                                                              
+[112] "Private Home/Residence; Banquet Facility; Camp"                                                                        
+[113] "Grocery Store; School/College/University"                                                                              
+[114] "Fast Food Restaurant; Restaurant; School/College/University"                                                           
+[115] "Private Home/Residence; Banquet Facility; Catering Service"                                                            
+[116] "Restaurant; Restaurant; Private Home/Residence; Banquet Facility"                                                      
+[117] "Restaurant; Catering Service; Religious Facility"                                                                      
+[118] "Banquet Facility; Religious Facility"                                                                                  
+[119] "Fast Food Restaurant; Restaurant; Fair/Festival"                                                                       
+[120] "Private Home/Residence; Grocery Store; School/College/University; Unknown"                                             
+[121] "Fast Food Restaurant; Restaurant; Unknown"                                                                             
+[122] "Fast Food Restaurant; Restaurant; Restaurant; Private Home/Residence; Grocery Store; Long-Term Care/Nursing Home/As..."
+[123] "Restaurant; Restaurant; Banquet Facility"                                                                              
+[124] "Fast Food Restaurant; Restaurant; Office/Indoor Workplace"                                                             
+[125] "Farm/Dairy"                                                                                                            
+[126] "Banquet Facility; Catering Service; Religious Facility"                                                                
+[127] "Fast Food Restaurant; Restaurant; Restaurant; Grocery Store; Office/Indoor Workplace"                                  
+[128] "Fast Food Restaurant; Restaurant; Private Home/Residence; Grocery Store"                                               
+[129] "Restaurant Buffet"                                                                                                     
+[130] "Catering Service; Fair/Festival; Grocery Store"                                                                        
+[131] "Restaurant; Private Home/Residence; Banquet Facility; Catering Service; Grocery Store"                                 
+[132] "Restaurant; Restaurant"                                                                                                
+[133] "Ship/Boat"                                                                                                             
+[134] "Restaurant; Restaurant Buffet"                                                                                         </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>training_data_fin<span class="ot">=</span>training_data_fin<span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">separate_rows</span>(Location,<span class="at">sep=</span><span class="st">";"</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">view</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="location-variable-looks-clean" class="level1">
+<h1>Location variable looks clean</h1>
+<section id="add-month-as-numeric-column" class="level3">
+<h3 class="anchored" data-anchor-id="add-month-as-numeric-column">Add Month as Numeric Column</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>training_data_fin <span class="ot">&lt;-</span> training_data_fin <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Numeric_Month =</span> <span class="fu">case_when</span>(</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"January"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"February"</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"March"</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"April"</span> <span class="sc">~</span> <span class="dv">4</span>,</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"May"</span> <span class="sc">~</span> <span class="dv">5</span>,</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"June"</span> <span class="sc">~</span> <span class="dv">6</span>,</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"July"</span> <span class="sc">~</span> <span class="dv">7</span>,</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"August"</span> <span class="sc">~</span> <span class="dv">8</span>,</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"September"</span> <span class="sc">~</span> <span class="dv">9</span>,</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"October"</span> <span class="sc">~</span> <span class="dv">10</span>,</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"November"</span> <span class="sc">~</span> <span class="dv">11</span>,</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>    Month <span class="sc">==</span> <span class="st">"December"</span> <span class="sc">~</span> <span class="dv">12</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(Numeric_Month, <span class="at">.after =</span> Month)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>##Since there are over 3000+ different categories for food, we want to organize them by adding a IFSAC category column #categorize everything else other than vectors into other</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co">#unique(analysis_data_fin$`IFSAC Category`)</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co">#unique(training_data_fin$Food)</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>Desserts<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Cookie"</span>,<span class="st">"Cream"</span>,<span class="st">"Canoli"</span>,<span class="st">"Cake"</span>,<span class="st">"Pudding"</span>)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>Beef<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Beef"</span>,<span class="st">"Steak"</span>)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>Poultry<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Chicken"</span>,<span class="st">"Turkey"</span>)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>Pork<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Pork"</span>,<span class="st">"Sausage"</span>,<span class="st">"Hot Dog"</span>,<span class="st">"Deli"</span>,<span class="st">"Spam"</span>,<span class="st">"Strawberries"</span>,<span class="st">"Blueberries"</span>,<span class="st">"Pig"</span>,<span class="st">"Ribs"</span>)</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>Dairy<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Milk"</span>,<span class="st">"Cheese"</span>,<span class="st">"Parsley"</span>)</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>Crusteaceans<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Lobster"</span>,<span class="st">"Crab"</span>,<span class="st">"Shrimp"</span>)</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>Fish<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Fish"</span>,<span class="st">"Tuna"</span>,<span class="st">"Salmon"</span>)</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>Mollusks<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Clams"</span>,<span class="st">"Oysters"</span>)</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>Fruits<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Tomato"</span>,<span class="st">"Banana"</span>,<span class="st">"Melon"</span>,<span class="st">"Grapes"</span>,<span class="st">"Mango"</span>)</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">Grains-Beans</span><span class="st">`</span><span class="ot">=</span><span class="fu">c</span>(<span class="st">"Rice"</span>,<span class="st">"Peas"</span>,<span class="st">"Beans"</span>,<span class="st">"wheat"</span>)</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">Vegetable-Row-Crops</span><span class="st">`</span><span class="ot">=</span><span class="fu">c</span>(<span class="st">"Lettuce"</span>,<span class="st">"artichokes"</span>,<span class="st">"broccoli"</span>,<span class="st">"asparagus"</span>,<span class="st">"celeries"</span>,<span class="st">"spinach"</span>)</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">Root-underground-vegetables</span><span class="st">`</span><span class="ot">=</span><span class="fu">c</span>(<span class="st">"Roots"</span>,<span class="st">"carrots"</span>,<span class="st">"Beets"</span>,<span class="st">"Onion"</span>,<span class="st">"Tubers"</span>,<span class="st">"yams"</span>,<span class="st">"Garlic"</span>,<span class="st">"Potatos"</span>,<span class="st">"taro"</span>)</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>Sprouts<span class="ot">=</span><span class="fu">c</span>(<span class="st">"alfalfa"</span>,<span class="st">"mung"</span>)</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>Salad<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Salad"</span>)</span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a><span class="co">#Other=c("Ice","Alcohol","Eggnog")</span></span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>Game<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Bear"</span>)</span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>Herbs<span class="ot">=</span><span class="fu">c</span>(<span class="st">"basil"</span>,<span class="st">"cilantro"</span>)</span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>Fungi<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Mushroom"</span>,<span class="st">"portabellas"</span>)</span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">Nuts-Seeds</span><span class="st">`</span><span class="ot">=</span><span class="fu">c</span>(<span class="st">"peanuts"</span>,<span class="st">"almonds"</span>,<span class="st">"Seasames"</span>)</span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>Eggs<span class="ot">=</span><span class="fu">c</span>(<span class="st">"Egg"</span>)</span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">Seeded-Vegetables</span><span class="st">`</span><span class="ot">=</span><span class="fu">c</span>(<span class="st">"Peppers"</span>,<span class="st">"Squashes"</span>,<span class="st">"Cucumbers"</span>,<span class="st">"Okras"</span>,<span class="st">"Corn"</span>)</span>
+<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">other meat</span><span class="st">`</span><span class="ot">=</span><span class="fu">c</span>(<span class="st">"Lamb"</span>)</span>
+<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a>training_data_fin <span class="ot">&lt;-</span> training_data_fin <span class="sc">%&gt;%</span></span>
+<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">case_when</span>(</span>
+<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"Salad"</span>,Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Salad"</span>,</span>
+<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Desserts, </span>
+<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food,<span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Dessert"</span>,</span>
+<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Poultry,</span>
+<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Poultry"</span>,</span>
+<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Beef,</span>
+<span id="cb39-34"><a href="#cb39-34" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Beef"</span>,</span>
+<span id="cb39-35"><a href="#cb39-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pork,</span>
+<span id="cb39-36"><a href="#cb39-36" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Pork"</span>,</span>
+<span id="cb39-37"><a href="#cb39-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Dairy,</span>
+<span id="cb39-38"><a href="#cb39-38" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Dairy"</span>,</span>
+<span id="cb39-39"><a href="#cb39-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Crusteaceans,</span>
+<span id="cb39-40"><a href="#cb39-40" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Crusteaceans"</span>,</span>
+<span id="cb39-41"><a href="#cb39-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Fish,</span>
+<span id="cb39-42"><a href="#cb39-42" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Fish"</span>,</span>
+<span id="cb39-43"><a href="#cb39-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Mollusks,</span>
+<span id="cb39-44"><a href="#cb39-44" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Mollusks"</span>,</span>
+<span id="cb39-45"><a href="#cb39-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Fruits,</span>
+<span id="cb39-46"><a href="#cb39-46" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Fruits"</span>,</span>
+<span id="cb39-47"><a href="#cb39-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(<span class="st">`</span><span class="at">Grains-Beans</span><span class="st">`</span>,</span>
+<span id="cb39-48"><a href="#cb39-48" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Grains-Beans"</span>,</span>
+<span id="cb39-49"><a href="#cb39-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(<span class="st">`</span><span class="at">Vegetable-Row-Crops</span><span class="st">`</span>,</span>
+<span id="cb39-50"><a href="#cb39-50" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Vegetable-Row-Crops"</span>,</span>
+<span id="cb39-51"><a href="#cb39-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(<span class="st">`</span><span class="at">Root-underground-vegetables</span><span class="st">`</span>,</span>
+<span id="cb39-52"><a href="#cb39-52" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Root-underground-vegetables"</span>,</span>
+<span id="cb39-53"><a href="#cb39-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Sprouts,</span>
+<span id="cb39-54"><a href="#cb39-54" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Sprouts"</span>,</span>
+<span id="cb39-55"><a href="#cb39-55" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb39-56"><a href="#cb39-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Herbs,</span>
+<span id="cb39-57"><a href="#cb39-57" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Herbs"</span>,</span>
+<span id="cb39-58"><a href="#cb39-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Fungi,</span>
+<span id="cb39-59"><a href="#cb39-59" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Fungi"</span>,</span>
+<span id="cb39-60"><a href="#cb39-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(<span class="st">`</span><span class="at">Nuts-Seeds</span><span class="st">`</span>,</span>
+<span id="cb39-61"><a href="#cb39-61" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Nuts-Seeds"</span>,</span>
+<span id="cb39-62"><a href="#cb39-62" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(<span class="st">`</span><span class="at">Seeded-Vegetables</span><span class="st">`</span>,</span>
+<span id="cb39-63"><a href="#cb39-63" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Food, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Seeded-Vegetables"</span>,</span>
+<span id="cb39-64"><a href="#cb39-64" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"eggs"</span>,Food,<span class="at">ignore.case =</span> <span class="cn">TRUE</span>)<span class="sc">~</span><span class="st">"Eggs"</span>,</span>
+<span id="cb39-65"><a href="#cb39-65" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"Lamb"</span>,Food)<span class="sc">~</span><span class="st">"Other Meat"</span>,</span>
+<span id="cb39-66"><a href="#cb39-66" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(Food),<span class="st">""</span>,<span class="st">"Other"</span>)</span>
+<span id="cb39-67"><a href="#cb39-67" aria-hidden="true" tabindex="-1"></a>   ))<span class="sc">%&gt;%</span></span>
+<span id="cb39-68"><a href="#cb39-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">na_if</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span>, <span class="st">""</span>))<span class="sc">%&gt;%</span></span>
+<span id="cb39-69"><a href="#cb39-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span>, <span class="at">.after =</span> Food)</span>
+<span id="cb39-70"><a href="#cb39-70" aria-hidden="true" tabindex="-1"></a>training_data_fin<span class="ot">=</span>training_data_fin<span class="sc">%&gt;%</span></span>
+<span id="cb39-71"><a href="#cb39-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span><span class="ot">=</span><span class="fu">case_when</span>(</span>
+<span id="cb39-72"><a href="#cb39-72" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">";"</span>,Food)<span class="sc">~</span><span class="st">"Multiple"</span>,<span class="cn">TRUE</span><span class="sc">~</span><span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="analysis-data-1" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-data-1">Analysis Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>analysis_data_fin <span class="ot">&lt;-</span> analysis_data <span class="sc">%&gt;%</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span><span class="fu">c</span>(<span class="st">`</span><span class="at">Animal Type</span><span class="st">`</span>, <span class="st">`</span><span class="at">Animal Type Specify</span><span class="st">`</span>, </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Water Exposure</span><span class="st">`</span>, <span class="st">`</span><span class="at">Water Type</span><span class="st">`</span>, <span class="st">`</span><span class="at">Water Status</span><span class="st">`</span>, </span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Food Contaminated Ingredient</span><span class="st">`</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">"Confirmed"</span>, <span class="st">`</span><span class="at">Etiology Status</span><span class="st">`</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Primary Mode</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Food"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="data-manipulation" class="level2">
+<h2 class="anchored" data-anchor-id="data-manipulation">Data Manipulation</h2>
+<section id="separate-rows-to-address-coinfections" class="level3">
+<h3 class="anchored" data-anchor-id="separate-rows-to-address-coinfections">Separate Rows to Address Coinfections</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>analysis_data_fin <span class="ot">&lt;-</span> analysis_data_fin <span class="sc">%&gt;%</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate_rows</span>(Etiology, <span class="at">sep =</span> <span class="st">"; "</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="modifying-ifsac-category-to-include-salads" class="level3">
+<h3 class="anchored" data-anchor-id="modifying-ifsac-category-to-include-salads">Modifying IFSAC Category to Include Salads</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>Desserts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"cookies"</span>, <span class="st">"cake"</span>, <span class="st">"chocolate"</span>, <span class="st">"brownie"</span>)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>analysis_data_fin <span class="ot">&lt;-</span> analysis_data_fin <span class="sc">%&gt;%</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">case_when</span>(</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"Salad"</span>, <span class="st">`</span><span class="at">Food Vehicle</span><span class="st">`</span>, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Salad"</span>,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Desserts, </span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), <span class="st">`</span><span class="at">Food Vehicle</span><span class="st">`</span>) <span class="sc">~</span> <span class="st">"Dessert"</span>,</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"Chicken"</span>, <span class="st">`</span><span class="at">Food Vehicle</span><span class="st">`</span>, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Poultry"</span>,</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"Turkey"</span>, <span class="st">`</span><span class="at">Food Vehicle</span><span class="st">`</span>, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Poultry"</span>,</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"Poultry"</span>, <span class="st">`</span><span class="at">Food Vehicle</span><span class="st">`</span>, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Poultry"</span>,</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="column-for-type-of-pathogen" class="level3">
+<h3 class="anchored" data-anchor-id="column-for-type-of-pathogen">Column for Type of Pathogen</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>analysis_data_fin <span class="ot">&lt;-</span> analysis_data_fin <span class="sc">%&gt;%</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Pathogen_Type =</span> <span class="fu">case_when</span>(</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Poison, </span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Etiology) <span class="sc">~</span> <span class="st">"Poison"</span>,</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Bacteria, </span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Etiology) <span class="sc">~</span> <span class="st">"Bacteria"</span>,</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Parasite, </span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Etiology) <span class="sc">~</span> <span class="st">"Parasite"</span>,</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Virus, </span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Etiology) <span class="sc">~</span> <span class="st">"Virus"</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">%&gt;%</span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">case_when</span>(</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Bacteria"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Etiology, </span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Bacillus|Brucella|Campylobacter|Clostridium|Staphylococcus|Escherichia|Listeria|Salmonella|Vibrio|Cholera|Enterococcus|Bacterium|Shigella|Yersinia"</span>),</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Parasite"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Etiology, <span class="st">"Cryptosporidium|Cyclospora|Entamoeba|Giardia|Parasite|Toxoplasma|Trichinella"</span>),</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Virus"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Etiology, <span class="st">"Astrovirus|Norovirus|Rotavirus"</span>),</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Poison"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Etiology, <span class="st">"Poison|Toxin|Heavy"</span>)</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">%&gt;%</span></span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">case_when</span>(</span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Escherichia"</span> <span class="sc">~</span> <span class="st">"E. coli"</span>,</span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Heavy"</span> <span class="sc">~</span> <span class="st">"Heavy Metals"</span>,</span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> Simplified_Etiology))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>#we want to drop the NA rows</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>training_data_fin<span class="sc">%&gt;%</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3,968 × 14
+    Year Month   Numeric_Mo…¹ State Locat…² Food  IFSAC…³ Species Status Illne…⁴
+   &lt;dbl&gt; &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;dbl&gt;
+ 1  1998 January            1 Cali… Restau… Fish… Fish    Scombr… Confi…       4
+ 2  1998 January            1 Cali… Privat… Lasa… Multip… Salmon… Confi…      26
+ 3  1998 January            1 Cali… Restau… Stuf… Multip… Salmon… Confi…       4
+ 4  1998 January            1 Flor… Restau… Sand… Poultry Campyl… Confi…       3
+ 5  1998 January            1 Guam  Restau… Chic… Poultry Vibrio… Confi…      47
+ 6  1998 January            1 Hawa… Privat… Fish… Fish    Ciguat… Confi…       3
+ 7  1998 January            1 Hawa… Privat… Fish… Fish    Scombr… Confi…       2
+ 8  1998 January            1 Hawa… Restau… Fish… Fish    Scombr… Confi…       2
+ 9  1998 January            1 Mary… Restau… Burr… Poultry Salmon… Confi…       4
+10  1998 January            1 Mary… Restau… Cake… Multip… Salmon… Confi…       8
+# … with 3,958 more rows, 4 more variables: Hospitalizations &lt;dbl&gt;,
+#   Fatalities &lt;dbl&gt;, Pathogen_Type &lt;chr&gt;, Simplified_Etiology &lt;chr&gt;, and
+#   abbreviated variable names ¹​Numeric_Month, ²​Location, ³​`IFSAC Category`,
+#   ⁴​Illnesses</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>analysis_data_fin<span class="sc">%&gt;%</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,273 × 17
+    Year Month State     Prima…¹ Etiol…² Serot…³ Etiol…⁴ Setting Illne…⁵ Hospi…⁶
+   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+ 1  2009     1 Massachu… Food    Escher… O157:H7 Confir… Privat…       3       2
+ 2  2009     1 Connecti… Food    Salmon… Enteri… Confir… Restau…       7       2
+ 3  2009     4 New York  Food    Salmon… Enteri… Confir… Restau…      13       4
+ 4  2009     3 Connecti… Food    Escher… O157:H7 Confir… Office…      60       5
+ 5  2009     4 Ohio      Food    Escher… O157:H7 Confir… Restau…       3       2
+ 6  2009     4 Wisconsin Food    Salmon… Enteri… Confir… Privat…      14       2
+ 7  2009     6 Minnesota Food    Escher… O157:H7 Confir… Privat…       4       0
+ 8  2009     6 Minnesota Food    Escher… O157:H7 Confir… Restau…       2       1
+ 9  2009     5 New York  Food    Salmon… Enteri… Confir… Restau…      19       2
+10  2009     1 Ohio      Food    Norovi… GII.12  Confir… Catere…      22       0
+# … with 1,263 more rows, 7 more variables: `Info on Hospitalizations` &lt;dbl&gt;,
+#   Deaths &lt;dbl&gt;, `Info on Deaths` &lt;dbl&gt;, `Food Vehicle` &lt;chr&gt;,
+#   `IFSAC Category` &lt;chr&gt;, Pathogen_Type &lt;chr&gt;, Simplified_Etiology &lt;chr&gt;, and
+#   abbreviated variable names ¹​`Primary Mode`, ²​Etiology,
+#   ³​`Serotype or Genotype`, ⁴​`Etiology Status`, ⁵​Illnesses, ⁶​Hospitalizations</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="check-data-structure-again" class="level2">
+<h2 class="anchored" data-anchor-id="check-data-structure-again">Check Data Structure Again</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(training_data_fin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table style="width: auto;" class="table table-condensed">
+<caption>
+Data summary
+</caption>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Name
+</td>
+<td style="text-align:left;">
+training_data_fin
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of rows
+</td>
+<td style="text-align:left;">
+9146
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of columns
+</td>
+<td style="text-align:left;">
+14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+_______________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Column type frequency:
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+character
+</td>
+<td style="text-align:left;">
+9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+________________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Group variables
+</td>
+<td style="text-align:left;">
+None
+</td>
+</tr>
+</tbody>
+
+</table>
+<p><strong>Variable type: character</strong></p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:right;">
+min
+</th>
+<th style="text-align:right;">
+max
+</th>
+<th style="text-align:right;">
+empty
+</th>
+<th style="text-align:right;">
+n_unique
+</th>
+<th style="text-align:right;">
+whitespace
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Month
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+State
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Location
+</td>
+<td style="text-align:right;">
+1157
+</td>
+<td style="text-align:right;">
+0.87
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+37
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Food
+</td>
+<td style="text-align:right;">
+3771
+</td>
+<td style="text-align:right;">
+0.59
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+335
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1779
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IFSAC Category
+</td>
+<td style="text-align:right;">
+3771
+</td>
+<td style="text-align:right;">
+0.59
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Species
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+35
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+111
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Status
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+141
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pathogen_Type
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:right;">
+0.99
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Simplified_Etiology
+</td>
+<td style="text-align:right;">
+150
+</td>
+<td style="text-align:right;">
+0.98
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+
+</table>
+<p><strong>Variable type: numeric</strong></p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+p0
+</th>
+<th style="text-align:right;">
+p25
+</th>
+<th style="text-align:right;">
+p50
+</th>
+<th style="text-align:right;">
+p75
+</th>
+<th style="text-align:right;">
+p100
+</th>
+<th style="text-align:left;">
+hist
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+2006.67
+</td>
+<td style="text-align:right;">
+5.06
+</td>
+<td style="text-align:right;">
+1998
+</td>
+<td style="text-align:right;">
+2002
+</td>
+<td style="text-align:right;">
+2006
+</td>
+<td style="text-align:right;">
+2011
+</td>
+<td style="text-align:right;">
+2015
+</td>
+<td style="text-align:left;">
+▆▆▇▅▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Numeric_Month
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+6.53
+</td>
+<td style="text-align:right;">
+3.27
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:left;">
+▇▇▇▆▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Illnesses
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+31.12
+</td>
+<td style="text-align:right;">
+78.84
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+1939
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Hospitalizations
+</td>
+<td style="text-align:right;">
+1021
+</td>
+<td style="text-align:right;">
+0.89
+</td>
+<td style="text-align:right;">
+2.10
+</td>
+<td style="text-align:right;">
+8.43
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+308
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fatalities
+</td>
+<td style="text-align:right;">
+1012
+</td>
+<td style="text-align:right;">
+0.89
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+0.53
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+</tbody>
+
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(analysis_data_fin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table style="width: auto;" class="table table-condensed">
+<caption>
+Data summary
+</caption>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Name
+</td>
+<td style="text-align:left;">
+analysis_data_fin
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of rows
+</td>
+<td style="text-align:left;">
+5339
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of columns
+</td>
+<td style="text-align:left;">
+17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+_______________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Column type frequency:
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+character
+</td>
+<td style="text-align:left;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+________________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Group variables
+</td>
+<td style="text-align:left;">
+None
+</td>
+</tr>
+</tbody>
+
+</table>
+<p><strong>Variable type: character</strong></p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:right;">
+min
+</th>
+<th style="text-align:right;">
+max
+</th>
+<th style="text-align:right;">
+empty
+</th>
+<th style="text-align:right;">
+n_unique
+</th>
+<th style="text-align:right;">
+whitespace
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+State
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Primary Mode
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Etiology
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+39
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+83
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Serotype or Genotype
+</td>
+<td style="text-align:right;">
+2395
+</td>
+<td style="text-align:right;">
+0.55
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+146
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+335
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Etiology Status
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+141
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Setting
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+0.93
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+237
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+151
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Food Vehicle
+</td>
+<td style="text-align:right;">
+2482
+</td>
+<td style="text-align:right;">
+0.54
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+335
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1161
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IFSAC Category
+</td>
+<td style="text-align:right;">
+2482
+</td>
+<td style="text-align:right;">
+0.54
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pathogen_Type
+</td>
+<td style="text-align:right;">
+238
+</td>
+<td style="text-align:right;">
+0.96
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Simplified_Etiology
+</td>
+<td style="text-align:right;">
+452
+</td>
+<td style="text-align:right;">
+0.92
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+
+</table>
+<p><strong>Variable type: numeric</strong></p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+p0
+</th>
+<th style="text-align:right;">
+p25
+</th>
+<th style="text-align:right;">
+p50
+</th>
+<th style="text-align:right;">
+p75
+</th>
+<th style="text-align:right;">
+p100
+</th>
+<th style="text-align:left;">
+hist
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+2014.40
+</td>
+<td style="text-align:right;">
+3.22
+</td>
+<td style="text-align:right;">
+2009
+</td>
+<td style="text-align:right;">
+2012
+</td>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:right;">
+2017
+</td>
+<td style="text-align:right;">
+2020
+</td>
+<td style="text-align:left;">
+▇▆▆▆▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Month
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+6.39
+</td>
+<td style="text-align:right;">
+3.27
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:left;">
+▇▇▇▆▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Illnesses
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+25.80
+</td>
+<td style="text-align:right;">
+60.67
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:right;">
+1939
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Hospitalizations
+</td>
+<td style="text-align:right;">
+119
+</td>
+<td style="text-align:right;">
+0.98
+</td>
+<td style="text-align:right;">
+2.33
+</td>
+<td style="text-align:right;">
+8.61
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+204
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Info on Hospitalizations
+</td>
+<td style="text-align:right;">
+144
+</td>
+<td style="text-align:right;">
+0.97
+</td>
+<td style="text-align:right;">
+21.71
+</td>
+<td style="text-align:right;">
+45.98
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+763
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Deaths
+</td>
+<td style="text-align:right;">
+87
+</td>
+<td style="text-align:right;">
+0.98
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+<td style="text-align:right;">
+0.55
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Info on Deaths
+</td>
+<td style="text-align:right;">
+127
+</td>
+<td style="text-align:right;">
+0.98
+</td>
+<td style="text-align:right;">
+22.29
+</td>
+<td style="text-align:right;">
+45.99
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+720
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+</tbody>
+
+</table>
+</div>
+</div>
+<p>All done, data is clean now.</p>
+<p>Let’s assign at the end to some final variable, this makes it easier to add further cleaning steps above.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>processeddata1<span class="ot">&lt;-</span> training_data_fin</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>processeddata2<span class="ot">&lt;-</span>analysis_data_fin</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="save-data" class="level1">
+<h1>Save data</h1>
+<p>Finally, we save the clean data as RDS files.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>save_data_location1 <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>,<span class="st">"processed_data"</span>,<span class="st">"processeddata1.rds"</span>)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(processeddata1, <span class="at">file =</span> save_data_location1)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>save_data_location2<span class="ot">=</span>here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>,<span class="st">"processed_data"</span>,<span class="st">"processeddata2.rds"</span>)</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(processeddata2, <span class="at">file =</span> save_data_location2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="notes" class="level1">
+<h1>Notes</h1>
+<p>Removing anyone who had “faulty” or missing data is one approach. It’s often not the best. based on your question and your analysis approach, you might want to do cleaning differently (e.g.&nbsp;keep individuals with some missing information).</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

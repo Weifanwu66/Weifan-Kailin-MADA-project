@@ -143,16 +143,15 @@ Pathogen_Poison <- c("Poison", "Toxin", "Metal","Pesticide","Ciguatoxin","Scombr
 #simplify "Escherichia coli, Shiga toxin-producing" to "Escherichia coli"
 #Create two new columns: Pathogen_type & Simplified_Etiology
 training_data_fin=training_data_fin%>%
-  mutate(Species=str_replace(Species,"Escherichia coli, Shiga toxin-producing","Escherichia"))%>%
   mutate(Pathogen_Type = case_when(
-    grepl(paste(Pathogen_Poison, 
-                collapse = "|"), Species,ignore.case = TRUE) ~ "Poison",
+    grepl(paste(Pathogen_Virus, 
+                collapse = "|"), Species,ignore.case = TRUE) ~ "Virus",
     grepl(paste(Pathogen_Bacteria, 
                 collapse = "|"), Species,ignore.case = TRUE) ~ "Bacteria",
     grepl(paste(Pathogen_Parasite, 
                 collapse = "|"), Species,ignore.case = TRUE) ~ "Parasite",
-    grepl(paste(Pathogen_Virus, 
-                collapse = "|"), Species,ignore.case = TRUE) ~ "Virus"
+    grepl(paste(Pathogen_Poison, 
+                collapse = "|"), Species,ignore.case = TRUE) ~ "Poison"
     )) %>%
   mutate(Simplified_Etiology = case_when(
     Pathogen_Type == "Bacteria" ~ str_extract(Species, 
@@ -196,9 +195,10 @@ training_data_fin <- training_data_fin %>%
   relocate(Numeric_Month, .after = Month)
 ```
 ##Since there are over 3000+ different categories for food, we want to organize them by adding a IFSAC category column
+#categorize everything else other than vectors into other
 ```{r}
-unique(analysis_data_fin$`IFSAC Category`)
-unique(training_data_fin$Food)
+#unique(analysis_data_fin$`IFSAC Category`)
+#unique(training_data_fin$Food)
 Desserts=c("Cookie","Cream","Canoli","Cake","Pudding")
 Beef=c("Beef","Steak")
 Poultry=c("Chicken","Turkey")
@@ -213,7 +213,7 @@ Fruits=c("Tomato","Banana","Melon","Grapes","Mango")
 `Root-underground-vegetables`=c("Roots","carrots","Beets","Onion","Tubers","yams","Garlic","Potatos","taro")
 Sprouts=c("alfalfa","mung")
 Salad=c("Salad")
-Other=c("Ice","Alcohol","Eggnog")
+#Other=c("Ice","Alcohol","Eggnog")
 Game=c("Bear")
 Herbs=c("basil","cilantro")
 Fungi=c("Mushroom","portabellas")
@@ -251,8 +251,7 @@ training_data_fin <- training_data_fin %>%
                 collapse = "|"), Food, ignore.case = TRUE) ~ "Root-underground-vegetables",
     grepl(paste(Sprouts,
                 collapse = "|"), Food, ignore.case = TRUE) ~ "Sprouts",
-    grepl(paste(Other,
-                collapse = "|"), Food, ignore.case = TRUE) ~ "Other",
+    
     grepl(paste(Herbs,
                 collapse = "|"), Food, ignore.case = TRUE) ~ "Herbs",
     grepl(paste(Fungi,
@@ -261,11 +260,15 @@ training_data_fin <- training_data_fin %>%
                 collapse = "|"), Food, ignore.case = TRUE) ~ "Nuts-Seeds",
     grepl(paste(`Seeded-Vegetables`,
                 collapse = "|"), Food, ignore.case = TRUE) ~ "Seeded-Vegetables",
-    grepl("eggs",Food,ignore.case = TRUE)~"Eggs"
-    
+    grepl("eggs",Food,ignore.case = TRUE)~"Eggs",
+    grepl("Lamb",Food)~"Other Meat",
+    TRUE ~ if_else(is.na(Food),"","Other")
    ))%>%
-  #mutate(`IFSAC Category`=case_when(Food==str_detect(Food, ";")~"Multiple"))%>%
-  view()
+  mutate(`IFSAC Category` = na_if(`IFSAC Category`, ""))%>%
+  relocate(`IFSAC Category`, .after = Food)
+training_data_fin=training_data_fin%>%
+  mutate(`IFSAC Category`=case_when(
+    grepl(";",Food)~"Multiple",TRUE~`IFSAC Category`))
 ```
 
 ## Analysis Data
@@ -328,17 +331,17 @@ analysis_data_fin <- analysis_data_fin %>%
 ```
 #we want to drop the NA rows
 ```{r}
-training_data_fin%>%
+training_data_final=training_data_fin%>%
   drop_na()
-analysis_data_fin%>%
+analysis_data_final=analysis_data_fin%>%
   drop_na()
 ```
 
 
 ## Check Data Structure Again
 ```{r}
-skim(training_data_fin)
-skim(analysis_data_fin)
+skim(training_data_final)
+skim(analysis_data_final)
 ```
 
 
@@ -350,8 +353,8 @@ All done, data is clean now.
 Let's assign at the end to some final variable, this makes it easier to add further cleaning steps above.
 
 ```{r}
-processeddata1<- training_data_fin
-processeddata2<-analysis_data_fin
+processeddata1<- training_data_final
+processeddata2<-analysis_data_final
 ```
 
 
