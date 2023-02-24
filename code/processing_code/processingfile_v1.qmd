@@ -333,12 +333,21 @@ analysis_data_fin <- analysis_data_fin %>%
         Simplified_Etiology == "Heavy" ~ "Heavy Metals",
         TRUE ~ Simplified_Etiology))
 ```
+###Column for Location
+```{r}
+analysis_data_fin_re <- analysis_data_fin %>%
+  rename(Location=Setting)%>%
+  mutate(Location=case_when(
+    grepl("Restaurant",Location)~"Restaurant",TRUE~Location))%>%
+    separate_rows(Location,sep="; ")
+analysis_data_fin_re
+```
 
 # Drop Rows Containing NA
 ```{r}
 training_data_final=training_data_fin%>%
   drop_na()
-analysis_data_final=analysis_data_fin%>%
+analysis_data_final=analysis_data_fin_re%>%
   drop_na()
 
 ```

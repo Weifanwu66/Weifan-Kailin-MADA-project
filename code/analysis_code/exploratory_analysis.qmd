@@ -5,26 +5,8 @@ date: "10/28/2021"
 output: html_document
 ---
 
-This Quarto file loads the cleaned data and does some exploring.
-
-I'm only showing it the way where the code is included in the file. 
-As described in the `processing_code` materials, I currently prefer the approach of having R code in a separate file and pulling it in.
-
-But I already had this written and haven't yet re-done it that way. Feel free to redo and send a pull request on GitHub :)
-
-Again, it is largely a matter of preference and what makes the most sense to decide if one wants to have code inside Quarto files, or as separate R files.
-And sometimes, an R script with enough comments is good enough and one doesn't need a Quarto file.
-
-Also note that while here I split cleaning and exploring, this is iterative. You saw that as part of the processing, we already had to explore the data somewhat to understand how to clean it. In general, as you explore, you'll find things that need cleaning. As you clean, you can explore more. Therefore, at times it might make more sense to combine the cleaning and exploring code parts into a single R or Quarto file. Or split things in any other logical way.
-
-As part of the exploratory analysis, you should produce plots or tables or other summary quantities for the most interesting/important quantities in your data. Depending on the total number of variables in your dataset, explore all or some of the others. Figures produced here might be histograms or density plots, correlation plots, etc. Tables might summarize your data.
-
-Start by exploring one variable at a time. Then continue by creating plots or tables of the outcome(s) of interest and the predictor/exposure/input variables you are most interested in. If your dataset is small, you can do that for all variables. 
-
-Plots produced here can be scatterplots, boxplots, violinplots, etc. Tables can be simple 2x2 tables or larger ones.
 
 # Load Libraries
-
 ```{r}
 # General Data Handling
 library(tidyverse)
@@ -60,48 +42,89 @@ The outcome of interest we will explore for the training data is hospitalization
 
 ```{r}
 # Time vs Hospitalizations
-ggplot(training_data_final %>% group_by(Year, Pathogen_Type, Hospitalizations) %>% count() %>% mutate(true_hospitalization = n * Hospitalizations), aes(x = Year, y = true_hospitalization, group = Pathogen_Type, color = Pathogen_Type)) + geom_point() + geom_jitter() + labs(x = "Year", y = "Hospitalizations", title = "Scatter Plot of Hospitalizations by Year and Pathogen Type")
+ggplot(training_data_final %>% 
+         group_by(Year, Pathogen_Type, Hospitalizations) %>% 
+         count() %>% 
+         mutate(true_hospitalization = n * Hospitalizations), aes(x = Year, y = true_hospitalization, group = Pathogen_Type, color = Pathogen_Type)) + geom_point() + 
+  geom_jitter() + 
+  labs(x = "Year", y = "Hospitalizations", title = "Scatter Plot of Hospitalizations by Year and Pathogen Type")
 
 ## Save Graph
 ggsave("time_v_hospitalization_pathogen_type.png", path = "results")
 
 # Pathogen Type + Etiology vs Hospitalization
-ggplot(training_data_final %>% group_by(Pathogen_Type, Simplified_Etiology, Hospitalizations) %>% count() %>% mutate(true_hospitalization = n * Hospitalizations), aes(x = Pathogen_Type, y = true_hospitalization, group = Simplified_Etiology, fill = Simplified_Etiology)) + geom_col() + labs(x = "Pathogen Type", y = "Hospitalizations", title = "Stacked Bar Chart of Hospitalizations by Pathogen Type and Etiology")
+ggplot(training_data_final %>% 
+         group_by(Pathogen_Type, Simplified_Etiology, Hospitalizations) %>% count() %>% 
+         mutate(true_hospitalization = n * Hospitalizations), aes(x = Pathogen_Type, y = true_hospitalization, group = Simplified_Etiology, fill = Simplified_Etiology)) +
+  geom_col() + 
+  labs(x = "Pathogen Type", y = "Hospitalizations", title = "Stacked Bar Chart of Hospitalizations by Pathogen Type and Etiology")
 
 ## Save Graph
 ggsave("pathogen_type_etiology_v_hospitalizations.png", path = "results")
 
 ## Closer Look at Bacterial Etiologies for Outbreaks
-ggplot(training_data_final %>% select(Pathogen_Type, Simplified_Etiology, Hospitalizations) %>% filter(Pathogen_Type == "Bacteria"), aes(x = Simplified_Etiology)) + geom_bar() + labs(x = "Bacteria", y = "Hospitalizations", title = "Bar Chart of Bacteria Frequency")
+ggplot(training_data_final %>% 
+         select(Pathogen_Type, Simplified_Etiology, Hospitalizations) %>% filter(Pathogen_Type == "Bacteria"), aes(x = Simplified_Etiology)) + geom_bar() + 
+  labs(x = "Bacteria", y = "Hospitalizations", title = "Bar Chart of Bacteria Frequency")
 
 ggsave("bacterial_etiology_v_hospitalization_frequency.png", path = "results")
 
 # States vs Hospitalization
 
-state_v_hospitalization_training <- training_data_final %>% group_by(State) %>% mutate(all_hospitalizations = sum(Hospitalizations)) %>% count(all_hospitalizations) %>% select(State, all_hospitalizations) %>% arrange(desc(all_hospitalizations))
+state_v_hospitalization_training <- training_data_final %>% 
+  group_by(State) %>% 
+  mutate(all_hospitalizations = sum(Hospitalizations)) %>%     count(all_hospitalizations) %>% 
+  select(State, all_hospitalizations) %>% arrange(desc(all_hospitalizations))
 
 saveRDS(state_v_hospitalization_training, file = "results/state_v_hospitalization_training.rds")
 
 rmarkdown::paged_table(state_v_hospitalization_training)
 
-# Food Type and Hospitalizations
-ggplot(training_data_final %>% filter(`IFSAC Category` != "Multiple") %>% filter(`IFSAC Category` != "Other"), aes(x = `IFSAC Category`, y = Hospitalizations)) + geom_col() + labs(x = "Food Type", y = "Hospitalizations", title = "Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'")
 
-ggsave("food_type_v_hospitalization.png", path = "results")
+# Food Type and Hospitalizations
+ggplot(training_data_final %>% 
+         filter(`IFSAC Category` != "Multiple") %>% 
+         filter(`IFSAC Category` != "Other"), 
+       aes(x = `IFSAC Category`, y = Hospitalizations)) + 
+  geom_col() + 
+  labs(x = "Food Type", y = "Hospitalizations", title = "Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'")
+ggsave("Food_type_v_hospitalization.png", path = "results")
+
+# Locations and Hospitalizations
+Location_v_hospitalization=ggplot(training_data_final, aes(x = Location, y = Hospitalizations)) +
+  geom_col() + 
+  labs(x = "Locations", y = "Hospitalizations", title = "Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'")+
+  scale_x_discrete(guide=guide_axis(n.dodge=3))
+Location_v_hospitalization
+
+ggsave("Location_v_hospitalization.png", path = "results")
 
 ```
-All outbreaks with a high hospitalization count (> 200 cases) are caused by bacteria. It also appears that most outbreaks caused by bacteria are due to Salmonella. California and Minnesota are the two states with the highest total hospitalization count due to foodborne illness from 1998 to 2015.
+All outbreaks with a high hospitalization count (> 200 cases) are caused by bacteria. It also appears that most outbreaks caused by bacteria are due to Salmonella. California and Minnesota are the two states with the highest total hospitalization count due to foodborne illness from 1998 to 2015. Resturants and Private home are the most frequent locations with the highest total hospitalization count.
 
 ## Analysis Data
 ```{r}
 # Illnesses Caused by Pathogen Type Over Time
-ggplot(analysis_data_final %>% group_by(Year, Pathogen_Type, Illnesses) %>% count() %>% mutate(true_illness_count = n * Illnesses), aes(x = Year, y = true_illness_count, group = Pathogen_Type, color = Pathogen_Type)) + geom_point() + geom_jitter() + labs(x = "Year", y = "Cases", title = "Scatter Plot of Illness by Year and Pathogen Type")
+ggplot(analysis_data_final %>% 
+         group_by(Year, Pathogen_Type, Illnesses) %>% 
+         count() %>% 
+         mutate(true_illness_count = n * Illnesses), 
+       aes(x = Year, y = true_illness_count, group = Pathogen_Type, color = Pathogen_Type)) + 
+  geom_point() + 
+  geom_jitter() + 
+  labs(x = "Year", y = "Cases", title = "Scatter Plot of Illness by Year and Pathogen Type")
 
 ## Save Graph
 ggsave("time_v_illness_pathogen_type.png", path = "results")
 
 # Pathogen Type + Etiology vs Illnesses Caused
-ggplot(analysis_data_final %>% group_by(Pathogen_Type, Simplified_Etiology, Illnesses) %>% count() %>% mutate(true_illness_count = n * Illnesses), aes(x = Pathogen_Type, y = Illnesses, group = Simplified_Etiology, fill = Simplified_Etiology)) + geom_col() + labs(x = "Pathogen Type", y = "Cases", title = "Stacked Bar Chart of Illnesses by Pathogen Type and Etiology")
+ggplot(analysis_data_final %>% 
+         group_by(Pathogen_Type, Simplified_Etiology, Illnesses) %>% 
+         count() %>% 
+         mutate(true_illness_count = n * Illnesses), 
+       aes(x = Pathogen_Type, y = Illnesses, group = Simplified_Etiology, fill = Simplified_Etiology)) + 
+  geom_col() + 
+  labs(x = "Pathogen Type", y = "Cases", title = "Stacked Bar Chart of Illnesses by Pathogen Type and Etiology")
 
 ## Save Graph
 ggsave("pathogen_type_etiology_v_illness.png", path = "results")
@@ -109,6 +132,7 @@ ggsave("pathogen_type_etiology_v_illness.png", path = "results")
 ## Closer Look at Bacterial Etiologies
 ggplot(analysis_data_final %>% group_by(Pathogen_Type, Simplified_Etiology, Illnesses) %>% filter(Pathogen_Type == "Bacteria"), aes(x = Simplified_Etiology)) + geom_bar() + labs(x = "Bacteria", y = "Cases", title = "Bar Chart of Bacteria Frequency")
 
+#save graph
 ggsave("bacterial_etiology_v_outbreak_frequency.png", path = "results")
 
 # States vs Illnesses
@@ -119,10 +143,24 @@ saveRDS(state_v_illness_analysis, file = "results/state_v_illness_analysis.rds")
 
 rmarkdown::paged_table(state_v_illness_analysis)
 
-# Food Type and Hospitalizations
-ggplot(analysis_data_final %>% filter(`IFSAC Category` != "Multiple") %>% filter(`IFSAC Category` != "Other"), aes(x = `IFSAC Category`, y = Illnesses)) + geom_col() + labs(x = "Food Type", y = "Illnesses", title = "Illnesses by Food Type, Excluding 'Multiple' and 'Other'")
+# Food Type and Illnesses
+ggplot(analysis_data_final %>% filter(`IFSAC Category` != "Multiple") %>% filter(`IFSAC Category` != "Other"), aes(x = `IFSAC Category`, y = Illnesses)) + geom_col() + labs(x = "Food Type", y = "Illnesses", title = "Illnesses by Food Type, Excluding 'Multiple' and 'Other'")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))
 
+#save graph
 ggsave("food_type_v_illness_frequency.png", path = "results")
 
+# Locations and Illnesses
+ggplot(analysis_data_final, aes(x = Location, y = Illnesses)) +
+  geom_col() + 
+  labs(x = "Locations", y = "Illnesses", title = "Illnesses by Locations")+
+  scale_x_discrete(guide=guide_axis(n.dodge=3))
+
+#save graph
+ggsave("Location_v_Illness.png", path = "results")
+
+
+
 ```
-???
+The outbreaks with a high number of cases (> 500) are caused by bacteria. The stacked barplot indicates that the top two etiologic agents that contribute to fooborne-illnesses are Salmonella and Norovirus, which belong to the pathogen type of Bacteria and Virus respectively. In bacterial pathogen, Salmonella genius is the most dominant factor that is associated with foodborne outbreaks, followed by E. coli species and Vibrio genius. Geographically speaking, Arkansas and Minnesota are the two states with the highest accumulated foodborne illnesses from 1998 to 2015. Salad, Poultry, and Fruits are the three most common types of food vectors that are involved in transmitting foodborne pathogens. Resturants and Private home are the most frequent locations that foodborne outbreaks occur.
+Overall, the relationships between predictors and outcomes of training dataset share similar patterns with those of analysis dataset.
