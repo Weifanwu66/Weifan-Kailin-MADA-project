@@ -30,8 +30,8 @@ Plots produced here can be scatterplots, boxplots, violinplots, etc. Tables can 
 ```{r}
 #load needed packages. make sure they are installed.
 library(here) #for data loading/saving
-library(dplyr)
-library(ggplot2)
+library(tidyverse)
+
 ```
 
 
@@ -43,8 +43,13 @@ data_location <- here::here("data","processed_data","processeddata.rds")
 #load data
 mydata <- readRDS(data_location)
 ```
-
-
+#outcome: hospitalization/illness
+#predictors:year/month/Food/State/Location
+#logistic regression models
+#visualizaiton: 
+linegraphs for years/month and illness, group by species/IFSAC code
+boxplot/violin for top 10 food/state/location with hospitalization and illness
+tables for IFSAC/ pathogens 
 
 
 
@@ -69,9 +74,22 @@ We are saving the results to the `results` folder. Depending on how many tables/
 
 # Data exploration through figures
 
-Histogram plots for the continuous outcomes. 
-
-Height first.
+```{r}
+rawdata1%>%filter(grepl("Confirmed", Status))
+food=rawdata1%>%
+  filter(!is.na(Food))%>%
+  group_by(Food)%>%
+  top_n(n=10)
+food
+species=rawdata1%>%
+  filter(!is.na(Species))%>%
+  mutate(Species=fct_collapse(Species,Norovirus=c("Norovirus","Norovirus genogroup I","Norovirus genogroup II","Norovirus unknown")))%>%
+  mutate(Species=fct_lump(Species,11,other_level = NA))%>%
+  count(Species)%>%
+  arrange(desc(n))%>%
+  filter(!is.na(Species))
+species
+```
 
 ```{r}
 p1 <- mydata %>% ggplot(aes(x=Height)) + geom_histogram() 

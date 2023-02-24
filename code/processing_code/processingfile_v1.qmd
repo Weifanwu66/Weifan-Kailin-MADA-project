@@ -107,7 +107,7 @@ Because the analysis dataset contains more than just foodborne outbreaks, we wan
 plot_na_pareto(analysis_data %>% filter(`Primary Mode` == "Food"))
 ```
 
-## Checking Etiologies
+## Checking Etiologies Status
 ```{r}
 # Training Data
 unique(training_data$Status)
@@ -128,6 +128,145 @@ training_data_fin <- training_data %>%
   select(!c(Ingredient, `Serotype/Genotype`)) %>%
   filter(grepl("Confirmed", Status))
 ```
+#Data manipulation
+##checking and cleaning the `Species` column
+```{r}
+unique(training_data_fin$Species)
+#Separate the rows for coninfections
+training_data_fin=training_data_fin%>%
+  separate_rows(Species,sep=";")
+#Create lists for pathogen types
+Pathogen_Bacteria <- c("Bacillus", "Brucella", "Campylobacter", "Clostridium", "Staphylococcus", "Escherichia", "Listeria", "Salmonella", "Vibrio", "Cholera", "Enterococcus", "Bacterium", "Shigella", "Yersinia","Streptococcus")
+Pathogen_Parasite <- c("Cryptosporidium", "Cyclospora", "Entamoeba", "Giardia", "Parasite", "Toxoplasma", "Trichinella")
+Pathogen_Virus <- c("Astrovirus", "Norovirus", "Rotavirus","Hepatitis","Virus")
+Pathogen_Poison <- c("Poison", "Toxin", "Metal","Pesticide","Ciguatoxin","Scombroidtoxin")
+#simplify "Escherichia coli, Shiga toxin-producing" to "Escherichia coli"
+#Create two new columns: Pathogen_type & Simplified_Etiology
+training_data_fin=training_data_fin%>%
+  mutate(Species=str_replace(Species,"Escherichia coli, Shiga toxin-producing","Escherichia"))%>%
+  mutate(Pathogen_Type = case_when(
+    grepl(paste(Pathogen_Poison, 
+                collapse = "|"), Species,ignore.case = TRUE) ~ "Poison",
+    grepl(paste(Pathogen_Bacteria, 
+                collapse = "|"), Species,ignore.case = TRUE) ~ "Bacteria",
+    grepl(paste(Pathogen_Parasite, 
+                collapse = "|"), Species,ignore.case = TRUE) ~ "Parasite",
+    grepl(paste(Pathogen_Virus, 
+                collapse = "|"), Species,ignore.case = TRUE) ~ "Virus"
+    )) %>%
+  mutate(Simplified_Etiology = case_when(
+    Pathogen_Type == "Bacteria" ~ str_extract(Species, 
+      "Bacillus|Brucella|Campylobacter|Clostridium|Staphylococcus|Escherichia|Listeria|Salmonella|Vibrio|Cholera|Enterococcus|Bacterium|Shigella|Yersinia|Streptococcus"),
+    Pathogen_Type == "Parasite" ~ str_extract(Species, "Cryptosporidium|Cyclospora|Entamoeba|Giardia|Parasite|Toxoplasma|Trichinella"),
+    Pathogen_Type == "Virus" ~ str_extract(Species, "Astrovirus|Norovirus|Rotavirus|Hepatitis"),
+    Pathogen_Type == "Poison" ~ str_extract(Species, "Poison|Toxin|Heavy|pesticide|Ciguatoxin|Scombroid")
+    )) %>%
+      mutate(Simplified_Etiology = case_when(
+        Simplified_Etiology == "Escherichia" ~ "E. coli",
+        Simplified_Etiology == "Heavy" ~ "Heavy Metals",
+        TRUE ~ Simplified_Etiology))%>%
+  view()
+```
+# Column for `Location` 
+```{r}
+#checking the names of location and separate the collapsed names
+unique(training_data_fin$Location)
+training_data_fin=training_data_fin%>%
+ separate_rows(Location,sep=";")%>%
+  view()
+
+```
+# Location variable looks clean
+### Add Month as Numeric Column
+```{r}
+training_data_fin <- training_data_fin %>%
+  mutate(Numeric_Month = case_when(
+    Month == "January" ~ 1,
+    Month == "February" ~ 2,
+    Month == "March" ~ 3,
+    Month == "April" ~ 4,
+    Month == "May" ~ 5,
+    Month == "June" ~ 6,
+    Month == "July" ~ 7,
+    Month == "August" ~ 8,
+    Month == "September" ~ 9,
+    Month == "October" ~ 10,
+    Month == "November" ~ 11,
+    Month == "December" ~ 12)) %>%
+  relocate(Numeric_Month, .after = Month)
+```
+##Since there are over 3000+ different categories for food, we want to organize them by adding a IFSAC category column
+```{r}
+unique(analysis_data_fin$`IFSAC Category`)
+unique(training_data_fin$Food)
+Desserts=c("Cookie","Cream","Canoli","Cake","Pudding")
+Beef=c("Beef","Steak")
+Poultry=c("Chicken","Turkey")
+Pork=c("Pork","Sausage","Hot Dog","Deli","Spam","Strawberries","Blueberries","Pig","Ribs")
+Dairy=c("Milk","Cheese","Parsley")
+Crusteaceans=c("Lobster","Crab","Shrimp")
+Fish=c("Fish","Tuna","Salmon")
+Mollusks=c("Clams","Oysters")
+Fruits=c("Tomato","Banana","Melon","Grapes","Mango")
+`Grains-Beans`=c("Rice","Peas","Beans","wheat")
+`Vegetable-Row-Crops`=c("Lettuce","artichokes","broccoli","asparagus","celeries","spinach")
+`Root-underground-vegetables`=c("Roots","carrots","Beets","Onion","Tubers","yams","Garlic","Potatos","taro")
+Sprouts=c("alfalfa","mung")
+Salad=c("Salad")
+Other=c("Ice","Alcohol","Eggnog")
+Game=c("Bear")
+Herbs=c("basil","cilantro")
+Fungi=c("Mushroom","portabellas")
+`Nuts-Seeds`=c("peanuts","almonds","Seasames")
+Eggs=c("Egg")
+`Seeded-Vegetables`=c("Peppers","Squashes","Cucumbers","Okras","Corn")
+`other meat`=c("Lamb")
+
+training_data_fin <- training_data_fin %>%
+  mutate(`IFSAC Category` = case_when(
+    grepl("Salad",Food, ignore.case = TRUE) ~ "Salad",
+    grepl(paste(Desserts, 
+                collapse = "|"), Food,ignore.case = TRUE) ~ "Dessert",
+    grepl(paste(Poultry,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Poultry",
+    grepl(paste(Beef,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Beef",
+    grepl(paste(Pork,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Pork",
+    grepl(paste(Dairy,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Dairy",
+    grepl(paste(Crusteaceans,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Crusteaceans",
+    grepl(paste(Fish,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Fish",
+    grepl(paste(Mollusks,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Mollusks",
+    grepl(paste(Fruits,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Fruits",
+    grepl(paste(`Grains-Beans`,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Grains-Beans",
+    grepl(paste(`Vegetable-Row-Crops`,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Vegetable-Row-Crops",
+    grepl(paste(`Root-underground-vegetables`,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Root-underground-vegetables",
+    grepl(paste(Sprouts,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Sprouts",
+    grepl(paste(Other,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Other",
+    grepl(paste(Herbs,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Herbs",
+    grepl(paste(Fungi,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Fungi",
+    grepl(paste(`Nuts-Seeds`,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Nuts-Seeds",
+    grepl(paste(`Seeded-Vegetables`,
+                collapse = "|"), Food, ignore.case = TRUE) ~ "Seeded-Vegetables",
+    grepl("eggs",Food,ignore.case = TRUE)~"Eggs"
+    
+   ))%>%
+  #mutate(`IFSAC Category`=case_when(Food==str_detect(Food, ";")~"Multiple"))%>%
+  view()
+```
 
 ## Analysis Data
 ```{r}
@@ -137,29 +276,6 @@ analysis_data_fin <- analysis_data %>%
             `Food Contaminated Ingredient`)) %>%
   filter(grepl("Confirmed", `Etiology Status`)) %>%
   filter(`Primary Mode` == "Food")
-```
-
-# checking the levels under each variable
-
-:D
-
-```{r}
-skim(d1$Food)
-#convert Food to factor
-d1$Food=as.factor(d1$Food)
-str(d1$Food)
-#Since there are over 3000 different levels, we need to combine some food into the same category
-d2=
-```
-
-checking the levels under `Species`
-```{r}
-
-```
-
-# Checking the levels under `Location`
-```{r}
-
 ```
 
 ## Data Manipulation
@@ -186,10 +302,6 @@ analysis_data_fin <- analysis_data_fin %>%
 
 ### Column for Type of Pathogen
 ```{r}
-Pathogen_Bacteria <- c("Bacillus", "Brucella", "Campylobacter", "Clostridium", "Staphylococcus", "Escherichia", "Listeria", "Salmonella", "Vibrio", "Cholera", "Enterococcus", "Bacterium", "Shigella", "Yersinia")
-Pathogen_Parasite <- c("Cryptosporidium", "Cyclospora", "Entamoeba", "Giardia", "Parasite", "Toxoplasma", "Trichinella")
-Pathogen_Virus <- c("Astrovirus", "Norovirus", "Rotavirus")
-Pathogen_Poison <- c("Poison", "Toxin", "Metal")
 
 analysis_data_fin <- analysis_data_fin %>%
   mutate(Pathogen_Type = case_when(
@@ -214,66 +326,46 @@ analysis_data_fin <- analysis_data_fin %>%
         Simplified_Etiology == "Heavy" ~ "Heavy Metals",
         TRUE ~ Simplified_Etiology))
 ```
-
-### Add Month as Numeric Column
+#we want to drop the NA rows
 ```{r}
-training_data_fin <- training_data_fin %>%
-  mutate(Numeric_Month = case_when(
-    Month == "January" ~ 1,
-    Month == "February" ~ 2,
-    Month == "March" ~ 3,
-    Month == "April" ~ 4,
-    Month == "May" ~ 5,
-    Month == "June" ~ 6,
-    Month == "July" ~ 7,
-    Month == "August" ~ 8,
-    Month == "September" ~ 9,
-    Month == "October" ~ 10,
-    Month == "November" ~ 11,
-    Month == "December" ~ 12)) %>%
-  relocate(Numeric_Month, .after = Month)
+training_data_fin%>%
+  drop_na()
+analysis_data_fin%>%
+  drop_na()
 ```
+
 
 ## Check Data Structure Again
 ```{r}
+skim(training_data_fin)
 skim(analysis_data_fin)
 ```
 
 
 
-```{r}
-rawdata1%>%filter(grepl("Confirmed", Status))
-food=rawdata1%>%
-  filter(!is.na(Food))%>%
-  group_by(Food)%>%
-  top_n(n=10)
-food
-species=rawdata1%>%
-  filter(!is.na(Species))%>%
-  mutate(Species=fct_collapse(Species,Norovirus=c("Norovirus","Norovirus genogroup I","Norovirus genogroup II","Norovirus unknown")))%>%
-  mutate(Species=fct_lump(Species,11,other_level = NA))%>%
-  count(Species)%>%
-  arrange(desc(n))%>%
-  filter(!is.na(Species))
-species
-```
+
 
 All done, data is clean now. 
 
 Let's assign at the end to some final variable, this makes it easier to add further cleaning steps above.
 
 ```{r}
-processeddata <- d4
+processeddata1<- training_data_fin
+processeddata2<-analysis_data_fin
 ```
 
 
 # Save data 
 
-Finally, we save the clean data as RDS file. 
+Finally, we save the clean data as RDS files. 
 
 ```{r}
-save_data_location <- here::here("data","processed_data","processeddata1.rds")
-saveRDS(processeddata1, file = save_data_location)
+save_data_location1 <- here::here("data","processed_data","processeddata1.rds")
+saveRDS(processeddata1, file = save_data_location1)
+
+save_data_location2=here::here("data","processed_data","processeddata2.rds")
+saveRDS(processeddata2, file = save_data_location2)
+
 ```
 
 
