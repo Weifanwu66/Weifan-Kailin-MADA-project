@@ -50,8 +50,7 @@ The raw datasets may be viewed within the repository of this project (data/raw_d
 
 ## Questions and Hypotheses to be Addressed
 
-We have several questions we would like our datasets to answer: (1) do foodborne disease outbreaks occur more often in restaurants or in private residences, (2) what pathogen species are most frequently associated with foodborne outbreaks, and (3) what type of food is most commonly involved in foodborne outbreaks.
-The outcomes of interest would therefore be location (for whether more outbreaks occur in restaurants/homes), species of pathogen, and food type most often associated with outbreaks.
+We have several questions we would like our datasets to answer: (1) what are the most frequent locations that foodborne disease outbreaks occur (2) what pathogen species are most frequently associated with foodborne outbreaks, and (3) what type of food is most commonly involved in foodborne outbreaks. The outcomes of interest would therefore be location (for whether more outbreaks occur in restaurants/homes), species of pathogen, and food type most often associated with outbreaks.
 
 We expect to see that outbreaks occur most often in homes rather than restaurants, the pathogen most commonly seen to be *E. coli*, and for the food most often associated with outbreaks to be some form of salad.
 Moreover, we want to predict the accuracy of the model trained by first dataset using the second dataset as testing data.

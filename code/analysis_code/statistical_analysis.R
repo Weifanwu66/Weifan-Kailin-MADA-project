@@ -40,7 +40,21 @@ saveRDS(lmtable1, file = table_file1)
 ############################
 #### Second model fit
 # fit linear model using height as outcome, weight and sex as predictor
+# Mapping the illness data through the states
 
+us=map_data("usa")
+map_States=training_data_final%>%
+  group_by(State)%>%
+  mutate(all_illnesses = sum(Illnesses)) %>%  count(all_illnesses) %>% select(State, all_illnesses)
+
+map1=map_States%>%
+  rename("region"="State")%>%
+  mutate(region=tolower(region))
+map1
+ggplot(data=map1)+
+  geom_map(aes(map_id=region,fill=as.factor(map1$all_illnesses)),map=us) + 
+  expand_limits(x=us$long,y=us$lat)
+map1
 lmfit2 <- lm(Height ~ Weight + Sex, mydata)  
 
 # place results from fit into a data frame with the tidy function
