@@ -104,19 +104,7 @@ rmarkdown::paged_table(readRDS("../../results/state_v_hospitalization_training.r
 
 ## Basic Statistical Analysis
 
-## Full Analysis
-
-*Use one or several suitable statistical/machine learning methods to analyze your data and to produce meaningful figures, tables, etc. This might again be code that is best placed in one or several separate R scripts that need to be well documented. You want the code to produce figures and data ready for display as tables, and save those. Then you load them here.*
-
-Example @tbl-resulttable2 shows a summary of a linear model fit.
-
-```{r}
-#| label: tbl-resulttable2
-#| tbl-cap: "Linear model fit table."
-#| echo: FALSE
-resulttable2 = readRDS(here("results","resulttable2.rds"))
-knitr::kable(resulttable2)
-```
+## Full Analysis (Machine Learning)
 
 {{< pagebreak >}}
 
@@ -124,26 +112,11 @@ knitr::kable(resulttable2)
 
 ## Summary and Interpretation
 
-*Summarize what you did, what you found and what it means.*
 
 ## Strengths and Limitations
 
-*Discuss what you perceive as strengths and limitations of your analysis.*
 
 ## Conclusions
-
-*What are the main take-home messages?*
-
-*Include citations in your Rmd file using bibtex, the list of references will automatically be placed at the end*
-
-This paper [@leek2015] discusses types of analyses.
-
-These papers [@mckay2020; @mckay2020a] are good examples of papers published using a fully reproducible setup similar to the one shown in this template.
-
-Note that this cited reference will show up at the end of the document, the reference formatting is determined by the CSL file specified in the YAML header.
-Many more style files for almost any journal [are available](https://www.zotero.org/styles).
-You also specify the location of your bibtex reference file in the YAML.
-You can call your reference file anything you like, I just used the generic word `references.bib` but giving it a more descriptive name is probably better.
 
 {{< pagebreak >}}
 
