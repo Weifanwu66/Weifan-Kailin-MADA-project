@@ -5,8 +5,6 @@ date: "10/28/2021"
 output: html_document
 ---
 
-  
-  
 This Quarto file loads the cleaned data and does some exploring.
 
 I'm only showing it the way where the code is included in the file. 
@@ -25,110 +23,106 @@ Start by exploring one variable at a time. Then continue by creating plots or ta
 
 Plots produced here can be scatterplots, boxplots, violinplots, etc. Tables can be simple 2x2 tables or larger ones.
 
-# Setup
+# Load Libraries
 
 ```{r}
-#load needed packages. make sure they are installed.
-library(here) #for data loading/saving
+# General Data Handling
 library(tidyverse)
 
+# For Data Loading and Saving
+library(here)
 ```
 
+# Load Data
 
-Load the data.
+## Training Data
+```{r}
+# Path to Data
+data_location <- here(
+  "data","processed_data","processed_training_data.rds")
+# Import Data
+training_data_final <- readRDS(data_location)
+```
+
+## Analysis Data
+```{r}
+# Path to Data
+data_location <- here(
+  "data","processed_data","processed_analysis_data.rds")
+# Import Data
+analysis_data_final <- readRDS(data_location)
+```
+
+# Data Exploration
+## Training Data
+
+The outcome of interest we will explore for the training data is hospitalizations.
 
 ```{r}
-#Path to data. Note the use of the here() package and not absolute paths
-data_location <- here::here("data","processed_data","processeddata.rds")
-#load data
-mydata <- readRDS(data_location)
+# Time vs Hospitalizations
+ggplot(training_data_final %>% group_by(Year, Pathogen_Type, Hospitalizations) %>% count() %>% mutate(true_hospitalization = n * Hospitalizations), aes(x = Year, y = true_hospitalization, group = Pathogen_Type, color = Pathogen_Type)) + geom_point() + geom_jitter() + labs(x = "Year", y = "Hospitalizations", title = "Scatter Plot of Hospitalizations by Year and Pathogen Type")
+
+## Save Graph
+ggsave("time_v_hospitalization_pathogen_type.png", path = "results")
+
+# Pathogen Type + Etiology vs Hospitalization
+ggplot(training_data_final %>% group_by(Pathogen_Type, Simplified_Etiology, Hospitalizations) %>% count() %>% mutate(true_hospitalization = n * Hospitalizations), aes(x = Pathogen_Type, y = true_hospitalization, group = Simplified_Etiology, fill = Simplified_Etiology)) + geom_col() + labs(x = "Pathogen Type", y = "Hospitalizations", title = "Stacked Bar Chart of Hospitalizations by Pathogen Type and Etiology")
+
+## Save Graph
+ggsave("pathogen_type_etiology_v_hospitalizations.png", path = "results")
+
+## Closer Look at Bacterial Etiologies for Outbreaks
+ggplot(training_data_final %>% select(Pathogen_Type, Simplified_Etiology, Hospitalizations) %>% filter(Pathogen_Type == "Bacteria"), aes(x = Simplified_Etiology)) + geom_bar() + labs(x = "Bacteria", y = "Hospitalizations", title = "Bar Chart of Bacteria Frequency")
+
+ggsave("bacterial_etiology_v_hospitalization_frequency.png", path = "results")
+
+# States vs Hospitalization
+
+state_v_hospitalization_training <- training_data_final %>% group_by(State) %>% mutate(all_hospitalizations = sum(Hospitalizations)) %>% count(all_hospitalizations) %>% select(State, all_hospitalizations) %>% arrange(desc(all_hospitalizations))
+
+saveRDS(state_v_hospitalization_training, file = "results/state_v_hospitalization_training.rds")
+
+rmarkdown::paged_table(state_v_hospitalization_training)
+
+# Food Type and Hospitalizations
+ggplot(training_data_final %>% filter(`IFSAC Category` != "Multiple") %>% filter(`IFSAC Category` != "Other"), aes(x = `IFSAC Category`, y = Hospitalizations)) + geom_col() + labs(x = "Food Type", y = "Hospitalizations", title = "Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'")
+
+ggsave("food_type_v_hospitalization.png", path = "results")
+
 ```
-#outcome: hospitalization/illness
-#predictors:year/month/Food/State/Location
-#logistic regression models
-#visualizaiton: 
-linegraphs for years/month and illness, group by species/IFSAC code
-boxplot/violin for top 10 food/state/location with hospitalization and illness
-tables for IFSAC/ pathogens 
+All outbreaks with a high hospitalization count (> 200 cases) are caused by bacteria. It also appears that most outbreaks caused by bacteria are due to Salmonella. California and Minnesota are the two states with the highest total hospitalization count due to foodborne illness from 1998 to 2015.
 
-
-
-# Data exploration through tables
-
-Showing a bit of code to produce and save a summary table.
-
-This uses a bit of code trickery to get things into the shape of a data frame (for easier saving/showing in manuscript)
-
+## Analysis Data
 ```{r}
-summary_df = data.frame(do.call(cbind, lapply(mydata, summary)))
-print(summary_df)
-# another way of looking at the data
-dplyr::glimpse(mydata)
-# save to file
-summarytable_file = here("results", "summarytable.rds")
-saveRDS(summary_df, file = summarytable_file)
+# Illnesses Caused by Pathogen Type Over Time
+ggplot(analysis_data_final %>% group_by(Year, Pathogen_Type, Illnesses) %>% count() %>% mutate(true_illness_count = n * Illnesses), aes(x = Year, y = true_illness_count, group = Pathogen_Type, color = Pathogen_Type)) + geom_point() + geom_jitter() + labs(x = "Year", y = "Cases", title = "Scatter Plot of Illness by Year and Pathogen Type")
+
+## Save Graph
+ggsave("time_v_illness_pathogen_type.png", path = "results")
+
+# Pathogen Type + Etiology vs Illnesses Caused
+ggplot(analysis_data_final %>% group_by(Pathogen_Type, Simplified_Etiology, Illnesses) %>% count() %>% mutate(true_illness_count = n * Illnesses), aes(x = Pathogen_Type, y = Illnesses, group = Simplified_Etiology, fill = Simplified_Etiology)) + geom_col() + labs(x = "Pathogen Type", y = "Cases", title = "Stacked Bar Chart of Illnesses by Pathogen Type and Etiology")
+
+## Save Graph
+ggsave("pathogen_type_etiology_v_illness.png", path = "results")
+
+## Closer Look at Bacterial Etiologies
+ggplot(analysis_data_final %>% group_by(Pathogen_Type, Simplified_Etiology, Illnesses) %>% filter(Pathogen_Type == "Bacteria"), aes(x = Simplified_Etiology)) + geom_bar() + labs(x = "Bacteria", y = "Cases", title = "Bar Chart of Bacteria Frequency")
+
+ggsave("bacterial_etiology_v_outbreak_frequency.png", path = "results")
+
+# States vs Illnesses
+
+state_v_illness_analysis <- analysis_data_final %>% group_by(State) %>% mutate(all_illnesses = sum(Illnesses)) %>% count(all_illnesses) %>% select(State, all_illnesses) %>% arrange(desc(all_illnesses))
+
+saveRDS(state_v_illness_analysis, file = "results/state_v_illness_analysis.rds")
+
+rmarkdown::paged_table(state_v_illness_analysis)
+
+# Food Type and Hospitalizations
+ggplot(analysis_data_final %>% filter(`IFSAC Category` != "Multiple") %>% filter(`IFSAC Category` != "Other"), aes(x = `IFSAC Category`, y = Illnesses)) + geom_col() + labs(x = "Food Type", y = "Illnesses", title = "Illnesses by Food Type, Excluding 'Multiple' and 'Other'")
+
+ggsave("food_type_v_illness_frequency.png", path = "results")
+
 ```
-
-We are saving the results to the `results` folder. Depending on how many tables/figures you have, it might make sense to have separate folders for each. And/or you could have separate folders for exploratory tables/figures and for final tables/figures. Just choose a setup that makes sense for your project and works for you, and provide enough documentation that someone can understand what you are doing.
-
-
-# Data exploration through figures
-
-```{r}
-rawdata1%>%filter(grepl("Confirmed", Status))
-food=rawdata1%>%
-  filter(!is.na(Food))%>%
-  group_by(Food)%>%
-  top_n(n=10)
-food
-species=rawdata1%>%
-  filter(!is.na(Species))%>%
-  mutate(Species=fct_collapse(Species,Norovirus=c("Norovirus","Norovirus genogroup I","Norovirus genogroup II","Norovirus unknown")))%>%
-  mutate(Species=fct_lump(Species,11,other_level = NA))%>%
-  count(Species)%>%
-  arrange(desc(n))%>%
-  filter(!is.na(Species))
-species
-```
-
-```{r}
-p1 <- mydata %>% ggplot(aes(x=Height)) + geom_histogram() 
-plot(p1)
-figure_file = here("results","height_distribution.png")
-ggsave(filename = figure_file, plot=p1) 
-```
-
-Now weights.
-
-```{r}
-p2 <- mydata %>% ggplot(aes(x=Weight)) + geom_histogram() 
-plot(p2)
-figure_file = here("results","weight_distribution.png")
-ggsave(filename = figure_file, plot=p2) 
-```
-
-Now height as function of weight.
-
-```{r}
-p3 <- mydata %>% ggplot(aes(x=Height, y=Weight)) + geom_point() + geom_smooth(method='lm')
-plot(p3)
-figure_file = here("results","height_weight.png")
-ggsave(filename = figure_file, plot=p3) 
-```
-
-Once more height as function of weight, stratified by sex.
-
-```{r}
-p4 <- mydata %>% ggplot(aes(x=Height, y=Weight, color = Sex)) + geom_point() + geom_smooth(method='lm')
-plot(p4)
-figure_file = here("results","height_weight_stratified.png")
-ggsave(filename = figure_file, plot=p4) 
-```
-
-
-
-# Notes
-
-For your own explorations, tables and figures can be "quick and dirty". As long as you can see what's going on, there is no need to polish them. That's in contrast to figures you'll produce for your final products (paper, report, presentation, website, etc.). Those should look as nice, polished and easy to understand as possible.
-
-
+???

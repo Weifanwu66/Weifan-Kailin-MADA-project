@@ -128,20 +128,21 @@ training_data_fin <- training_data %>%
   select(!c(Ingredient, `Serotype/Genotype`)) %>%
   filter(grepl("Confirmed", Status))
 ```
-#Data manipulation
-##checking and cleaning the `Species` column
+# Data Manipulation
+## Training Data
+### Cleaning the "Species" Column
 ```{r}
 unique(training_data_fin$Species)
-#Separate the rows for coninfections
+# Separate the rows for coninfections
 training_data_fin=training_data_fin%>%
   separate_rows(Species,sep=";")
-#Create lists for pathogen types
+# Create lists for pathogen types
 Pathogen_Bacteria <- c("Bacillus", "Brucella", "Campylobacter", "Clostridium", "Staphylococcus", "Escherichia", "Listeria", "Salmonella", "Vibrio", "Cholera", "Enterococcus", "Bacterium", "Shigella", "Yersinia","Streptococcus")
 Pathogen_Parasite <- c("Cryptosporidium", "Cyclospora", "Entamoeba", "Giardia", "Parasite", "Toxoplasma", "Trichinella")
 Pathogen_Virus <- c("Astrovirus", "Norovirus", "Rotavirus","Hepatitis","Virus")
 Pathogen_Poison <- c("Poison", "Toxin", "Metal","Pesticide","Ciguatoxin","Scombroidtoxin")
-#simplify "Escherichia coli, Shiga toxin-producing" to "Escherichia coli"
-#Create two new columns: Pathogen_type & Simplified_Etiology
+# simplify "Escherichia coli, Shiga toxin-producing" to "Escherichia coli"
+# Create two new columns: Pathogen_type & Simplified_Etiology
 training_data_fin=training_data_fin%>%
   mutate(Pathogen_Type = case_when(
     grepl(paste(Pathogen_Virus, 
@@ -163,19 +164,20 @@ training_data_fin=training_data_fin%>%
       mutate(Simplified_Etiology = case_when(
         Simplified_Etiology == "Escherichia" ~ "E. coli",
         Simplified_Etiology == "Heavy" ~ "Heavy Metals",
-        TRUE ~ Simplified_Etiology))%>%
-  view()
+        TRUE ~ Simplified_Etiology))
 ```
-# Column for `Location` 
+
+### Column for Location
 ```{r}
-#checking the names of location and separate the collapsed names
+# Checking Location Names and Separate Multiple Names
 unique(training_data_fin$Location)
-training_data_fin=training_data_fin%>%
- separate_rows(Location,sep=";")%>%
-  view()
+training_data_fin=training_data_fin %>%
+ separate_rows(Location,sep="; ")
 
 ```
-# Location variable looks clean
+
+The variable for location appears to be clean now.
+
 ### Add Month as Numeric Column
 ```{r}
 training_data_fin <- training_data_fin %>%
@@ -194,11 +196,14 @@ training_data_fin <- training_data_fin %>%
     Month == "December" ~ 12)) %>%
   relocate(Numeric_Month, .after = Month)
 ```
-##Since there are over 3000+ different categories for food, we want to organize them by adding a IFSAC category column
-#categorize everything else other than vectors into other
+
+### Make IFSAC Category Column for Training Data
+
+Everything else not included in vectors will be categorized as "Other".
+
 ```{r}
-#unique(analysis_data_fin$`IFSAC Category`)
-#unique(training_data_fin$Food)
+# unique(analysis_data_fin$`IFSAC Category`)
+# unique(training_data_fin$Food)
 Desserts=c("Cookie","Cream","Canoli","Cake","Pudding")
 Beef=c("Beef","Steak")
 Poultry=c("Chicken","Turkey")
@@ -213,7 +218,7 @@ Fruits=c("Tomato","Banana","Melon","Grapes","Mango")
 `Root-underground-vegetables`=c("Roots","carrots","Beets","Onion","Tubers","yams","Garlic","Potatos","taro")
 Sprouts=c("alfalfa","mung")
 Salad=c("Salad")
-#Other=c("Ice","Alcohol","Eggnog")
+# Other=c("Ice","Alcohol","Eggnog")
 Game=c("Bear")
 Herbs=c("basil","cilantro")
 Fungi=c("Mushroom","portabellas")
@@ -281,7 +286,6 @@ analysis_data_fin <- analysis_data %>%
   filter(`Primary Mode` == "Food")
 ```
 
-## Data Manipulation
 ### Separate Rows to Address Coinfections
 ```{r}
 analysis_data_fin <- analysis_data_fin %>%
@@ -329,14 +333,15 @@ analysis_data_fin <- analysis_data_fin %>%
         Simplified_Etiology == "Heavy" ~ "Heavy Metals",
         TRUE ~ Simplified_Etiology))
 ```
-#we want to drop the NA rows
+
+# Drop Rows Containing NA
 ```{r}
 training_data_final=training_data_fin%>%
   drop_na()
 analysis_data_final=analysis_data_fin%>%
   drop_na()
-```
 
+```
 
 ## Check Data Structure Again
 ```{r}
@@ -344,36 +349,21 @@ skim(training_data_final)
 skim(analysis_data_final)
 ```
 
+# Save Data 
 
-
-
-
-All done, data is clean now. 
-
-Let's assign at the end to some final variable, this makes it easier to add further cleaning steps above.
+The cleaned datasets will be saved as RDS files. 
 
 ```{r}
-processeddata1<- training_data_final
-processeddata2<-analysis_data_final
-```
+# Label Final Datasets as Cleaned/Processed
+processed_training_data <- training_data_final
+processed_analysis_data <- analysis_data_final
 
+# Save Data
+save_data_location1 <- here::here("data","processed_data","processed_training_data.rds")
+saveRDS(processed_training_data, file = save_data_location1)
 
-# Save data 
-
-Finally, we save the clean data as RDS files. 
-
-```{r}
-save_data_location1 <- here::here("data","processed_data","processeddata1.rds")
-saveRDS(processeddata1, file = save_data_location1)
-
-save_data_location2=here::here("data","processed_data","processeddata2.rds")
-saveRDS(processeddata2, file = save_data_location2)
+save_data_location2=here::here("data","processed_data","processed_analysis_data.rds")
+saveRDS(processed_analysis_data, file = save_data_location2)
 
 ```
-
-
-
-# Notes
-
-Removing anyone who had "faulty" or missing data is one approach. It's often not the best. based on your question and your analysis approach, you might want to do cleaning differently (e.g. keep individuals with some missing information).
 
