@@ -83,6 +83,34 @@ saveRDS(state_v_hospitalization_training, file = table_path)
 
 rmarkdown::paged_table(state_v_hospitalization_training)
 
+## Project total hospitalizations in states map
+training_hosp=training_data_final%>%
+  mutate(state=tolower(State))%>%
+  group_by(state)%>%
+  mutate(all_hosp = sum(Hospitalizations)) %>%  count(all_hosp) %>%
+  select(state, all_hosp)
+training_hosp
+
+state_map=training_hosp%>%
+  distinct(state)%>%
+  inner_join(.,map_data("state"),by=c("state"="region"))
+state_map
+
+map_final=right_join(training_hosp,state_map,by=c("state"="state"))
+
+map_final%>%
+  ggplot(aes(x=long,y=lat,fill=all_hosp,group=group))+
+  geom_polygon(color="black",size=0.1)+
+  geom_polygon(data=state_map,aes(x=long,y=lat,group=group),fill=NA,color="black",size=0.3)+
+  scale_fill_gradient(name="Number of \n Hospitalizations",
+                      low="#FFFFFF",high="#FF0000",
+                       limits=c(0,NA))+
+  labs(title="Cases of Hospitalizations Caused by Foodborne Illnesses\n in Each State During 1998-2015")+
+  theme_void()+
+  coord_quickmap()
+
+ggsave("State_hospitalization_map.png",path=image_path,width=3000,height=2000,units="px")
+
 # Food Type and Hospitalizations
 ggplot(training_data_final %>% 
          filter(`IFSAC Category` != "Multiple") %>% 
@@ -90,6 +118,7 @@ ggplot(training_data_final %>%
        aes(x = `IFSAC Category`, y = Hospitalizations)) + 
   geom_col() + 
   labs(x = "Food Type", y = "Hospitalizations", title = "Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'")
+
 ggsave("Food_type_v_hospitalization.png", path = image_path, width = 3000, height = 2000, units = "px")
 
 # Locations and Hospitalizations
@@ -163,5 +192,5 @@ ggplot(analysis_data_final, aes(x = Location, y = Illnesses)) +
 ggsave("Location_v_Illness.png", path = image_path, width = 3000, height = 2000, units = "px")
 
 ```
-The outbreaks with a high number of cases (> 500) are caused by bacteria. The stacked barplot indicates that the top two etiologic agents that contribute to fooborne-illnesses are Salmonella and Norovirus, which belong to the pathogen type of Bacteria and Virus respectively. In bacterial pathogen, Salmonella genius is the most dominant factor that is associated with foodborne outbreaks, followed by E. coli species and Vibrio genius. Geographically speaking, Arkansas and Minnesota are the two states with the highest accumulated foodborne illnesses from 1998 to 2015. Salad, Poultry, and Fruits are the three most common types of food vectors that are involved in transmitting foodborne pathogens. Resturants and Private home are the most frequent locations that foodborne outbreaks occur.
+The outbreaks with a high number of cases (> 500) are caused by bacteria. The stacked barplot indicates that the top two etiologic agents that contribute to fooborne-illnesses are Salmonella and Norovirus, which belong to the pathogen type of Bacteria and Virus respectively. In bacterial pathogen, Salmonella genus is the most dominant factor that is associated with foodborne outbreaks, followed by E. coli species and Vibrio genus. Geographically speaking, Arkansas and Minnesota are the two states with the highest accumulated foodborne illnesses from 1998 to 2015. Salad, Poultry, and Fruits are the three most common types of food vectors that are involved in transmitting foodborne pathogens. Resturants and Private home are the most frequent locations that foodborne outbreaks occur.
 Overall, the relationships between predictors and outcomes of training dataset share similar patterns with those of analysis dataset.
