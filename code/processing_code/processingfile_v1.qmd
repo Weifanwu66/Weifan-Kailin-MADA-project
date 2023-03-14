@@ -31,7 +31,7 @@ training_data <- read_csv(data_location)
 
 data_location <- here(
   "data","raw_data","NationalOutbreakPublicDataTool.xlsx")
-analysis_data <- readxl::read_excel(data_location)
+testing_data <- readxl::read_excel(data_location)
 ```
 
 # Check Data
@@ -63,7 +63,7 @@ Health Outcomes
 -   Hospitalizations
 -   Fatalities
 
-## Analysis Data
+## Testing Data
 ```{r}
 str(analysis_data)
 summary(analysis_data)
@@ -145,8 +145,8 @@ Pathogen_Poison <- c("Poison", "Toxin", "Metal","Pesticide","Ciguatoxin","Scombr
 # Create two new columns: Pathogen_type & Simplified_Etiology
 training_data_fin=training_data_fin%>%
   mutate(Pathogen_Type = case_when(
-    grepl(paste(Pathogen_Virus, 
-                collapse = "|"), Species,ignore.case = TRUE) ~ "Virus",
+    grepl(paste(Pathogen_Virus,
+                collapse="|"), Species,ignore.case = TRUE) ~ "Virus",
     grepl(paste(Pathogen_Bacteria, 
                 collapse = "|"), Species,ignore.case = TRUE) ~ "Bacteria",
     grepl(paste(Pathogen_Parasite, 
@@ -154,13 +154,7 @@ training_data_fin=training_data_fin%>%
     grepl(paste(Pathogen_Poison, 
                 collapse = "|"), Species,ignore.case = TRUE) ~ "Poison"
     )) %>%
-  mutate(Simplified_Etiology = case_when(
-    Pathogen_Type == "Bacteria" ~ str_extract(Species, 
-      "Bacillus|Brucella|Campylobacter|Clostridium|Staphylococcus|Escherichia|Listeria|Salmonella|Vibrio|Cholera|Enterococcus|Bacterium|Shigella|Yersinia|Streptococcus"),
-    Pathogen_Type == "Parasite" ~ str_extract(Species, "Cryptosporidium|Cyclospora|Entamoeba|Giardia|Parasite|Toxoplasma|Trichinella"),
-    Pathogen_Type == "Virus" ~ str_extract(Species, "Astrovirus|Norovirus|Rotavirus|Hepatitis"),
-    Pathogen_Type == "Poison" ~ str_extract(Species, "Poison|Toxin|Heavy|pesticide|Ciguatoxin|Scombroid")
-    )) %>%
+  mutate(Simplified_Etiology = word(Species,1))%>%
       mutate(Simplified_Etiology = case_when(
         Simplified_Etiology == "Escherichia" ~ "E. coli",
         Simplified_Etiology == "Heavy" ~ "Heavy Metals",
@@ -173,7 +167,6 @@ training_data_fin=training_data_fin%>%
 unique(training_data_fin$Location)
 training_data_fin=training_data_fin %>%
  separate_rows(Location,sep="; ")
-
 ```
 
 The variable for location appears to be clean now.
@@ -321,13 +314,7 @@ analysis_data_fin <- analysis_data_fin %>%
     grepl(paste(Pathogen_Virus, 
                 collapse = "|"), Etiology) ~ "Virus"
     )) %>%
-  mutate(Simplified_Etiology = case_when(
-    Pathogen_Type == "Bacteria" ~ str_extract(Etiology, 
-      "Bacillus|Brucella|Campylobacter|Clostridium|Staphylococcus|Escherichia|Listeria|Salmonella|Vibrio|Cholera|Enterococcus|Bacterium|Shigella|Yersinia"),
-    Pathogen_Type == "Parasite" ~ str_extract(Etiology, "Cryptosporidium|Cyclospora|Entamoeba|Giardia|Parasite|Toxoplasma|Trichinella"),
-    Pathogen_Type == "Virus" ~ str_extract(Etiology, "Astrovirus|Norovirus|Rotavirus"),
-    Pathogen_Type == "Poison" ~ str_extract(Etiology, "Poison|Toxin|Heavy")
-    )) %>%
+  mutate(Simplified_Etiology = word(Etiology,1)) %>%
       mutate(Simplified_Etiology = case_when(
         Simplified_Etiology == "Escherichia" ~ "E. coli",
         Simplified_Etiology == "Heavy" ~ "Heavy Metals",
