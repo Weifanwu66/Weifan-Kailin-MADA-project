@@ -76,7 +76,8 @@ Norovirus_Hosp=training_data_final%>%
   select(Simplified_Etiology, Hospitalizations, `IFSAC Category`)%>%
   group_by(Simplified_Etiology, Hospitalizations, `IFSAC Category`)%>%
   filter(Simplified_Etiology=="Salmonella")%>%
-  filter(`IFSAC Category`!= %n% C("Multiple","Other"))%>%
+  filter(`IFSAC Category` != "Multiple")%>%
+  filter(`IFSAC Category` != "Other") %>%
   count()%>%
   mutate(total_hospitalizations=n*Hospitalizations)
 

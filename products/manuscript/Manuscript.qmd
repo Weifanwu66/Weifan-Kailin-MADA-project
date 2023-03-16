@@ -76,9 +76,9 @@ For more information, in-depth preprocessing may be viewed in "code/processing_c
 
 ## Statistical Analysis
 
-Post-preprocessing, we performed an exploratory data analysis to view general relationships between the predictors: time (year), pathogen type and etiology, state, food type, and health outcomes of interest: hospitalizations and illnesses.
+Post-preprocessing, we performed an exploratory data analysis to view general relationships between the predictors: time (year), pathogen type and etiology, state, food type, and health outcomes of interest: hospitalizations and illnesses. 
 
-We will be building regression models using these predictors and health outcomes as well; we intend to implement machine learning to train a model to predict health outcomes using the Kaggle dataset for the CDC NORS data.
+Afterwards, we built regression models using these predictors and health outcomes; we intend to implement machine learning to train a model to predict health outcomes using the Kaggle dataset for the CDC NORS data.
 
 {{< pagebreak >}}
 
@@ -103,6 +103,19 @@ rmarkdown::paged_table(readRDS("../../results/state_v_hospitalization_training.r
 ![Figure 4. Bacterial etiology by outbreak frequency.](images/bacterial_etiology_v_outbreak_frequency.png)
 
 ## Basic Statistical Analysis
+Multivariate Poisson regression performed for illness as the health outcome proved to be the best model (RMSE = 55.6) among simple linear, multiple linear, simple Poisson, and multivariate Poisson regressions. 
+
+```{r echo=FALSE}
+illness_model_evaluated <- readRDS(here("results", "illness_model_evaluation.rds"))
+rmarkdown::paged_table(illness_model_evaluated)
+```
+
+For hospitalization as the health outcome, multivariate linear regression was the best model (RMSE = 7.09) among those previously listed.
+
+```{r echo=FALSE}
+illness_model_evaluated <- readRDS(here("results", "hospital_model_evaluation.rds"))
+rmarkdown::paged_table(illness_model_evaluated)
+```
 
 ## Full Analysis (Machine Learning)
 
