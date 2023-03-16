@@ -30,7 +30,7 @@ training_data_final <- readRDS(data_location)
 ```{r}
 # Path to Data
 data_location <- here(
-  "data","processed_data","processed_testing_data.rds")
+  "data","processed_data","processed_analysis_data.rds")
 # Import Data
 analysis_data_final <- readRDS(data_location)
 ```
@@ -40,7 +40,7 @@ analysis_data_final <- readRDS(data_location)
 
 The outcome of interest we will explore for the training data is hospitalizations.
 
-```{r}
+```{r fig.height=8,fig.width=8}
 # Time vs Hospitalizations
 ggplot(training_data_final %>% 
          group_by(Year, Pathogen_Type, Hospitalizations) %>% 
@@ -58,22 +58,32 @@ ggplot(training_data_final %>%
          group_by(Pathogen_Type, Simplified_Etiology, Hospitalizations) %>% count() %>% 
          mutate(true_hospitalization = n * Hospitalizations), aes(x = Pathogen_Type, y = true_hospitalization, group = Simplified_Etiology, fill = Simplified_Etiology)) +
   geom_col() + 
-  labs(x = "Pathogen Type", y = "Hospitalizations", title = "Stacked Bar Chart of Hospitalizations by \nPathogen Type and Etiology")
+  labs(x = "Pathogen Type", y = "Hospitalizations", title = "Stacked Bar Chart of Hospitalizations by Pathogen Type and Etiology")
 
 ## Save Graph
 ggsave("pathogen_type_etiology_v_hospitalizations.png", path = image_path, width = 3000, height = 2000, units = "px")
 
 ## Closer Look at Bacterial Etiologies for Outbreaks
 ggplot(training_data_final %>% 
-         select(Pathogen_Type, Simplified_Etiology, Hospitalizations, `IFSAC Category`) %>% filter(Pathogen_Type == "Bacteria"), aes(x = Simplified_Etiology,y=`Hospitalizations`))+ 
-  geom_col() + 
-  labs(x = "Bacteria", y = "Hospitalizations", title = "Bar Chart of Bacteria Frequency")+
-  coord_flip()
+         select(Pathogen_Type, Simplified_Etiology, Hospitalizations) %>% filter(Pathogen_Type == "Bacteria"), aes(x = Simplified_Etiology)) + geom_bar() + 
+  labs(x = "Bacteria", y = "Hospitalizations", title = "Bar Chart of Bacteria Frequency")
 
 ggsave("bacterial_etiology_v_hospitalization_frequency.png", path = image_path, width = 3000, height = 2000, units = "px")
 
+####
 
-       
+Norovirus_Hosp=training_data_final%>%
+  select(Simplified_Etiology, Hospitalizations, `IFSAC Category`)%>%
+  group_by(Simplified_Etiology, Hospitalizations, `IFSAC Category`)%>%
+  filter(Simplified_Etiology=="Salmonella")%>%
+  filter(`IFSAC Category`!= %n% C("Multiple","Other"))%>%
+  count()%>%
+  mutate(total_hospitalizations=n*Hospitalizations)
+
+ggplot(Norovirus_Hosp,aes(x=`IFSAC Category`,y=total_hospitalizations))+
+  geom_boxplot()+
+  scale_x_discrete(guide=guide_axis(n.dodge=3))
+
 # States vs Hospitalization
 
 state_v_hospitalization_training <- training_data_final %>% 
@@ -121,16 +131,15 @@ ggplot(training_data_final %>%
          filter(`IFSAC Category` != "Other"), 
        aes(x = `IFSAC Category`, y = Hospitalizations)) + 
   geom_col() + 
-  labs(x = "Food Type", y = "Hospitalizations", title = "Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'")+
-  coord_flip()
+  labs(x = "Food Type", y = "Hospitalizations", title = "Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'")
 
 ggsave("Food_type_v_hospitalization.png", path = image_path, width = 3000, height = 2000, units = "px")
 
 # Locations and Hospitalizations
 Location_v_Hospitalization <- ggplot(training_data_final, aes(x = Location, y = Hospitalizations)) +
   geom_col() + 
-  labs(x = "Locations", y = "Hospitalizations", title = "Hospitalizations by Food Type, Excluding 'Multiple' and \n'Other'")+
-  coord_flip()
+  labs(x = "Locations", y = "Hospitalizations", title = "Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'")+
+  scale_x_discrete(guide=guide_axis(n.dodge=3))
 
 Location_v_Hospitalization
 
@@ -139,10 +148,10 @@ ggsave("Location_v_hospitalization.png", path = image_path, width = 3000, height
 ```
 All outbreaks with a high hospitalization count (> 200 cases) are caused by bacteria. It also appears that most outbreaks caused by bacteria are due to Salmonella. California and Minnesota are the two states with the highest total hospitalization count due to foodborne illness from 1998 to 2015. Resturants and Private home are the most frequent locations with the highest total hospitalization count.
 
-## Testing Data
+## Analysis Data
 ```{r}
 # Illnesses Caused by Pathogen Type Over Time
-ggplot(testing_data_final %>% 
+ggplot(analysis_data_final %>% 
          group_by(Year, Pathogen_Type, Illnesses) %>% 
          count() %>% 
          mutate(true_illness_count = n * Illnesses), 
@@ -155,7 +164,7 @@ ggplot(testing_data_final %>%
 ggsave("time_v_illness_pathogen_type.png", path = image_path, width = 3000, height = 2000, units = "px")
 
 # Pathogen Type + Etiology vs Illnesses Caused
-ggplot(testing_data_final %>% 
+ggplot(analysis_data_final %>% 
          group_by(Pathogen_Type, Simplified_Etiology, Illnesses) %>% 
          count() %>% 
          mutate(true_illness_count = n * Illnesses), 
@@ -167,32 +176,31 @@ ggplot(testing_data_final %>%
 ggsave("pathogen_type_etiology_v_illness.png", path = image_path, width = 3000, height = 2000, units = "px")
 
 ## Closer Look at Bacterial Etiologies
-ggplot(testing_data_final %>% group_by(Pathogen_Type, Simplified_Etiology, Illnesses) %>% filter(Pathogen_Type == "Bacteria"), aes(x = Simplified_Etiology)) + geom_bar() + labs(x = "Bacteria", y = "Cases", title = "Bar Chart of Bacteria Frequency")+
-  coord_flip()
+ggplot(analysis_data_final %>% group_by(Pathogen_Type, Simplified_Etiology, Illnesses) %>% filter(Pathogen_Type == "Bacteria"), aes(x = Simplified_Etiology)) + geom_bar() + labs(x = "Bacteria", y = "Cases", title = "Bar Chart of Bacteria Frequency")
 
 # Save Graph
 ggsave("bacterial_etiology_v_outbreak_frequency.png", path = image_path, width = 3000, height = 2000, units = "px")
 
 # States vs Illnesses
 
-state_v_illness_testing <- testing_data_final %>% group_by(State) %>% mutate(all_illnesses = sum(Illnesses)) %>% count(all_illnesses) %>% select(State, all_illnesses) %>% arrange(desc(all_illnesses))
+state_v_illness_analysis <- analysis_data_final %>% group_by(State) %>% mutate(all_illnesses = sum(Illnesses)) %>% count(all_illnesses) %>% select(State, all_illnesses) %>% arrange(desc(all_illnesses))
 
-saveRDS(state_v_illness_testing, file = table_path)
+saveRDS(state_v_illness_analysis, file = table_path)
 
 rmarkdown::paged_table(state_v_illness_analysis)
 
 # Food Type and Illnesses
-ggplot(testing_data_final %>% filter(`IFSAC Category` != "Multiple") %>% filter(`IFSAC Category` != "Other"), aes(x = `IFSAC Category`, y = Illnesses)) + geom_col() + labs(x = "Food Type", y = "Illnesses", title = "Illnesses by Food Type, Excluding 'Multiple' and 'Other'")+
-  coord_flip()
+ggplot(analysis_data_final %>% filter(`IFSAC Category` != "Multiple") %>% filter(`IFSAC Category` != "Other"), aes(x = `IFSAC Category`, y = Illnesses)) + geom_col() + labs(x = "Food Type", y = "Illnesses", title = "Illnesses by Food Type, Excluding 'Multiple' and 'Other'")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))
 
 # Save Graph
 ggsave("food_type_v_illness_frequency.png", path = image_path, width = 3000, height = 2000, units = "px")
 
 # Locations and Illnesses
-ggplot(testing_data_final, aes(x = Location, y = Illnesses)) +
+ggplot(analysis_data_final, aes(x = Location, y = Illnesses)) +
   geom_col() + 
   labs(x = "Locations", y = "Illnesses", title = "Illnesses by Locations")+
-  coord_flip()
+  scale_x_discrete(guide=guide_axis(n.dodge=3))
 
 # Save Graph
 ggsave("Location_v_Illness.png", path = image_path, width = 3000, height = 2000, units = "px")

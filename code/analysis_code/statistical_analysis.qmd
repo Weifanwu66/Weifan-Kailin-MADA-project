@@ -1,0 +1,150 @@
+# Load libraries
+```{r}
+library(here)
+library(tidyverse)
+library(tidymodels)
+library(poissonreg)
+```
+# Load data
+```{r}
+# Path to Data
+data_location <- here(
+  "data","processed_data","processed_training_data.rds")
+# Import Data
+training_data_final <- readRDS(data_location)
+glimpse(training_data_final)
+```
+## First health outcome of interest: Illnesses
+### Predictors: time (year), pathogen type, etiology, location, state, and food type (`IFSAC Category`)
+```{r}
+# Checking the distribution of Illnesses
+training_data_final%>%
+  ggplot(aes(Illnesses))+
+  geom_histogram()+
+  scale_x_continuous(trans=scales::pseudo_log_trans(base=10))
+image_path <- here("results")
+ggsave("histogram_Illnesses.png", path = image_path, width = 3000, height = 2000, units = "px")
+# Creating a tibble only includes our predictors of interest
+illness_data=training_data_final%>%
+  select(c(1,4,5,7,10,13,14))%>%
+  mutate_if(is.character, as.factor)
+glimpse(illness_data)
+```
+### Modeling `Illness` using linear regression and Poisson regression
+#### Since the outcome is counts and the event ocurrs independently, it follows a Poisson distribution
+```{r}
+# Model specification and fitting for linear regression model
+lm_spec=linear_reg()%>%
+  set_engine(engine="lm")
+# Modeling with main predictor `Simplified_Etiology`
+lm_fit1=lm_spec%>%
+  fit(Illnesses~Simplified_Etiology, data=illness_data)
+# Modeling with all predictors
+lm_fit2=lm_spec%>%
+  fit(Illnesses~., data=illness_data)
+# Model specification and fitting for Poisson regression model
+# create a workflow for poisson regression model, we will use the default glm engine
+# Modeling with main predictor `Simplified_Etiology`
+poisson_wf1=workflow(Illnesses~Simplified_Etiology, poisson_reg())
+# Modeling with all predictors
+poisson_wf2=workflow(Illnesses~., poisson_reg())
+# Fitting models
+poisson_fit1=fit(poisson_wf1,data=illness_data)
+poisson_fit2=fit(poisson_wf2,data=illness_data)
+```
+
+### Model Evaluation
+```{r}
+# Checking parameters for linear regression model
+tidy(lm_fit1) %>%
+  arrange(-estimate)
+tidy(lm_fit2)%>%
+  arrange(-estimate)
+# Checking parameters for Poisson regression model
+tidy(poisson_fit1)%>%
+ arrange(-estimate)
+tidy(poisson_fit2)%>%
+ arrange(-estimate)
+# Model evaluation
+Result=lm_fit1%>%
+ predict(new_data=illness_data)%>%
+ mutate (.pred=round(.pred),true_value=illness_data$Illnesses, model= "lm_single")%>%
+bind_rows(lm_fit1%>%
+            predict(new_data=illness_data)%>%
+            mutate (.pred=round(.pred),true_value=illness_data$Illnesses, model= "lm_multiple")%>%
+            bind_rows(poisson_fit1%>%
+                        predict(new_data= illness_data)%>% 
+                        mutate (true_value=illness_data$Illnesses, model= "glm_single")%>%
+                        bind_rows(poisson_fit2%>%
+                                    predict(new_data= illness_data)%>% 
+                                    mutate (true_value=illness_data$Illnesses, model= "glm_multiple")
+                        )
+            )
+)
+Result%>%
+  group_by(model)%>%
+  rmse(truth=true_value,estimate=.pred)
+
+```
+### According to the result, the model built using Poisson regression with multiple predictors seems to have the smallest root mean squared error.
+## Second health outcome of interest: Hospitilization
+### Predictors: time (year), pathogen type, etiology, location, state, and food type (`IFSAC Category`)
+```{r}
+# Checking the distribution of Hospitalization
+training_data_final%>%
+  ggplot(aes(Hospitalizations))+
+  geom_histogram()+
+  scale_x_continuous(trans=scales::pseudo_log_trans(base=10))
+# Creating a tibble only includes our predictors of interest
+hosp_data=training_data_final%>%
+  select(c(1,4,5,7,11,13,14))%>%
+  mutate_if(is.character, as.factor)
+glimpse(hosp_data)
+ggsave("histogram_Hospitalizations.png",path=image_path)
+```
+### Modeling `Hospitalizations` using linear regression and Poisson regression
+```{r}
+# Model specification and fitting for linear regression model
+lm_spec=linear_reg()%>%
+  set_engine(engine="lm")
+# Modeling with main predictor `Simplified_Etiology`
+lm_fit3=lm_spec%>%
+  fit(Hospitalizations~Simplified_Etiology, data=hosp_data)
+# Modeling with all predictors
+lm_fit4=lm_spec%>%
+  fit(Hospitalizations~., data=hosp_data)
+# Model specification and fitting for Poisson regression model
+# create a workflow for poisson regression model, we will use the default glm engine
+# Modeling with main predictor `Simplified_Etiology`
+poisson_wf3=workflow(Hospitalizations~Simplified_Etiology, poisson_reg())
+# Modeling with all predictors
+poisson_wf4=workflow(Hospitalizations~., poisson_reg())
+# Fitting models
+poisson_fit3=fit(poisson_wf3,data=hosp_data)
+poisson_fit4=fit(poisson_wf4,data=hosp_data)
+```
+
+### Model evaluation
+```{r}
+Result=lm_fit3%>%
+ predict(new_data=hosp_data)%>%
+ mutate (.pred=round(.pred),true_value=hosp_data$Hospitalizations, model= "lm_single")%>%
+bind_rows(lm_fit4%>%
+            predict(new_data=hosp_data)%>%
+            mutate (.pred=round(.pred),true_value=hosp_data$Hospitalizations, model= "lm_multiple")%>%
+            bind_rows(poisson_fit1%>%
+                        predict(new_data= hosp_data)%>% 
+                        mutate (true_value=hosp_data$Hospitalizations, model= "glm_single")%>%
+                        bind_rows(poisson_fit2%>%
+                                    predict(new_data= hosp_data)%>% 
+                                    mutate (true_value=hosp_data$Hospitalizations, model= "glm_multiple")
+                        )
+            )
+)
+Result%>%
+  group_by(model)%>%
+  rmse(truth=true_value,estimate=.pred)
+
+```
+
+
