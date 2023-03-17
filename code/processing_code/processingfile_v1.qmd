@@ -31,7 +31,7 @@ training_data <- read_csv(data_location)
 
 data_location <- here(
   "data","raw_data","NationalOutbreakPublicDataTool.xlsx")
-analysis_data <- readxl::read_excel(data_location)
+testing_data <- readxl::read_excel(data_location)
 ```
 
 # Check Data
@@ -63,17 +63,17 @@ Health Outcomes
 -   Hospitalizations
 -   Fatalities
 
-## Analysis Data
+## Testing Data
 ```{r}
-str(analysis_data)
-summary(analysis_data)
+str(testing_data)
+summary(testing_data)
 
-# Closer Look at Training Data
-head(analysis_data)
-skim(analysis_data)
+# Closer Look at Testing Data
+head(testing_data)
+skim(testing_data)
 
 # Plotting NAs of Training Data
-plot_na_pareto(analysis_data)
+plot_na_pareto(testing_data)
 ```
 
 It appears that the training data contains the following variables:
@@ -100,11 +100,11 @@ Health Outcomes
 -   Deaths
 -   Info on Deaths
 
-Because the analysis dataset contains more than just foodborne outbreaks, we want to specify it to just foodborne illnesses.
+Because the testing dataset contains more than just foodborne outbreaks, we want to specify it to just foodborne illnesses.
 
 ```{r}
 # Plot of NAs After Limiting to Analysis Data to Food
-plot_na_pareto(analysis_data %>% filter(`Primary Mode` == "Food"))
+plot_na_pareto(testing_data %>% filter(`Primary Mode` == "Food"))
 ```
 
 ## Checking Etiologies Status
@@ -113,7 +113,7 @@ plot_na_pareto(analysis_data %>% filter(`Primary Mode` == "Food"))
 unique(training_data$Status)
 
 # Analysis Data
-unique(analysis_data$`Etiology Status`)
+unique(testing_data$`Etiology Status`)
 ```
 
 Given that "Status" and "Etiology Status" refer to laboratory confirmations, we will filter our case definitions to be only laboratory-confirmed pathogens.
@@ -271,7 +271,7 @@ training_data_fin=training_data_fin%>%
 
 ## Analysis Data
 ```{r}
-analysis_data_fin <- analysis_data %>%
+testing_data_fin <- testing_data %>%
   select(!c(`Animal Type`, `Animal Type Specify`, 
             `Water Exposure`, `Water Type`, `Water Status`, 
             `Food Contaminated Ingredient`)) %>%
@@ -281,7 +281,7 @@ analysis_data_fin <- analysis_data %>%
 
 ### Separate Rows to Address Coinfections
 ```{r}
-analysis_data_fin <- analysis_data_fin %>%
+testing_data_fin <- testing_data_fin %>%
   separate_rows(Etiology, sep = "; ")
 ```
 
@@ -289,7 +289,7 @@ analysis_data_fin <- analysis_data_fin %>%
 ```{r}
 Desserts <- c("cookies", "cake", "chocolate", "brownie")
 
-analysis_data_fin <- analysis_data_fin %>%
+testing_data_fin <- testing_data_fin %>%
   mutate(`IFSAC Category` = case_when(
     grepl("Salad", `Food Vehicle`, ignore.case = TRUE) ~ "Salad",
     grepl(paste(Desserts, 
@@ -303,7 +303,7 @@ analysis_data_fin <- analysis_data_fin %>%
 ### Column for Type of Pathogen
 ```{r}
 
-analysis_data_fin <- analysis_data_fin %>%
+testing_data_fin <- testing_data_fin %>%
   mutate(Pathogen_Type = case_when(
     grepl(paste(Pathogen_Poison, 
                 collapse = "|"), Etiology) ~ "Poison",
@@ -322,19 +322,19 @@ analysis_data_fin <- analysis_data_fin %>%
 ```
 ###Column for Location
 ```{r}
-analysis_data_fin_re <- analysis_data_fin %>%
+testing_data_fin <- analysis_data_fin %>%
   rename(Location=Setting)%>%
   mutate(Location=case_when(
     grepl("Restaurant",Location)~"Restaurant",TRUE~Location))%>%
     separate_rows(Location,sep="; ")
-analysis_data_fin_re
+testing_data_fin
 ```
 
 # Drop Rows Containing NA
 ```{r}
 training_data_final=training_data_fin%>%
   drop_na()
-analysis_data_final=analysis_data_fin_re%>%
+testing_data_final=testing_data_fin%>%
   drop_na()
 
 ```
@@ -342,7 +342,7 @@ analysis_data_final=analysis_data_fin_re%>%
 ## Check Data Structure Again
 ```{r}
 skim(training_data_final)
-skim(analysis_data_final)
+skim(testing_data_final)
 ```
 
 # Save Data 
@@ -352,14 +352,14 @@ The cleaned datasets will be saved as RDS files.
 ```{r}
 # Label Final Datasets as Cleaned/Processed
 processed_training_data <- training_data_final
-processed_analysis_data <- analysis_data_final
+processed_testing_data <- testing_data_final
 
 # Save Data
 save_data_location1 <- here::here("data","processed_data","processed_training_data.rds")
 saveRDS(processed_training_data, file = save_data_location1)
 
-save_data_location2=here::here("data","processed_data","processed_analysis_data.rds")
-saveRDS(processed_analysis_data, file = save_data_location2)
+save_data_location2=here::here("data","processed_data","processed_testing_data.rds")
+saveRDS(processed_testing_data, file = save_data_location2)
 
 ```
 

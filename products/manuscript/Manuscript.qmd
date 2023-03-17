@@ -43,10 +43,12 @@ Ultimately, measures can be conducted or adjusted based on analysis for preventi
 We adopted two datasets for this study.
 The first dataset was uploaded onto Kaggle in 2017 and contains data from the Centers for Disease Control and Prevention (CDC) on foodborne disease outbreaks from 1998 to 2015 [@cdc2017].
 There are 12 variables and 16,950+ observations.
+This data set is intended to be used for model building.
 
 The second dataset was collected from the National Outbreak Reporting System (NORS), Centers for Disease Control and Prevention (CDC) website [@cdc2020].
 This dataset covers the reports of foodborne and waterborne disease outbreaks and enteric (intestinal) disease outbreaks spread by contact with environmental sources, infected people or animals, and other means from 2009 to 2020.
 The raw datasets may be viewed within the repository of this project (data/raw_data/).
+This data set is collected with the purpose of evaluating the model performance in the end.
 
 ## Questions and Hypotheses to be Addressed
 
@@ -78,7 +80,7 @@ For more information, in-depth preprocessing may be viewed in "code/processing_c
 
 Post-preprocessing, we performed an exploratory data analysis to view general relationships between the predictors: time (year), pathogen type and etiology, state, food type, and health outcomes of interest: hospitalizations and illnesses. 
 
-Afterwards, we built regression models using these predictors and health outcomes; we intend to implement machine learning to train a model to predict health outcomes using the Kaggle dataset for the CDC NORS data.
+Afterwards, we built regression models including linear and Poisson regression using these predictors and health outcomes from training data set [@cdc2017]; data was re-sampled using bootstrapping approach for 1000 times for a better estimate of the accuracy and variability of the model coefficients; we intend to implement random forest to train a model to predict health outcomes using the Kaggle dataset for the CDC NORS data. The performance of models was compared across different metrics. The best model was ultimately employed to predict the outcome based on predictors in the testing data set [@cdc2020a].
 
 {{< pagebreak >}}
 
