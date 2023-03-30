@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Andreas Handel">
+<meta name="author" content="Weifan Wu and Kailin Chen">
 <meta name="dcterms.date" content="2023-01-03">
 
 <title>Data Pre-Processing/Cleaning Script</title>
@@ -120,7 +120,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Andreas Handel </p>
+             <p>Weifan Wu and Kailin Chen </p>
           </div>
   </div>
     
@@ -197,7 +197,7 @@ dbl (4): Year, Illnesses, Hospitalizations, Fatalities
 </div>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>data_location <span class="ot">&lt;-</span> <span class="fu">here</span>(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data"</span>,<span class="st">"raw_data"</span>,<span class="st">"NationalOutbreakPublicDataTool.xlsx"</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>analysis_data <span class="ot">&lt;-</span> readxl<span class="sc">::</span><span class="fu">read_excel</span>(data_location)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>testing_data <span class="ot">&lt;-</span> readxl<span class="sc">::</span><span class="fu">read_excel</span>(data_location)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="check-data" class="level1">
@@ -796,10 +796,10 @@ Fatalities
 </div>
 <p>It appears that the training data contains the following variables: General - Year, Month (Time) - State (Location) - Food, Ingredient (Vehicle of Transmission) - Species - Status Health Outcomes - Illnesses - Hospitalizations - Fatalities</p>
 </section>
-<section id="analysis-data" class="level2">
-<h2 class="anchored" data-anchor-id="analysis-data">Analysis Data</h2>
+<section id="testing-data" class="level2">
+<h2 class="anchored" data-anchor-id="testing-data">Testing Data</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(analysis_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(testing_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tibble [42,619 × 21] (S3: tbl_df/tbl/data.frame)
  $ Year                        : num [1:42619] 2009 2009 2009 2009 2009 ...
@@ -824,7 +824,7 @@ Fatalities
  $ Animal Type Specify         : chr [1:42619] NA NA NA NA ...
  $ Water Status                : chr [1:42619] NA NA NA NA ...</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(analysis_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(testing_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      Year          Month           State           Primary Mode      
  Min.   :2009   Min.   : 1.000   Length:42619       Length:42619      
@@ -875,8 +875,8 @@ Fatalities
                                        
                                        </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Closer Look at Training Data</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(analysis_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Closer Look at Testing Data</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(testing_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 21
    Year Month State     Primar…¹ Etiol…² Serot…³ Etiol…⁴ Setting Illne…⁵ Hospi…⁶
@@ -895,7 +895,7 @@ Fatalities
 #   names ¹​`Primary Mode`, ²​Etiology, ³​`Serotype or Genotype`,
 #   ⁴​`Etiology Status`, ⁵​Illnesses, ⁶​Hospitalizations</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(analysis_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(testing_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <table style="width: auto;" class="table table-condensed">
@@ -908,7 +908,7 @@ Data summary
 Name
 </td>
 <td style="text-align:left;">
-analysis_data
+testing_data
 </td>
 </tr>
 <tr>
@@ -1665,16 +1665,16 @@ Info on Deaths
 </table>
 </div>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting NAs of Training Data</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_na_pareto</span>(analysis_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_na_pareto</span>(testing_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="processingfile_v1_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>It appears that the training data contains the following variables: General - Year, Month (Time) - State (Location) - Primary Mode (Vehicle of Transmission) - Food Vehicle - Food Contaminated Ingredient - Water Exposure - Water Type - Water Status - Animal Type - Animal Type Specify - Etiology - Serotype or Genotype - Etiology Status - Setting - IFSAC Category Health Outcomes - Illnesses - Hospitalizations - Info on Hospitalizations - Deaths - Info on Deaths</p>
-<p>Because the analysis dataset contains more than just foodborne outbreaks, we want to specify it to just foodborne illnesses.</p>
+<p>Because the testing dataset contains more than just foodborne outbreaks, we want to specify it to just foodborne illnesses.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot of NAs After Limiting to Analysis Data to Food</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_na_pareto</span>(analysis_data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Primary Mode</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Food"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_na_pareto</span>(testing_data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Primary Mode</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Food"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="processingfile_v1_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1711,7 +1711,7 @@ Info on Deaths
 [23] "Suspected; Suspected; Confirmed; Suspected; Suspected; Confirmed"                                                                             </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Analysis Data</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(analysis_data<span class="sc">$</span><span class="st">`</span><span class="at">Etiology Status</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(testing_data<span class="sc">$</span><span class="st">`</span><span class="at">Etiology Status</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "Confirmed"                                                                                                                                    
  [2] "Suspected"                                                                                                                                    
@@ -1967,8 +1967,8 @@ Info on Deaths
 <span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Create two new columns: Pathogen_type &amp; Simplified_Etiology</span></span>
 <span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>training_data_fin<span class="ot">=</span>training_data_fin<span class="sc">%&gt;%</span></span>
 <span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Pathogen_Type =</span> <span class="fu">case_when</span>(</span>
-<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Virus, </span>
-<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Species,<span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Virus"</span>,</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Virus,</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse=</span><span class="st">"|"</span>), Species,<span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Virus"</span>,</span>
 <span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Bacteria, </span>
 <span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Species,<span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Bacteria"</span>,</span>
 <span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Parasite, </span>
@@ -1976,17 +1976,11 @@ Info on Deaths
 <span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Poison, </span>
 <span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Species,<span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Poison"</span></span>
 <span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">%&gt;%</span></span>
-<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">case_when</span>(</span>
-<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Bacteria"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Species, </span>
-<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Bacillus|Brucella|Campylobacter|Clostridium|Staphylococcus|Escherichia|Listeria|Salmonella|Vibrio|Cholera|Enterococcus|Bacterium|Shigella|Yersinia|Streptococcus"</span>),</span>
-<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Parasite"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Species, <span class="st">"Cryptosporidium|Cyclospora|Entamoeba|Giardia|Parasite|Toxoplasma|Trichinella"</span>),</span>
-<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Virus"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Species, <span class="st">"Astrovirus|Norovirus|Rotavirus|Hepatitis"</span>),</span>
-<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Poison"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Species, <span class="st">"Poison|Toxin|Heavy|pesticide|Ciguatoxin|Scombroid"</span>)</span>
-<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">%&gt;%</span></span>
-<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">case_when</span>(</span>
-<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Escherichia"</span> <span class="sc">~</span> <span class="st">"E. coli"</span>,</span>
-<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Heavy"</span> <span class="sc">~</span> <span class="st">"Heavy Metals"</span>,</span>
-<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> Simplified_Etiology))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">word</span>(Species,<span class="dv">1</span>))<span class="sc">%&gt;%</span></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">case_when</span>(</span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Escherichia"</span> <span class="sc">~</span> <span class="st">"E. coli"</span>,</span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Heavy"</span> <span class="sc">~</span> <span class="st">"Heavy Metals"</span>,</span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> Simplified_Etiology))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="column-for-location" class="level3">
@@ -2234,10 +2228,10 @@ Info on Deaths
 </div>
 </section>
 </section>
-<section id="analysis-data-1" class="level2">
-<h2 class="anchored" data-anchor-id="analysis-data-1">Analysis Data</h2>
+<section id="analysis-data" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-data">Analysis Data</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>analysis_data_fin <span class="ot">&lt;-</span> analysis_data <span class="sc">%&gt;%</span></span>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>testing_data_fin <span class="ot">&lt;-</span> testing_data <span class="sc">%&gt;%</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span><span class="fu">c</span>(<span class="st">`</span><span class="at">Animal Type</span><span class="st">`</span>, <span class="st">`</span><span class="at">Animal Type Specify</span><span class="st">`</span>, </span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Water Exposure</span><span class="st">`</span>, <span class="st">`</span><span class="at">Water Type</span><span class="st">`</span>, <span class="st">`</span><span class="at">Water Status</span><span class="st">`</span>, </span>
 <span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">Food Contaminated Ingredient</span><span class="st">`</span>)) <span class="sc">%&gt;%</span></span>
@@ -2247,7 +2241,7 @@ Info on Deaths
 <section id="separate-rows-to-address-coinfections" class="level3">
 <h3 class="anchored" data-anchor-id="separate-rows-to-address-coinfections">Separate Rows to Address Coinfections</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>analysis_data_fin <span class="ot">&lt;-</span> analysis_data_fin <span class="sc">%&gt;%</span></span>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>testing_data_fin <span class="ot">&lt;-</span> testing_data_fin <span class="sc">%&gt;%</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate_rows</span>(Etiology, <span class="at">sep =</span> <span class="st">"; "</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
@@ -2256,7 +2250,7 @@ Info on Deaths
 <div class="cell">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>Desserts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"cookies"</span>, <span class="st">"cake"</span>, <span class="st">"chocolate"</span>, <span class="st">"brownie"</span>)</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>analysis_data_fin <span class="ot">&lt;-</span> analysis_data_fin <span class="sc">%&gt;%</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>testing_data_fin <span class="ot">&lt;-</span> testing_data_fin <span class="sc">%&gt;%</span></span>
 <span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">case_when</span>(</span>
 <span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"Salad"</span>, <span class="st">`</span><span class="at">Food Vehicle</span><span class="st">`</span>, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">"Salad"</span>,</span>
 <span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Desserts, </span>
@@ -2270,7 +2264,7 @@ Info on Deaths
 <section id="column-for-type-of-pathogen" class="level3">
 <h3 class="anchored" data-anchor-id="column-for-type-of-pathogen">Column for Type of Pathogen</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>analysis_data_fin <span class="ot">&lt;-</span> analysis_data_fin <span class="sc">%&gt;%</span></span>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>testing_data_fin <span class="ot">&lt;-</span> testing_data_fin <span class="sc">%&gt;%</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Pathogen_Type =</span> <span class="fu">case_when</span>(</span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Poison, </span>
 <span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Etiology) <span class="sc">~</span> <span class="st">"Poison"</span>,</span>
@@ -2281,26 +2275,20 @@ Info on Deaths
 <span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="fu">paste</span>(Pathogen_Virus, </span>
 <span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="st">"|"</span>), Etiology) <span class="sc">~</span> <span class="st">"Virus"</span></span>
 <span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">%&gt;%</span></span>
-<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">case_when</span>(</span>
-<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Bacteria"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Etiology, </span>
-<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Bacillus|Brucella|Campylobacter|Clostridium|Staphylococcus|Escherichia|Listeria|Salmonella|Vibrio|Cholera|Enterococcus|Bacterium|Shigella|Yersinia"</span>),</span>
-<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Parasite"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Etiology, <span class="st">"Cryptosporidium|Cyclospora|Entamoeba|Giardia|Parasite|Toxoplasma|Trichinella"</span>),</span>
-<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Virus"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Etiology, <span class="st">"Astrovirus|Norovirus|Rotavirus"</span>),</span>
-<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>    Pathogen_Type <span class="sc">==</span> <span class="st">"Poison"</span> <span class="sc">~</span> <span class="fu">str_extract</span>(Etiology, <span class="st">"Poison|Toxin|Heavy"</span>)</span>
-<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">%&gt;%</span></span>
-<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">case_when</span>(</span>
-<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Escherichia"</span> <span class="sc">~</span> <span class="st">"E. coli"</span>,</span>
-<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Heavy"</span> <span class="sc">~</span> <span class="st">"Heavy Metals"</span>,</span>
-<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> Simplified_Etiology))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">word</span>(Etiology,<span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Simplified_Etiology =</span> <span class="fu">case_when</span>(</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Escherichia"</span> <span class="sc">~</span> <span class="st">"E. coli"</span>,</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>        Simplified_Etiology <span class="sc">==</span> <span class="st">"Heavy"</span> <span class="sc">~</span> <span class="st">"Heavy Metals"</span>,</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> Simplified_Etiology))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>###Column for Location</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>analysis_data_fin_re <span class="ot">&lt;-</span> analysis_data_fin <span class="sc">%&gt;%</span></span>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>testing_data_fin <span class="ot">&lt;-</span> testing_data_fin <span class="sc">%&gt;%</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Location=</span>Setting)<span class="sc">%&gt;%</span></span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Location=</span><span class="fu">case_when</span>(</span>
 <span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grepl</span>(<span class="st">"Restaurant"</span>,Location)<span class="sc">~</span><span class="st">"Restaurant"</span>,<span class="cn">TRUE</span><span class="sc">~</span>Location))<span class="sc">%&gt;%</span></span>
 <span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">separate_rows</span>(Location,<span class="at">sep=</span><span class="st">"; "</span>)</span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>analysis_data_fin_re</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>testing_data_fin</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5,566 × 17
     Year Month State     Prima…¹ Etiol…² Serot…³ Etiol…⁴ Locat…⁵ Illne…⁶ Hospi…⁷
@@ -2331,7 +2319,7 @@ Info on Deaths
 <div class="cell">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>training_data_final<span class="ot">=</span>training_data_fin<span class="sc">%&gt;%</span></span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>analysis_data_final<span class="ot">=</span>analysis_data_fin_re<span class="sc">%&gt;%</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>testing_data_final<span class="ot">=</span>testing_data_fin<span class="sc">%&gt;%</span></span>
 <span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="check-data-structure-again" class="level2">
@@ -2358,7 +2346,7 @@ training_data_final
 Number of rows
 </td>
 <td style="text-align:left;">
-3968
+4033
 </td>
 </tr>
 <tr>
@@ -2547,7 +2535,7 @@ Food
 0
 </td>
 <td style="text-align:right;">
-1444
+1468
 </td>
 <td style="text-align:right;">
 0
@@ -2590,7 +2578,7 @@ Species
 1
 </td>
 <td style="text-align:right;">
-8
+5
 </td>
 <td style="text-align:right;">
 40
@@ -2599,7 +2587,7 @@ Species
 0
 </td>
 <td style="text-align:right;">
-73
+84
 </td>
 <td style="text-align:right;">
 0
@@ -2668,16 +2656,16 @@ Simplified_Etiology
 1
 </td>
 <td style="text-align:right;">
-6
+0
 </td>
 <td style="text-align:right;">
 15
 </td>
 <td style="text-align:right;">
-0
+173
 </td>
 <td style="text-align:right;">
-24
+35
 </td>
 <td style="text-align:right;">
 0
@@ -2738,10 +2726,10 @@ Year
 1
 </td>
 <td style="text-align:right;">
-2006.67
+2006.70
 </td>
 <td style="text-align:right;">
-5.05
+5.06
 </td>
 <td style="text-align:right;">
 1998
@@ -2773,7 +2761,7 @@ Numeric_Month
 1
 </td>
 <td style="text-align:right;">
-6.58
+6.60
 </td>
 <td style="text-align:right;">
 3.22
@@ -2785,7 +2773,7 @@ Numeric_Month
 4
 </td>
 <td style="text-align:right;">
-6
+7
 </td>
 <td style="text-align:right;">
 9
@@ -2808,10 +2796,10 @@ Illnesses
 1
 </td>
 <td style="text-align:right;">
-32.57
+32.23
 </td>
 <td style="text-align:right;">
-67.27
+66.83
 </td>
 <td style="text-align:right;">
 2
@@ -2843,10 +2831,10 @@ Hospitalizations
 1
 </td>
 <td style="text-align:right;">
-2.52
+2.51
 </td>
 <td style="text-align:right;">
-8.46
+8.40
 </td>
 <td style="text-align:right;">
 0
@@ -2906,7 +2894,7 @@ Fatalities
 
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(analysis_data_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(testing_data_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <table style="width: auto;" class="table table-condensed">
@@ -2919,7 +2907,7 @@ Data summary
 Name
 </td>
 <td style="text-align:left;">
-analysis_data_final
+testing_data_final
 </td>
 </tr>
 <tr>
@@ -3580,14 +3568,14 @@ Info on Deaths
 <div class="cell">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Label Final Datasets as Cleaned/Processed</span></span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>processed_training_data <span class="ot">&lt;-</span> training_data_final</span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>processed_analysis_data <span class="ot">&lt;-</span> analysis_data_final</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>processed_testing_data <span class="ot">&lt;-</span> testing_data_final</span>
 <span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Save Data</span></span>
 <span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>save_data_location1 <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>,<span class="st">"processed_data"</span>,<span class="st">"processed_training_data.rds"</span>)</span>
 <span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(processed_training_data, <span class="at">file =</span> save_data_location1)</span>
 <span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>save_data_location2<span class="ot">=</span>here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>,<span class="st">"processed_data"</span>,<span class="st">"processed_analysis_data.rds"</span>)</span>
-<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(processed_analysis_data, <span class="at">file =</span> save_data_location2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>save_data_location2<span class="ot">=</span>here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>,<span class="st">"processed_data"</span>,<span class="st">"processed_testing_data.rds"</span>)</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(processed_testing_data, <span class="at">file =</span> save_data_location2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 

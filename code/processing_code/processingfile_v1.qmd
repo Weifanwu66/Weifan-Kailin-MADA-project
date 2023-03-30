@@ -1,6 +1,6 @@
 ---
 title: "Data Pre-Processing/Cleaning Script"
-author: "Andreas Handel"
+author: "Weifan Wu and Kailin Chen"
 date: "2023-01-03"
 output: html_document
 ---
@@ -322,7 +322,7 @@ testing_data_fin <- testing_data_fin %>%
 ```
 ###Column for Location
 ```{r}
-testing_data_fin <- analysis_data_fin %>%
+testing_data_fin <- testing_data_fin %>%
   rename(Location=Setting)%>%
   mutate(Location=case_when(
     grepl("Restaurant",Location)~"Restaurant",TRUE~Location))%>%

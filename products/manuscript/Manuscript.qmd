@@ -1,7 +1,7 @@
 ---
 title: "Manuscript for foodborne-outbreak Project"
 subtitle: ""
-author: Andreas Handel
+author: Weifan Wu and Kailin Chen
 date: "`r Sys.Date()`"
 format:
   docx:

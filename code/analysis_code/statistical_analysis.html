@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Weifan Wu and Kailin Chen">
+<meta name="dcterms.date" content="2023-03-16">
 
-<title>statistical_analysis</title>
+<title>Statistical analysis script</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -106,16 +108,45 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Statistical analysis script</h1>
+</div>
 
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Weifan Wu and Kailin Chen </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 16, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
 
 <section id="load-libraries" class="level1">
 <h1>Load libraries</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pathing</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>here() starts at C:/Users/weifa/OneDrive/Documents/GitKraken/MADA/data analysis/Weifan-Kailin-MADA-project</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data Handling and Modeling</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2
 ──</code></pre>
@@ -145,13 +176,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ✖ dplyr::lag()      masks stats::lag()
 ✖ yardstick::spec() masks readr::spec()
 ✖ recipes::step()   masks stats::step()
-• Use suppressPackageStartupMessages() to eliminate package startup messages</code></pre>
+• Use tidymodels_prefer() to resolve common conflicts.</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(poissonreg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="load-data" class="level1">
-<h1>Load data</h1>
+<h1>Load Data</h1>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Path to Data</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>data_location <span class="ot">&lt;-</span> <span class="fu">here</span>(</span>
@@ -178,13 +209,13 @@ $ Pathogen_Type       &lt;chr&gt; "Poison", "Bacteria", "Bacteria", "Bacteria", 
 $ Simplified_Etiology &lt;chr&gt; "Scombroid", "Salmonella", "Salmonella", "Campylob…</code></pre>
 </div>
 </div>
-<section id="first-health-outcome-of-interest-illnesses" class="level2">
-<h2 class="anchored" data-anchor-id="first-health-outcome-of-interest-illnesses">First health outcome of interest: Illnesses</h2>
-<section id="predictors-time-year-pathogen-type-etiology-location-state-and-food-type-ifsac-category" class="level3">
-<h3 class="anchored" data-anchor-id="predictors-time-year-pathogen-type-etiology-location-state-and-food-type-ifsac-category">Predictors: time (year), pathogen type, etiology, location, state, and food type (<code>IFSAC Category</code>)</h3>
+</section>
+<section id="first-health-outcome-of-interest-illnesses" class="level1">
+<h1>First Health Outcome of Interest: Illnesses</h1>
+<p>Predictors - Time (Year) - Pathogen Type - Etiology - Location - State - Food Type (IFSAC Category)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking the distribution of Illnesses</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>training_data_final<span class="sc">%&gt;%</span></span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking Illness Distribution</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>training_data_final <span class="sc">%&gt;%</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(Illnesses))<span class="sc">+</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>()<span class="sc">+</span></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">trans=</span>scales<span class="sc">::</span><span class="fu">pseudo_log_trans</span>(<span class="at">base=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -194,11 +225,16 @@ $ Simplified_Etiology &lt;chr&gt; "Scombroid", "Salmonella", "Salmonella", "Camp
 <div class="cell-output-display">
 <p><img src="statistical_analysis_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating a tibble only includes our predictors of interest</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>illness_data<span class="ot">=</span>training_data_final<span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">10</span>,<span class="dv">13</span>,<span class="dv">14</span>))<span class="sc">%&gt;%</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.character, as.factor)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(illness_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"results"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"histogram_Illnesses.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tibble with Predictors of Interest</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>illness_data<span class="ot">=</span>training_data_final <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">13</span>, <span class="dv">14</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.character, as.factor)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(illness_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 4,033
 Columns: 7
@@ -211,39 +247,35 @@ $ Pathogen_Type       &lt;fct&gt; Poison, Bacteria, Bacteria, Bacteria, Bacteria
 $ Simplified_Etiology &lt;fct&gt; Scombroid, Salmonella, Salmonella, Campylobacter, …</code></pre>
 </div>
 </div>
-</section>
-<section id="modeling-illness-using-linear-regression-and-poisson-regression" class="level3">
-<h3 class="anchored" data-anchor-id="modeling-illness-using-linear-regression-and-poisson-regression">Modeling <code>Illness</code> using linear regression and Poisson regression</h3>
-<section id="since-the-outcome-is-counts-and-the-event-ocurrs-independently-it-follows-a-poisson-distribution" class="level4">
-<h4 class="anchored" data-anchor-id="since-the-outcome-is-counts-and-the-event-ocurrs-independently-it-follows-a-poisson-distribution">Since the outcome is counts and the event ocurrs independently, it follows a Poisson distribution</h4>
+<section id="modeling-illness-with-linear-regression-and-poisson-regression" class="level2">
+<h2 class="anchored" data-anchor-id="modeling-illness-with-linear-regression-and-poisson-regression">Modeling Illness with Linear Regression and Poisson Regression</h2>
+<p>Since the outcome is counts/frequency and the event occurs independently, it follows a Poisson distribution. To create a workflow for poisson regression model, the default <em>glm</em> engine will be used.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Model specification and fitting for linear regression model</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>lm_spec<span class="ot">=</span><span class="fu">linear_reg</span>()<span class="sc">%&gt;%</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="at">engine=</span><span class="st">"lm"</span>)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Modeling with main predictor `Simplified_Etiology`</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>lm_fit1<span class="ot">=</span>lm_spec<span class="sc">%&gt;%</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(Illnesses<span class="sc">~</span>Simplified_Etiology, <span class="at">data=</span>illness_data)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Modeling with all predictors</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>lm_fit2<span class="ot">=</span>lm_spec<span class="sc">%&gt;%</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(Illnesses<span class="sc">~</span>., <span class="at">data=</span>illness_data)</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Model specification and fitting for Poisson regression model</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># create a workflow for poisson regression model, we will use the default glm engine</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Modeling with main predictor `Simplified_Etiology`</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>poisson_wf1<span class="ot">=</span><span class="fu">workflow</span>(Illnesses<span class="sc">~</span>Simplified_Etiology, <span class="fu">poisson_reg</span>())</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Modeling with all predictors</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>poisson_wf2<span class="ot">=</span><span class="fu">workflow</span>(Illnesses<span class="sc">~</span>., <span class="fu">poisson_reg</span>())</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Fitting models</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>poisson_fit1<span class="ot">=</span><span class="fu">fit</span>(poisson_wf1,<span class="at">data=</span>illness_data)</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>poisson_fit2<span class="ot">=</span><span class="fu">fit</span>(poisson_wf2,<span class="at">data=</span>illness_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Regression</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>lm_spec <span class="ot">=</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="at">engine =</span> <span class="st">"lm"</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Modeling with Main Predictor `Simplified_Etiology`</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>lm_fit1 <span class="ot">=</span> lm_spec <span class="sc">%&gt;%</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(Illnesses <span class="sc">~</span> Simplified_Etiology, <span class="at">data =</span> illness_data)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Modeling with All Predictors</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>lm_fit2 <span class="ot">=</span> lm_spec <span class="sc">%&gt;%</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(Illnesses <span class="sc">~</span> ., <span class="at">data =</span> illness_data)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Poisson Regression</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Modeling with Main Predictor `Simplified_Etiology`</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>poisson_wf1 <span class="ot">=</span> <span class="fu">workflow</span>(Illnesses <span class="sc">~</span> Simplified_Etiology, <span class="fu">poisson_reg</span>())</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Modeling with All Predictors</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>poisson_wf2 <span class="ot">=</span> <span class="fu">workflow</span>(Illnesses <span class="sc">~</span> ., <span class="fu">poisson_reg</span>())</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Model Fitting</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>poisson_fit1 <span class="ot">=</span> <span class="fu">fit</span>(poisson_wf1, <span class="at">data=</span>illness_data)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>poisson_fit2 <span class="ot">=</span> <span class="fu">fit</span>(poisson_wf2, <span class="at">data=</span>illness_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
-</section>
 <section id="model-evaluation" class="level3">
 <h3 class="anchored" data-anchor-id="model-evaluation">Model Evaluation</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking parameters for linear regression model</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lm_fit1) <span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>estimate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking Parameters for Linear Regression Model</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lm_fit1) <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>estimate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 35 × 5
    term                              estimate std.error statistic  p.value
@@ -260,8 +292,8 @@ $ Simplified_Etiology &lt;fct&gt; Scombroid, Salmonella, Salmonella, Campylobact
 10 Simplified_EtiologyStreptococcus     -52.0     33.0     -1.57  1.15e- 1
 # … with 25 more rows</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lm_fit2)<span class="sc">%&gt;%</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>estimate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lm_fit2) <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>estimate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 132 × 5
    term                                      estimate std.error stati…¹  p.value
@@ -278,9 +310,9 @@ $ Simplified_Etiology &lt;fct&gt; Scombroid, Salmonella, Salmonella, Campylobact
 10 StateTexas                                    38.3     18.5     2.07 3.83e- 2
 # … with 122 more rows, and abbreviated variable name ¹​statistic</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking parameters for Poisson regression model</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(poisson_fit1)<span class="sc">%&gt;%</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a> <span class="fu">arrange</span>(<span class="sc">-</span>estimate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking Parameters for Poisson Regression Model</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(poisson_fit1) <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a> <span class="fu">arrange</span>(<span class="sc">-</span>estimate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 35 × 5
    term                              estimate std.error statistic  p.value
@@ -297,8 +329,8 @@ $ Simplified_Etiology &lt;fct&gt; Scombroid, Salmonella, Salmonella, Campylobact
 10 Simplified_EtiologyStreptococcus    -1.07    0.0966     -11.1  1.13e-28
 # … with 25 more rows</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(poisson_fit2)<span class="sc">%&gt;%</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">arrange</span>(<span class="sc">-</span>estimate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(poisson_fit2) <span class="sc">%&gt;%</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">arrange</span>(<span class="sc">-</span>estimate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 132 × 5
    term                                        estim…¹ std.e…² stati…³   p.value
@@ -316,65 +348,58 @@ $ Simplified_Etiology &lt;fct&gt; Scombroid, Salmonella, Salmonella, Campylobact
 # … with 122 more rows, and abbreviated variable names ¹​estimate, ²​std.error,
 #   ³​statistic</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Model evaluation</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>Result<span class="ot">=</span>lm_fit1<span class="sc">%&gt;%</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a> <span class="fu">predict</span>(<span class="at">new_data=</span>illness_data)<span class="sc">%&gt;%</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a> <span class="fu">mutate</span> (<span class="at">.pred=</span><span class="fu">round</span>(.pred),<span class="at">true_value=</span>illness_data<span class="sc">$</span>Illnesses, <span class="at">model=</span> <span class="st">"lm_single"</span>)<span class="sc">%&gt;%</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(lm_fit1<span class="sc">%&gt;%</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">predict</span>(<span class="at">new_data=</span>illness_data)<span class="sc">%&gt;%</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span> (<span class="at">.pred=</span><span class="fu">round</span>(.pred),<span class="at">true_value=</span>illness_data<span class="sc">$</span>Illnesses, <span class="at">model=</span> <span class="st">"lm_multiple"</span>)<span class="sc">%&gt;%</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">bind_rows</span>(poisson_fit1<span class="sc">%&gt;%</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">predict</span>(<span class="at">new_data=</span> illness_data)<span class="sc">%&gt;%</span> </span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">mutate</span> (<span class="at">true_value=</span>illness_data<span class="sc">$</span>Illnesses, <span class="at">model=</span> <span class="st">"glm_single"</span>)<span class="sc">%&gt;%</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">bind_rows</span>(poisson_fit2<span class="sc">%&gt;%</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">predict</span>(<span class="at">new_data=</span> illness_data)<span class="sc">%&gt;%</span> </span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">mutate</span> (<span class="at">true_value=</span>illness_data<span class="sc">$</span>Illnesses, <span class="at">model=</span> <span class="st">"glm_multiple"</span>)</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>                        )</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Model Evaluation</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>Result <span class="ot">=</span> lm_fit1 <span class="sc">%&gt;%</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(<span class="at">new_data =</span> illness_data) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">.pred =</span> <span class="fu">round</span>(.pred), </span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">true_value =</span> illness_data<span class="sc">$</span>Illnesses, <span class="at">model=</span> <span class="st">"lm_single"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(lm_fit1 <span class="sc">%&gt;%</span> </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>              <span class="fu">predict</span>(<span class="at">new_data=</span>illness_data) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">.pred=</span><span class="fu">round</span>(.pred), </span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>                     <span class="at">true_value =</span> illness_data<span class="sc">$</span>Illnesses, <span class="at">model=</span> <span class="st">"lm_multiple"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>              <span class="fu">bind_rows</span>(poisson_fit1 <span class="sc">%&gt;%</span> <span class="fu">predict</span>(<span class="at">new_data=</span> illness_data) <span class="sc">%&gt;%</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">mutate</span>(<span class="at">true_value=</span>illness_data<span class="sc">$</span>Illnesses, </span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">model=</span> <span class="st">"glm_single"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">bind_rows</span>(poisson_fit2 <span class="sc">%&gt;%</span> </span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>                                      <span class="fu">predict</span>(<span class="at">new_data=</span> illness_data)<span class="sc">%&gt;%</span> </span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>                                      <span class="fu">mutate</span>(<span class="at">true_value=</span>illness_data<span class="sc">$</span>Illnesses, </span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">model=</span> <span class="st">"glm_multiple"</span>)))</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
 prediction from a rank-deficient fit may be misleading</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>Result<span class="sc">%&gt;%</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model)<span class="sc">%&gt;%</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rmse</span>(<span class="at">truth=</span>true_value,<span class="at">estimate=</span>.pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 4 × 4
-  model        .metric .estimator .estimate
-  &lt;chr&gt;        &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 glm_multiple rmse    standard        55.6
-2 glm_single   rmse    standard        65.0
-3 lm_multiple  rmse    standard        65.0
-4 lm_single    rmse    standard        65.0</code></pre>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>Result <span class="ot">&lt;-</span> Result <span class="sc">%&gt;%</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rmse</span>(<span class="at">truth=</span>true_value, <span class="at">estimate =</span> .pred) <span class="sc">%&gt;%</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">illness_model =</span> model)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(Result, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">"results"</span>, <span class="st">"illness_model_evaluation.rds"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-</section>
-<section id="according-to-the-result-the-model-built-using-poisson-regression-with-multiple-predictors-seems-to-have-the-smallest-root-mean-squared-error." class="level3">
-<h3 class="anchored" data-anchor-id="according-to-the-result-the-model-built-using-poisson-regression-with-multiple-predictors-seems-to-have-the-smallest-root-mean-squared-error.">According to the result, the model built using Poisson regression with multiple predictors seems to have the smallest root mean squared error.</h3>
+<p>According to the result, the model built using Poisson regression with multiple predictors seems to have the smallest root mean squared error.</p>
 </section>
 </section>
-<section id="second-health-outcome-of-interest-hospitilization" class="level2">
-<h2 class="anchored" data-anchor-id="second-health-outcome-of-interest-hospitilization">Second health outcome of interest: Hospitilization</h2>
-<section id="predictors-time-year-pathogen-type-etiology-location-state-and-food-type-ifsac-category-1" class="level3">
-<h3 class="anchored" data-anchor-id="predictors-time-year-pathogen-type-etiology-location-state-and-food-type-ifsac-category-1">Predictors: time (year), pathogen type, etiology, location, state, and food type (<code>IFSAC Category</code>)</h3>
+</section>
+<section id="second-health-outcome-of-interest-hospitilization" class="level1">
+<h1>Second Health Outcome of Interest: Hospitilization</h1>
+<p>Predictors - Time (Year) - Pathogen Type - Etiology - Location - State - Food Type (IFSAC Category)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking the distribution of Hospitalization</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>training_data_final<span class="sc">%&gt;%</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(Hospitalizations))<span class="sc">+</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>()<span class="sc">+</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">trans=</span>scales<span class="sc">::</span><span class="fu">pseudo_log_trans</span>(<span class="at">base=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking the Distribution of Hospitalization</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>training_data_final <span class="sc">%&gt;%</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(Hospitalizations)) <span class="sc">+</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>() <span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">trans=</span>scales<span class="sc">::</span><span class="fu">pseudo_log_trans</span>(<span class="at">base =</span> <span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 </div>
 <div class="cell-output-display">
 <p><img src="statistical_analysis_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating a tibble only includes our predictors of interest</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>hosp_data<span class="ot">=</span>training_data_final<span class="sc">%&gt;%</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">11</span>,<span class="dv">13</span>,<span class="dv">14</span>))<span class="sc">%&gt;%</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.character, as.factor)</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(hosp_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tibble for Variables of Interest</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>hosp_data <span class="ot">=</span> training_data_final <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">11</span>, <span class="dv">13</span>, <span class="dv">14</span>))<span class="sc">%&gt;%</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.character, as.factor)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(hosp_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 4,033
 Columns: 7
@@ -386,49 +411,56 @@ $ Hospitalizations    &lt;dbl&gt; 0, 3, 3, 1, 0, 0, 0, 0, 0, 0, 1, 6, 0, 2, 2, 0
 $ Pathogen_Type       &lt;fct&gt; Poison, Bacteria, Bacteria, Bacteria, Bacteria, Po…
 $ Simplified_Etiology &lt;fct&gt; Scombroid, Salmonella, Salmonella, Campylobacter, …</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"histogram_Hospitalizations.png"</span>, <span class="at">path =</span> image_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Saving 7 x 5 in image
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 </div>
-</section>
-<section id="modeling-hospitalizations-using-linear-regression-and-poisson-regression" class="level3">
-<h3 class="anchored" data-anchor-id="modeling-hospitalizations-using-linear-regression-and-poisson-regression">Modeling <code>Hospitalizations</code> using linear regression and Poisson regression</h3>
+</div>
+<section id="modeling-hospitalizations-using-linear-regression-and-poisson-regression" class="level2">
+<h2 class="anchored" data-anchor-id="modeling-hospitalizations-using-linear-regression-and-poisson-regression">Modeling <code>Hospitalizations</code> using Linear Regression and Poisson Regression</h2>
+<p>To create a workflow for the Poisson regression model, we will use the default <em>glm</em> engine again.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Model specification and fitting for linear regression model</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>lm_spec<span class="ot">=</span><span class="fu">linear_reg</span>()<span class="sc">%&gt;%</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="at">engine=</span><span class="st">"lm"</span>)</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Modeling with main predictor `Simplified_Etiology`</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>lm_fit3<span class="ot">=</span>lm_spec<span class="sc">%&gt;%</span></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(Hospitalizations<span class="sc">~</span>Simplified_Etiology, <span class="at">data=</span>hosp_data)</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Modeling with all predictors</span></span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>lm_fit4<span class="ot">=</span>lm_spec<span class="sc">%&gt;%</span></span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(Hospitalizations<span class="sc">~</span>., <span class="at">data=</span>hosp_data)</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Model specification and fitting for Poisson regression model</span></span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="co"># create a workflow for poisson regression model, we will use the default glm engine</span></span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Modeling with main predictor `Simplified_Etiology`</span></span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>poisson_wf3<span class="ot">=</span><span class="fu">workflow</span>(Hospitalizations<span class="sc">~</span>Simplified_Etiology, <span class="fu">poisson_reg</span>())</span>
-<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Modeling with all predictors</span></span>
-<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>poisson_wf4<span class="ot">=</span><span class="fu">workflow</span>(Hospitalizations<span class="sc">~</span>., <span class="fu">poisson_reg</span>())</span>
-<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Fitting models</span></span>
-<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>poisson_fit3<span class="ot">=</span><span class="fu">fit</span>(poisson_wf3,<span class="at">data=</span>hosp_data)</span>
-<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>poisson_fit4<span class="ot">=</span><span class="fu">fit</span>(poisson_wf4,<span class="at">data=</span>hosp_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Model Specification and Fitting for Linear Regression Model</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>lm_spec <span class="ot">=</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="at">engine =</span> <span class="st">"lm"</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Modeling with Main Predictor `Simplified_Etiology`</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>lm_fit3 <span class="ot">=</span> lm_spec <span class="sc">%&gt;%</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(Hospitalizations <span class="sc">~</span> Simplified_Etiology, <span class="at">data =</span> hosp_data)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Modeling with All Predictors</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>lm_fit4 <span class="ot">=</span> lm_spec <span class="sc">%&gt;%</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(Hospitalizations <span class="sc">~</span> ., <span class="at">data =</span> hosp_data)</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Model Specification and Fitting for Poisson Regression Model</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Modeling with Main Predictor `Simplified_Etiology`</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>poisson_wf3 <span class="ot">=</span> <span class="fu">workflow</span>(Hospitalizations <span class="sc">~</span> Simplified_Etiology, <span class="fu">poisson_reg</span>())</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Modeling with all predictors</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>poisson_wf4<span class="ot">=</span><span class="fu">workflow</span>(Hospitalizations<span class="sc">~</span>., <span class="fu">poisson_reg</span>())</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Fitting models</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>poisson_fit3 <span class="ot">=</span> <span class="fu">fit</span>(poisson_wf3,<span class="at">data =</span> hosp_data)</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>poisson_fit4 <span class="ot">=</span> <span class="fu">fit</span>(poisson_wf4,<span class="at">data =</span> hosp_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
 <section id="model-evaluation-1" class="level3">
-<h3 class="anchored" data-anchor-id="model-evaluation-1">Model evaluation</h3>
+<h3 class="anchored" data-anchor-id="model-evaluation-1">Model Evaluation</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>Result<span class="ot">=</span>lm_fit3<span class="sc">%&gt;%</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">predict</span>(<span class="at">new_data=</span>hosp_data)<span class="sc">%&gt;%</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a> <span class="fu">mutate</span> (<span class="at">.pred=</span><span class="fu">round</span>(.pred),<span class="at">true_value=</span>hosp_data<span class="sc">$</span>Hospitalizations, <span class="at">model=</span> <span class="st">"lm_single"</span>)<span class="sc">%&gt;%</span></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(lm_fit4<span class="sc">%&gt;%</span></span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">predict</span>(<span class="at">new_data=</span>hosp_data)<span class="sc">%&gt;%</span></span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span> (<span class="at">.pred=</span><span class="fu">round</span>(.pred),<span class="at">true_value=</span>hosp_data<span class="sc">$</span>Hospitalizations, <span class="at">model=</span> <span class="st">"lm_multiple"</span>)<span class="sc">%&gt;%</span></span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">bind_rows</span>(poisson_fit1<span class="sc">%&gt;%</span></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">predict</span>(<span class="at">new_data=</span> hosp_data)<span class="sc">%&gt;%</span> </span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">mutate</span> (<span class="at">true_value=</span>hosp_data<span class="sc">$</span>Hospitalizations, <span class="at">model=</span> <span class="st">"glm_single"</span>)<span class="sc">%&gt;%</span></span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">bind_rows</span>(poisson_fit2<span class="sc">%&gt;%</span></span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">predict</span>(<span class="at">new_data=</span> hosp_data)<span class="sc">%&gt;%</span> </span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">mutate</span> (<span class="at">true_value=</span>hosp_data<span class="sc">$</span>Hospitalizations, <span class="at">model=</span> <span class="st">"glm_multiple"</span>)</span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>                        )</span>
-<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>Result <span class="ot">=</span> lm_fit3 <span class="sc">%&gt;%</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">predict</span>(<span class="at">new_data =</span> hosp_data) <span class="sc">%&gt;%</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a> <span class="fu">mutate</span>(<span class="at">.pred =</span> <span class="fu">round</span>(.pred), <span class="at">true_value =</span> hosp_data<span class="sc">$</span>Hospitalizations,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">model=</span> <span class="st">"lm_single"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(lm_fit4 <span class="sc">%&gt;%</span> </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>              <span class="fu">predict</span>(<span class="at">new_data=</span>hosp_data) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span> (<span class="at">.pred=</span><span class="fu">round</span>(.pred), </span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">true_value=</span>hosp_data<span class="sc">$</span>Hospitalizations, </span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">model=</span> <span class="st">"lm_multiple"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>              <span class="fu">bind_rows</span>(poisson_fit1 <span class="sc">%&gt;%</span> </span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">predict</span>(<span class="at">new_data =</span> hosp_data) <span class="sc">%&gt;%</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">mutate</span>(<span class="at">true_value =</span> hosp_data<span class="sc">$</span>Hospitalizations, </span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>                               <span class="at">model=</span> <span class="st">"glm_single"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">bind_rows</span>(poisson_fit2 <span class="sc">%&gt;%</span> </span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>                                      <span class="fu">predict</span>(<span class="at">new_data=</span> hosp_data) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>                                      <span class="fu">mutate</span>(<span class="at">true_value =</span> hosp_data<span class="sc">$</span>Hospitalizations, </span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">model=</span> <span class="st">"glm_multiple"</span>)))</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in predict.lm(object = object$fit, newdata = new_data, type =
 "response"): prediction from a rank-deficient fit may be misleading</code></pre>
@@ -437,19 +469,14 @@ $ Simplified_Etiology &lt;fct&gt; Scombroid, Salmonella, Salmonella, Campylobact
 <pre><code>Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
 prediction from a rank-deficient fit may be misleading</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>Result<span class="sc">%&gt;%</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model)<span class="sc">%&gt;%</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rmse</span>(<span class="at">truth=</span>true_value,<span class="at">estimate=</span>.pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 4 × 4
-  model        .metric .estimator .estimate
-  &lt;chr&gt;        &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 glm_multiple rmse    standard       44.2 
-2 glm_single   rmse    standard       34.0 
-3 lm_multiple  rmse    standard        7.09
-4 lm_single    rmse    standard        8.00</code></pre>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>Result <span class="ot">&lt;-</span> Result <span class="sc">%&gt;%</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model)<span class="sc">%&gt;%</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rmse</span>(<span class="at">truth =</span> true_value, <span class="at">estimate =</span> .pred) <span class="sc">%&gt;%</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">hospital_model =</span> model)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(Result, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">"results"</span>, <span class="st">"hospital_model_evaluation.rds"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
+<p>According to the result, the model built using linear regression with multiple predictors seems to have the smallest root mean squared error.</p>
 </section>
 </section>
 </section>

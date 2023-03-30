@@ -1,3 +1,10 @@
+---
+title: "Statistical analysis script"
+author: "Weifan Wu and Kailin Chen"
+date: "03/16/2023"
+output: html_document
+---
+
 # Load libraries
 ```{r}
 # Pathing

@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Andreas Handel">
+<meta name="author" content="Weifan Wu and Kailin Chen">
 <meta name="dcterms.date" content="2021-10-28">
 
-<title>An example exploratory analysis script</title>
+<title>Exploratory analysis script</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -113,7 +113,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">An example exploratory analysis script</h1>
+<h1 class="title">Exploratory analysis script</h1>
 </div>
 
 
@@ -123,7 +123,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Andreas Handel </p>
+             <p>Weifan Wu and Kailin Chen </p>
           </div>
   </div>
     
@@ -199,7 +199,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span> </span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Year"</span>, <span class="at">y =</span> <span class="st">"Hospitalizations"</span>, <span class="at">title =</span> <span class="st">"Scatter Plot of Hospitalizations by Year and Pathogen Type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="768"></p>
 </div>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Save Graph</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>image_path <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"results"</span>)</span>
@@ -212,7 +212,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Pathogen Type"</span>, <span class="at">y =</span> <span class="st">"Hospitalizations"</span>, <span class="at">title =</span> <span class="st">"Stacked Bar Chart of Hospitalizations by Pathogen Type and Etiology"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
+<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="768"></p>
 </div>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Save Graph</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"pathogen_type_etiology_v_hospitalizations.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
@@ -220,66 +220,84 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Closer Look at Bacterial Etiologies for Outbreaks</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(training_data_final <span class="sc">%&gt;%</span> </span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>         <span class="fu">select</span>(Pathogen_Type, Simplified_Etiology, Hospitalizations) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Pathogen_Type <span class="sc">==</span> <span class="st">"Bacteria"</span>), <span class="fu">aes</span>(<span class="at">x =</span> Simplified_Etiology)) <span class="sc">+</span> <span class="fu">geom_bar</span>() <span class="sc">+</span> </span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Bacteria"</span>, <span class="at">y =</span> <span class="st">"Hospitalizations"</span>, <span class="at">title =</span> <span class="st">"Bar Chart of Bacteria Frequency"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Bacteria"</span>, <span class="at">y =</span> <span class="st">"Hospitalizations"</span>, <span class="at">title =</span> <span class="st">"Bar Chart of Bacteria Frequency"</span>)<span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-3.png" class="img-fluid" width="672"></p>
+<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-3.png" class="img-fluid" width="768"></p>
 </div>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"bacterial_etiology_v_hospitalization_frequency.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># States vs Hospitalization</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="do">####</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>state_v_hospitalization_training <span class="ot">&lt;-</span> training_data_final <span class="sc">%&gt;%</span> </span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(State) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_hospitalizations =</span> <span class="fu">sum</span>(Hospitalizations)) <span class="sc">%&gt;%</span>     <span class="fu">count</span>(all_hospitalizations) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(State, all_hospitalizations) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(all_hospitalizations))</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Save Table</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>table_path <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"results"</span>, <span class="st">"state_v_hospitalization_training.rds"</span>)</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(state_v_hospitalization_training, <span class="at">file =</span> table_path)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>Norovirus_Hosp<span class="ot">=</span>training_data_final<span class="sc">%&gt;%</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Simplified_Etiology, Hospitalizations, <span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Simplified_Etiology, Hospitalizations, <span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Simplified_Etiology<span class="sc">==</span><span class="st">"Salmonella"</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"Multiple"</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"Other"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>()<span class="sc">%&gt;%</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total_hospitalizations=</span>n<span class="sc">*</span>Hospitalizations)</span>
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(state_v_hospitalization_training)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(Norovirus_Hosp,<span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span>,<span class="at">y=</span>total_hospitalizations))<span class="sc">+</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()<span class="sc">+</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-4.png" class="img-fluid" width="768"></p>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># States vs Hospitalization</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>state_v_hospitalization_training <span class="ot">&lt;-</span> training_data_final <span class="sc">%&gt;%</span> </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(State) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_hospitalizations =</span> <span class="fu">sum</span>(Hospitalizations)) <span class="sc">%&gt;%</span>     <span class="fu">count</span>(all_hospitalizations) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(State, all_hospitalizations) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(all_hospitalizations))</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Save Table</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>table_path <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"results"</span>, <span class="st">"state_v_hospitalization_training.rds"</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(state_v_hospitalization_training, <span class="at">file =</span> table_path)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(state_v_hospitalization_training)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["State"],"name":[1],"type":["chr"],"align":["left"]},{"label":["all_hospitalizations"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"Multistate","2":"4379"},{"1":"California","2":"487"},{"1":"Minnesota","2":"393"},{"1":"Ohio","2":"369"},{"1":"Illinois","2":"361"},{"1":"New York","2":"298"},{"1":"Georgia","2":"263"},{"1":"Pennsylvania","2":"260"},{"1":"Florida","2":"245"},{"1":"Wisconsin","2":"243"},{"1":"Michigan","2":"183"},{"1":"Tennessee","2":"172"},{"1":"Virginia","2":"145"},{"1":"Washington","2":"141"},{"1":"Colorado","2":"129"},{"1":"Maryland","2":"127"},{"1":"North Carolina","2":"121"},{"1":"Oregon","2":"119"},{"1":"Texas","2":"118"},{"1":"South Carolina","2":"111"},{"1":"Arizona","2":"110"},{"1":"Arkansas","2":"109"},{"1":"Missouri","2":"109"},{"1":"Alabama","2":"98"},{"1":"Massachusetts","2":"87"},{"1":"Louisiana","2":"84"},{"1":"Connecticut","2":"83"},{"1":"Indiana","2":"76"},{"1":"Hawaii","2":"68"},{"1":"Nevada","2":"57"},{"1":"Kansas","2":"48"},{"1":"Alaska","2":"46"},{"1":"Iowa","2":"42"},{"1":"New Jersey","2":"32"},{"1":"Mississippi","2":"31"},{"1":"New Mexico","2":"27"},{"1":"Utah","2":"25"},{"1":"Wyoming","2":"25"},{"1":"Idaho","2":"24"},{"1":"Nebraska","2":"23"},{"1":"Kentucky","2":"22"},{"1":"Maine","2":"21"},{"1":"New Hampshire","2":"18"},{"1":"South Dakota","2":"14"},{"1":"Vermont","2":"12"},{"1":"Rhode Island","2":"9"},{"1":"North Dakota","2":"8"},{"1":"Puerto Rico","2":"7"},{"1":"West Virginia","2":"7"},{"1":"Oklahoma","2":"6"},{"1":"Delaware","2":"4"},{"1":"Washington DC","2":"4"},{"1":"Montana","2":"1"},{"1":"Guam","2":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["State"],"name":[1],"type":["chr"],"align":["left"]},{"label":["all_hospitalizations"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"Multistate","2":"4379"},{"1":"California","2":"503"},{"1":"Minnesota","2":"400"},{"1":"Ohio","2":"377"},{"1":"Illinois","2":"363"},{"1":"New York","2":"309"},{"1":"Florida","2":"263"},{"1":"Georgia","2":"263"},{"1":"Pennsylvania","2":"263"},{"1":"Wisconsin","2":"245"},{"1":"Michigan","2":"185"},{"1":"Tennessee","2":"172"},{"1":"Virginia","2":"145"},{"1":"Washington","2":"145"},{"1":"Maryland","2":"133"},{"1":"Colorado","2":"130"},{"1":"Oregon","2":"127"},{"1":"North Carolina","2":"121"},{"1":"Texas","2":"118"},{"1":"South Carolina","2":"111"},{"1":"Arizona","2":"110"},{"1":"Arkansas","2":"109"},{"1":"Missouri","2":"109"},{"1":"Alabama","2":"98"},{"1":"Massachusetts","2":"87"},{"1":"Louisiana","2":"84"},{"1":"Connecticut","2":"83"},{"1":"Indiana","2":"76"},{"1":"Hawaii","2":"68"},{"1":"Iowa","2":"62"},{"1":"Alaska","2":"58"},{"1":"Nevada","2":"57"},{"1":"Kansas","2":"49"},{"1":"New Jersey","2":"48"},{"1":"Mississippi","2":"31"},{"1":"New Mexico","2":"27"},{"1":"Utah","2":"25"},{"1":"Wyoming","2":"25"},{"1":"Idaho","2":"24"},{"1":"Nebraska","2":"23"},{"1":"Kentucky","2":"22"},{"1":"Maine","2":"21"},{"1":"New Hampshire","2":"18"},{"1":"South Dakota","2":"14"},{"1":"Vermont","2":"12"},{"1":"Rhode Island","2":"11"},{"1":"North Dakota","2":"8"},{"1":"Puerto Rico","2":"7"},{"1":"West Virginia","2":"7"},{"1":"Oklahoma","2":"6"},{"1":"Delaware","2":"4"},{"1":"Washington DC","2":"4"},{"1":"Montana","2":"1"},{"1":"Guam","2":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Project total hospitalizations in states map</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>training_hosp<span class="ot">=</span>training_data_final<span class="sc">%&gt;%</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state=</span><span class="fu">tolower</span>(State))<span class="sc">%&gt;%</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state)<span class="sc">%&gt;%</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_hosp =</span> <span class="fu">sum</span>(Hospitalizations)) <span class="sc">%&gt;%</span>  <span class="fu">count</span>(all_hosp) <span class="sc">%&gt;%</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state, all_hosp)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>training_hosp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Project total hospitalizations in states map</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>training_hosp<span class="ot">=</span>training_data_final<span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state=</span><span class="fu">tolower</span>(State))<span class="sc">%&gt;%</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state)<span class="sc">%&gt;%</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_hosp =</span> <span class="fu">sum</span>(Hospitalizations)) <span class="sc">%&gt;%</span>  <span class="fu">count</span>(all_hosp) <span class="sc">%&gt;%</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state, all_hosp)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>training_hosp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 54 × 2
 # Groups:   state [54]
    state       all_hosp
    &lt;chr&gt;          &lt;dbl&gt;
  1 alabama           98
- 2 alaska            46
+ 2 alaska            58
  3 arizona          110
  4 arkansas         109
- 5 california       487
- 6 colorado         129
+ 5 california       503
+ 6 colorado         130
  7 connecticut       83
  8 delaware           4
- 9 florida          245
+ 9 florida          263
 10 georgia          263
 # … with 44 more rows</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>state_map<span class="ot">=</span>training_hosp<span class="sc">%&gt;%</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(state)<span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(.,<span class="fu">map_data</span>(<span class="st">"state"</span>),<span class="at">by=</span><span class="fu">c</span>(<span class="st">"state"</span><span class="ot">=</span><span class="st">"region"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>state_map<span class="ot">=</span>training_hosp<span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(state)<span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(.,<span class="fu">map_data</span>(<span class="st">"state"</span>),<span class="at">by=</span><span class="fu">c</span>(<span class="st">"state"</span><span class="ot">=</span><span class="st">"region"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in inner_join(., map_data("state"), by = c(state = "region")): Each row in `x` is expected to match at most 1 row in `y`.
 ℹ Row 1 of `x` matches multiple rows.
 ℹ If multiple matches are expected, set `multiple = "all"` to silence this
   warning.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>state_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>state_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 15,527 × 6
 # Groups:   state [48]
@@ -297,105 +315,116 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 10 alabama -87.8  30.3     1    10 &lt;NA&gt;     
 # … with 15,517 more rows</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>map_final<span class="ot">=</span><span class="fu">right_join</span>(training_hosp,state_map,<span class="at">by=</span><span class="fu">c</span>(<span class="st">"state"</span><span class="ot">=</span><span class="st">"state"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>map_final<span class="ot">=</span><span class="fu">right_join</span>(training_hosp,state_map,<span class="at">by=</span><span class="fu">c</span>(<span class="st">"state"</span><span class="ot">=</span><span class="st">"state"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in right_join(training_hosp, state_map, by = c(state = "state")): Each row in `x` is expected to match at most 1 row in `y`.
 ℹ Row 1 of `x` matches multiple rows.
 ℹ If multiple matches are expected, set `multiple = "all"` to silence this
   warning.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>map_final<span class="sc">%&gt;%</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>long,<span class="at">y=</span>lat,<span class="at">fill=</span>all_hosp,<span class="at">group=</span>group))<span class="sc">+</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_polygon</span>(<span class="at">color=</span><span class="st">"black"</span>,<span class="at">size=</span><span class="fl">0.1</span>)<span class="sc">+</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_polygon</span>(<span class="at">data=</span>state_map,<span class="fu">aes</span>(<span class="at">x=</span>long,<span class="at">y=</span>lat,<span class="at">group=</span>group),<span class="at">fill=</span><span class="cn">NA</span>,<span class="at">color=</span><span class="st">"black"</span>,<span class="at">size=</span><span class="fl">0.3</span>)<span class="sc">+</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">name=</span><span class="st">"Number of </span><span class="sc">\n</span><span class="st"> Hospitalizations"</span>,</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">low=</span><span class="st">"#FFFFFF"</span>,<span class="at">high=</span><span class="st">"#FF0000"</span>,</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="cn">NA</span>))<span class="sc">+</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Cases of Hospitalizations Caused by Foodborne Illnesses</span><span class="sc">\n</span><span class="st"> in Each State During 1998-2015"</span>)<span class="sc">+</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()<span class="sc">+</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_quickmap</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>map_final<span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>long,<span class="at">y=</span>lat,<span class="at">fill=</span>all_hosp,<span class="at">group=</span>group))<span class="sc">+</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_polygon</span>(<span class="at">color=</span><span class="st">"black"</span>,<span class="at">size=</span><span class="fl">0.1</span>)<span class="sc">+</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_polygon</span>(<span class="at">data=</span>state_map,<span class="fu">aes</span>(<span class="at">x=</span>long,<span class="at">y=</span>lat,<span class="at">group=</span>group),<span class="at">fill=</span><span class="cn">NA</span>,<span class="at">color=</span><span class="st">"black"</span>,<span class="at">size=</span><span class="fl">0.3</span>)<span class="sc">+</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">name=</span><span class="st">"Number of </span><span class="sc">\n</span><span class="st"> Hospitalizations"</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">low=</span><span class="st">"#FFFFFF"</span>,<span class="at">high=</span><span class="st">"#FF0000"</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="cn">NA</span>))<span class="sc">+</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Cases of Hospitalizations Caused by Foodborne Illnesses</span><span class="sc">\n</span><span class="st"> in Each State During 1998-2015"</span>)<span class="sc">+</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()<span class="sc">+</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_quickmap</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 ℹ Please use `linewidth` instead.</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-4.png" class="img-fluid" width="672"></p>
+<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-5.png" class="img-fluid" width="768"></p>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"State_hospitalization_map.png"</span>,<span class="at">path=</span>image_path,<span class="at">width=</span><span class="dv">3000</span>,<span class="at">height=</span><span class="dv">2000</span>,<span class="at">units=</span><span class="st">"px"</span>)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Food Type and Hospitalizations</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(training_data_final <span class="sc">%&gt;%</span> </span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"Multiple"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"Other"</span>), </span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span>, <span class="at">y =</span> Hospitalizations)) <span class="sc">+</span> </span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Food Type"</span>, <span class="at">y =</span> <span class="st">"Hospitalizations"</span>, <span class="at">title =</span> <span class="st">"Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-5.png" class="img-fluid" width="672"></p>
-</div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"Food_type_v_hospitalization.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"State_hospitalization_map.png"</span>,<span class="at">path=</span>image_path,<span class="at">width=</span><span class="dv">3000</span>,<span class="at">height=</span><span class="dv">2000</span>,<span class="at">units=</span><span class="st">"px"</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Locations and Hospitalizations</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>Location_v_Hospitalization <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(training_data_final, <span class="fu">aes</span>(<span class="at">x =</span> Location, <span class="at">y =</span> Hospitalizations)) <span class="sc">+</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Locations"</span>, <span class="at">y =</span> <span class="st">"Hospitalizations"</span>, <span class="at">title =</span> <span class="st">"Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'"</span>)<span class="sc">+</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">guide=</span><span class="fu">guide_axis</span>(<span class="at">n.dodge=</span><span class="dv">3</span>))</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>Location_v_Hospitalization</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Food Type and Hospitalizations</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(training_data_final <span class="sc">%&gt;%</span> </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"Multiple"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"Other"</span>), </span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span>, <span class="at">y =</span> Hospitalizations)) <span class="sc">+</span> </span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Food Type"</span>, <span class="at">y =</span> <span class="st">"Hospitalizations"</span>, <span class="at">title =</span> <span class="st">"Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'"</span>)<span class="sc">+</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-6.png" class="img-fluid" width="672"></p>
+<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-6.png" class="img-fluid" width="768"></p>
 </div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"Location_v_hospitalization.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"Food_type_v_hospitalization.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Locations and Hospitalizations</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>Location_v_Hospitalization <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(training_data_final, <span class="fu">aes</span>(<span class="at">x =</span> Location, <span class="at">y =</span> Hospitalizations)) <span class="sc">+</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Locations"</span>, <span class="at">y =</span> <span class="st">"Hospitalizations"</span>, <span class="at">title =</span> <span class="st">"Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'"</span>)<span class="sc">+</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>Location_v_Hospitalization</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-4-7.png" class="img-fluid" width="768"></p>
 </div>
-<p>All outbreaks with a high hospitalization count (&gt; 200 cases) are caused by bacteria. It also appears that most outbreaks caused by bacteria are due to Salmonella. California and Minnesota are the two states with the highest total hospitalization count due to foodborne illness from 1998 to 2015. Resturants and Private home are the most frequent locations with the highest total hospitalization count.</p>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"Location_v_hospitalization.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>All outbreaks with a high hospitalization count (&gt; 200 cases) are caused by bacteria. It also appears that most outbreaks caused by bacteria are due to Salmonella. California and Minnesota are the two states with the highest total hospitalization count due to foodborne illness from 1998 to 2015. Restaurants and Private home are the most frequent locations with the highest total hospitalization count.</p>
 </section>
-<section id="analysis-data-1" class="level2">
-<h2 class="anchored" data-anchor-id="analysis-data-1">Analysis Data</h2>
+<section id="testing-data" class="level2">
+<h2 class="anchored" data-anchor-id="testing-data">Testing Data</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Illnesses Caused by Pathogen Type Over Time</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(analysis_data_final <span class="sc">%&gt;%</span> </span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">group_by</span>(Year, Pathogen_Type, Illnesses) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>         <span class="fu">count</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>         <span class="fu">mutate</span>(<span class="at">true_illness_count =</span> n <span class="sc">*</span> Illnesses), </span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> Year, <span class="at">y =</span> true_illness_count, <span class="at">group =</span> Pathogen_Type, <span class="at">color =</span> Pathogen_Type)) <span class="sc">+</span> </span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span> </span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Year"</span>, <span class="at">y =</span> <span class="st">"Cases"</span>, <span class="at">title =</span> <span class="st">"Scatter Plot of Illness by Year and Pathogen Type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Illnesses Caused by Pathogen Type Over Time</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(analysis_data_final <span class="sc">%&gt;%</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">group_by</span>(Year, Pathogen_Type, Illnesses) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>         <span class="fu">count</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>         <span class="fu">mutate</span>(<span class="at">true_illness_count =</span> n <span class="sc">*</span> Illnesses), </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> Year, <span class="at">y =</span> true_illness_count, <span class="at">group =</span> Pathogen_Type, <span class="at">color =</span> Pathogen_Type)) <span class="sc">+</span> </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span> </span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Year"</span>, <span class="at">y =</span> <span class="st">"Cases"</span>, <span class="at">title =</span> <span class="st">"Scatter Plot of Illness by Year and Pathogen Type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Save Graph</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"time_v_illness_pathogen_type.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Pathogen Type + Etiology vs Illnesses Caused</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(analysis_data_final <span class="sc">%&gt;%</span> </span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>         <span class="fu">group_by</span>(Pathogen_Type, Simplified_Etiology, Illnesses) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>         <span class="fu">count</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>         <span class="fu">mutate</span>(<span class="at">true_illness_count =</span> n <span class="sc">*</span> Illnesses), </span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> Pathogen_Type, <span class="at">y =</span> Illnesses, <span class="at">group =</span> Simplified_Etiology, <span class="at">fill =</span> Simplified_Etiology)) <span class="sc">+</span> </span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Pathogen Type"</span>, <span class="at">y =</span> <span class="st">"Cases"</span>, <span class="at">title =</span> <span class="st">"Stacked Bar Chart of Illnesses by Pathogen Type and Etiology"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Save Graph</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"time_v_illness_pathogen_type.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Pathogen Type + Etiology vs Illnesses Caused</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(analysis_data_final <span class="sc">%&gt;%</span> </span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>         <span class="fu">group_by</span>(Pathogen_Type, Simplified_Etiology, Illnesses) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>         <span class="fu">count</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>         <span class="fu">mutate</span>(<span class="at">true_illness_count =</span> n <span class="sc">*</span> Illnesses), </span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> Pathogen_Type, <span class="at">y =</span> Illnesses, <span class="at">group =</span> Simplified_Etiology, <span class="at">fill =</span> Simplified_Etiology)) <span class="sc">+</span> </span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Pathogen Type"</span>, <span class="at">y =</span> <span class="st">"Cases"</span>, <span class="at">title =</span> <span class="st">"Stacked Bar Chart of Illnesses by Pathogen Type and Etiology"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Save Graph</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"pathogen_type_etiology_v_illness.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Closer Look at Bacterial Etiologies</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(analysis_data_final <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Pathogen_Type, Simplified_Etiology, Illnesses) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Pathogen_Type <span class="sc">==</span> <span class="st">"Bacteria"</span>), <span class="fu">aes</span>(<span class="at">x =</span> Simplified_Etiology)) <span class="sc">+</span> <span class="fu">geom_bar</span>() <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Bacteria"</span>, <span class="at">y =</span> <span class="st">"Cases"</span>, <span class="at">title =</span> <span class="st">"Bar Chart of Bacteria Frequency"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Save Graph</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"pathogen_type_etiology_v_illness.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Closer Look at Bacterial Etiologies</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(analysis_data_final <span class="sc">%&gt;%</span> </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>         <span class="fu">group_by</span>(Pathogen_Type, Simplified_Etiology, Illnesses) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>         <span class="fu">filter</span>(Pathogen_Type <span class="sc">==</span> <span class="st">"Bacteria"</span>), <span class="fu">aes</span>(<span class="at">x =</span> Simplified_Etiology)) <span class="sc">+</span> </span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span> </span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Bacteria"</span>, <span class="at">y =</span> <span class="st">"Cases"</span>, <span class="at">title =</span> <span class="st">"Bar Chart of Bacteria Frequency"</span>)<span class="sc">+</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-5-3.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save Graph</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"bacterial_etiology_v_outbreak_frequency.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># States vs Illnesses</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>state_v_illness_analysis <span class="ot">&lt;-</span> analysis_data_final <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(State) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">all_illnesses =</span> <span class="fu">sum</span>(Illnesses)) <span class="sc">%&gt;%</span> <span class="fu">count</span>(all_illnesses) <span class="sc">%&gt;%</span> <span class="fu">select</span>(State, all_illnesses) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(all_illnesses))</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(state_v_illness_analysis, <span class="at">file =</span> table_path)</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(state_v_illness_analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save Graph</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"bacterial_etiology_v_outbreak_frequency.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># States vs Illnesses</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>state_v_illness_analysis <span class="ot">&lt;-</span> analysis_data_final <span class="sc">%&gt;%</span> </span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(State) <span class="sc">%&gt;%</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_illnesses =</span> <span class="fu">sum</span>(Illnesses)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(all_illnesses) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(State, all_illnesses) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(all_illnesses))</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(state_v_illness_analysis, <span class="at">file =</span> table_path)</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(state_v_illness_analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -404,27 +433,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Food Type and Illnesses</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(analysis_data_final <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"Multiple"</span>) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"Other"</span>), <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span>, <span class="at">y =</span> Illnesses)) <span class="sc">+</span> <span class="fu">geom_col</span>() <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Food Type"</span>, <span class="at">y =</span> <span class="st">"Illnesses"</span>, <span class="at">title =</span> <span class="st">"Illnesses by Food Type, Excluding 'Multiple' and 'Other'"</span>)<span class="sc">+</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">guide =</span> <span class="fu">guide_axis</span>(<span class="at">n.dodge=</span><span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Food Type and Illnesses</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(analysis_data_final <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"Multiple"</span>) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"Other"</span>), <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">IFSAC Category</span><span class="st">`</span>, <span class="at">y =</span> Illnesses)) <span class="sc">+</span> </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Food Type"</span>, <span class="at">y =</span> <span class="st">"Illnesses"</span>, <span class="at">title =</span> <span class="st">"Illnesses by Food Type, Excluding 'Multiple' and 'Other'"</span>)<span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-5-4.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save Graph</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"food_type_v_illness_frequency.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Locations and Illnesses</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(analysis_data_final, <span class="fu">aes</span>(<span class="at">x =</span> Location, <span class="at">y =</span> Illnesses)) <span class="sc">+</span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Locations"</span>, <span class="at">y =</span> <span class="st">"Illnesses"</span>, <span class="at">title =</span> <span class="st">"Illnesses by Locations"</span>)<span class="sc">+</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">guide=</span><span class="fu">guide_axis</span>(<span class="at">n.dodge=</span><span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save Graph</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"food_type_v_illness_frequency.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Locations and Illnesses</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(analysis_data_final, <span class="fu">aes</span>(<span class="at">x =</span> Location, <span class="at">y =</span> Illnesses)) <span class="sc">+</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Locations"</span>, <span class="at">y =</span> <span class="st">"Illnesses"</span>, <span class="at">title =</span> <span class="st">"Illnesses by Locations"</span>)<span class="sc">+</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="exploratory_analysis_files/figure-html/unnamed-chunk-5-5.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save Graph</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"Location_v_Illness.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save Graph</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"Location_v_Illness.png"</span>, <span class="at">path =</span> image_path, <span class="at">width =</span> <span class="dv">3000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The outbreaks with a high number of cases (&gt; 500) are caused by bacteria. The stacked barplot indicates that the top two etiologic agents that contribute to fooborne-illnesses are Salmonella and Norovirus, which belong to the pathogen type of Bacteria and Virus respectively. In bacterial pathogen, Salmonella genius is the most dominant factor that is associated with foodborne outbreaks, followed by E. coli species and Vibrio genius. Geographically speaking, Arkansas and Minnesota are the two states with the highest accumulated foodborne illnesses from 1998 to 2015. Salad, Poultry, and Fruits are the three most common types of food vectors that are involved in transmitting foodborne pathogens. Resturants and Private home are the most frequent locations that foodborne outbreaks occur. Overall, the relationships between predictors and outcomes of training dataset share similar patterns with those of analysis dataset.</p>
+<p>The outbreaks with a high number of cases (&gt; 500) are caused by bacteria. The stacked barplot indicates that the top two etiologic agents that contribute to fooborne-illnesses are Salmonella and Norovirus, which belong to the pathogen type of Bacteria and Virus respectively. In bacterial pathogen, Salmonella genus is the most dominant factor that is associated with foodborne outbreaks, followed by E. coli species and Vibrio genus. Geographically speaking, Arkansas and Minnesota are the two states with the highest accumulated foodborne illnesses from 1998 to 2015. Salad, Poultry, and Fruits are the three most common types of food vectors that are involved in transmitting foodborne pathogens. Resturants and Private home are the most frequent locations that foodborne outbreaks occur. Overall, the relationships between predictors and outcomes of training dataset share similar patterns with those of analysis dataset.</p>
 </section>
 </section>
 
