@@ -50,7 +50,7 @@ ggplot(training_data_final %>%
   labs(x = "Year", y = "Hospitalizations", title = "Scatter Plot of Hospitalizations by Year and Pathogen Type")
 
 ## Save Graph
-image_path <- here("results")
+image_path <- here("results","images_EDA")
 ggsave("time_v_hospitalization_pathogen_type.png", path = image_path, width = 3000, height = 2000, units = "px")
 
 # Pathogen Type + Etiology vs Hospitalization

@@ -5,7 +5,7 @@ date: "03/16/2023"
 output: html_document
 ---
 
-# Load libraries
+## Load libraries
 ```{r}
 # Pathing
 library(here)
@@ -14,17 +14,20 @@ library(here)
 library(tidyverse)
 library(tidymodels)
 library(poissonreg)
+library(ranger)
+library(knitr)
+library(skimr)
 ```
-# Load Data
+## Load Data
 ```{r}
 # Path to Data
 data_location <- here(
   "data","processed_data","processed_training_data.rds")
 # Import Data
 training_data_final <- readRDS(data_location)
-glimpse(training_data_final)
+skim(training_data_final)
 ```
-# First Health Outcome of Interest: Illnesses
+## First Health Outcome of Interest: Illnesses
 
 Predictors
 -   Time (Year)
@@ -40,14 +43,15 @@ training_data_final %>%
   ggplot(aes(Illnesses))+
   geom_histogram()+
   scale_x_continuous(trans=scales::pseudo_log_trans(base=10))
-image_path <- here("results")
-ggsave("histogram_Illnesses.png", path = image_path, width = 3000, height = 2000, units = "px")
+images_stats_path=here("results","images_statistic_analysis")
+ggsave("histogram_Illnesses.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
 
-# Tibble with Predictors of Interest
+# Create a tibble with predictors of interest
 illness_data=training_data_final %>%
-  select(c(1, 4, 5, 7, 10, 13, 14)) %>%
+  select(c(1, 4, 5, 7, 10, 14)) %>%
+  filter(!`IFSAC Category`%in%c("Multiple","Other"),Location!="Unknown")%>%
   mutate_if(is.character, as.factor)
-glimpse(illness_data)
+skim(illness_data)
 ```
 
 ## Modeling Illness with Linear Regression and Poisson Regression
@@ -55,67 +59,147 @@ glimpse(illness_data)
 Since the outcome is counts/frequency and the event occurs independently, it follows a Poisson distribution. To create a workflow for poisson regression model, the default *glm* engine will be used.
 
 ```{r}
-# Linear Regression
+set.seed(123)
+# Set up cross validation
+illness_fold=vfold_cv(illness_data,repeats = 2,strata = Illnesses)
+
+# Data pre-processing
+## Recipe for main predictor
+illness_main_rec=recipe(Illnesses~Simplified_Etiology,data=illness_data)%>%
+  step_dummy(Simplified_Etiology)
+## Recipe for all predictors
+### Lump small proportion into "other" using step_other
+### Create dummy code for nominal variables
+illness_all_rec=recipe(Illnesses~.,data=illness_data)%>%
+  step_other(State,Location,`IFSAC Category`,Simplified_Etiology,threshold = 0.01)%>%
+  step_dummy(all_nominal())
+### Checking processed data set
+illness_all_rec%>%
+  prep()%>%
+  bake(new_data=NULL)
+
+# Model specification
+## Linear Regression
 lm_spec = linear_reg() %>%
   set_engine(engine = "lm")
-## Modeling with Main Predictor `Simplified_Etiology`
-lm_fit1 = lm_spec %>%
-  fit(Illnesses ~ Simplified_Etiology, data = illness_data)
-## Modeling with All Predictors
-lm_fit2 = lm_spec %>%
-  fit(Illnesses ~ ., data = illness_data)
 
-# Poisson Regression
-## Modeling with Main Predictor `Simplified_Etiology`
-poisson_wf1 = workflow(Illnesses ~ Simplified_Etiology, poisson_reg())
+# Creating workflow
+## Main Predictor `Simplified_Etiology`
+lm_wf1 = workflow() %>%
+ add_recipe(illness_main_rec)%>%
+  add_model(lm_spec)
 ## Modeling with All Predictors
-poisson_wf2 = workflow(Illnesses ~ ., poisson_reg())
-## Model Fitting
-poisson_fit1 = fit(poisson_wf1, data=illness_data)
-poisson_fit2 = fit(poisson_wf2, data=illness_data)
+lm_wf2 = workflow() %>%
+  add_recipe(illness_all_rec)%>%
+  add_model(lm_spec)
+## Poisson Regression
+## Modeling with Main Predictor `Simplified_Etiology`
+poisson_wf1 = workflow()%>%
+  add_recipe(illness_main_rec)%>%
+  add_model(poisson_reg())
+## Modeling with All Predictors
+poisson_wf2 = workflow()%>%
+  add_recipe(illness_all_rec)%>%
+  add_model(poisson_reg())
+```
+
+## Model fitting
+```{r}
+## Linear regression
+### Main predictor
+set.seed(234)
+lm_rs1=lm_wf1%>%
+fit_resamples(resamples=illness_fold,
+    control=control_resamples(save_pred=TRUE))
+
+### All predictors
+lm_rs2=lm_wf2%>%
+  fit_resamples(resamples=illness_fold,
+  control=control_resamples(save_pred=TRUE))
+
+## Poisson regression
+### Main predictor
+poisson_rs1 = poisson_wf1%>%
+  fit_resamples(resamples=illness_fold,
+    control=control_resamples(save_pred=TRUE))
+
+### All predictors
+poisson_rs2 = poisson_wf2%>%
+  fit_resamples(resamples=illness_fold,
+    control=control_resamples(save_pred=TRUE))
 ```
 
 ### Model Evaluation
 ```{r}
+# Checking metrics for Linear Regression Model
+lm_rs1%>%
+  collect_metrics()
+lm_rs2%>%
+  collect_metrics()
+# Checking metrics for poisson regression model
+poisson_rs1%>%
+  collect_metrics()
+poisson_rs2%>%
+  collect_metrics()
 # Checking Parameters for Linear Regression Model
-tidy(lm_fit1) %>%
+lm_fit1=lm_wf1%>%
+  fit(illness_data)%>%
+  tidy()%>%
   arrange(-estimate)
-tidy(lm_fit2) %>%
+
+lm_fit2=lm_wf2%>%
+  fit(illness_data)%>%
+  tidy()%>%
   arrange(-estimate)
 
 # Checking Parameters for Poisson Regression Model
-tidy(poisson_fit1) %>%
- arrange(-estimate)
-tidy(poisson_fit2) %>%
- arrange(-estimate)
+poisson_fit1=poisson_wf1%>%
+  fit(illness_data)%>%
+  tidy()%>%
+  arrange(-estimate)
 
-# Model Evaluation
-Result = lm_fit1 %>% 
-  predict(new_data = illness_data) %>% 
-  mutate(.pred = round(.pred), 
-        true_value = illness_data$Illnesses, model= "lm_single") %>% 
-  bind_rows(lm_fit1 %>% 
-              predict(new_data=illness_data) %>% 
-              mutate(.pred=round(.pred), 
-                     true_value = illness_data$Illnesses, model= "lm_multiple") %>% 
-              bind_rows(poisson_fit1 %>% predict(new_data= illness_data) %>%
-                          mutate(true_value=illness_data$Illnesses, 
-                                 model= "glm_single") %>% 
-                          bind_rows(poisson_fit2 %>% 
-                                      predict(new_data= illness_data)%>% 
-                                      mutate(true_value=illness_data$Illnesses, 
-                                             model= "glm_multiple")))
-)
+poisson_fit2=poisson_wf2%>%
+  fit(illness_data)%>%
+  tidy()%>%
+  arrange(-estimate)
 
-Result <- Result %>%
-  group_by(model) %>%
-  rmse(truth=true_value, estimate = .pred) %>%
-  rename(illness_model = model)
-
-saveRDS(Result, file = here("results", "illness_model_evaluation.rds"))
+# Plotting predictions vs Illnesses for Linear model
+lm_rs1%>%
+  collect_predictions()%>%
+  filter(Illnesses<300)%>%
+  ggplot(aes(Illnesses,.pred,color=id2,group=id2))+
+  geom_point()+
+  geom_smooth(se=FALSE)+
+  labs(y="Predicted Illnesses",title="Predicted Illnesses VS Illnesses by linear regression with main predictor")
+ggsave("Predicted Illnesses VS Illnesses by linear regression with main predictor.png",path=images_stats_path,width=3000,height=2000,units="px")
+lm_rs2%>%
+  collect_predictions()%>%
+  #filter(Illnesses<300)%>%
+  ggplot(aes(Illnesses,.pred,color=id2,group=id2))+
+  geom_point()+
+  geom_smooth(se=FALSE)+
+  labs(y="Predicted Illnesses",title="Predicted Illnesses VS Illnesses by linear regression with all predictors")
+ggsave("Predicted Illnesses VS Illnesses by linear regression with all predictors.png",path=images_stats_path,width=3000,height=2000,units="px")
+# Plotting predictions vs Illnesses for Poisson model
+poisson_rs1%>%
+  collect_predictions()%>%
+  #filter(Illnesses<300)%>%
+  ggplot(aes(Illnesses,.pred,color=id2,group=id2))+
+  geom_point()+
+  geom_smooth(se=FALSE)+
+  labs(y="Predicted Illnesses",title="Predicted Illnesses VS Illnesses by linear regression with main predictor")
+ggsave("Predicted Illnesses VS Illnesses by poisson regression with main predictor.png",path=images_stats_path,width=3000,height=2000,units="px")
+poisson_rs2%>%
+  collect_predictions()%>%
+  #filter(Illnesses<500)%>%
+  ggplot(aes(Illnesses,.pred,color=id2,group=id2))+
+  geom_point()+
+  geom_smooth(se=FALSE)+
+  labs(y="Predicted Illnesses",title="Predicted Illnesses VS Illnesses by linear regression with all predictors")
+ggsave("Predicted Illnesses VS Illnesses by poisson regression with all predictors.png",path=images_stats_path,width=3000,height=2000,units="px")
 
 ```
-According to the result, the model built using Poisson regression with multiple predictors seems to have the smallest root mean squared error.
+According to the result, the model built using Poisson regression with multiple predictors seems to have the smallest root mean squared error and highest R^2. However, none of those models can catch the outliers (Illness>1000)
 
 # Second Health Outcome of Interest: Hospitilization
 
@@ -135,65 +219,253 @@ training_data_final %>%
   scale_x_continuous(trans=scales::pseudo_log_trans(base = 10))
 # Tibble for Variables of Interest
 hosp_data = training_data_final %>%
-  select(c(1, 4, 5, 7, 11, 13, 14))%>%
+  select(c(1, 4, 5, 7, 11, 14))%>%
+  filter(!`IFSAC Category`%in%c("Multiple","other"),!Location%in%c("Unknown"))%>%
   mutate_if(is.character, as.factor)
-glimpse(hosp_data)
-ggsave("histogram_Hospitalizations.png", path = image_path)
+skim(hosp_data)
+ggsave("histogram_Hospitalizations.png", path = images_stats_path)
 ```
 
 ## Modeling `Hospitalizations` using Linear Regression and Poisson Regression
 
-To create a workflow for the Poisson regression model, we will use the default *glm* engine again.
+To create a workflow for the Poisson regression model, we will use the default *glm* engine again. 
 
 ```{r}
-# Model Specification and Fitting for Linear Regression Model
+set.seed(1234)
+# Set up cross validation
+hosp_fold=vfold_cv(hosp_data,repeats = 2,strata = Hospitalizations)
+
+# Data pre-processing
+## Recipe for main predictor
+hosp_main_rec=recipe(Hospitalizations ~ Simplified_Etiology,data=hosp_data)%>%
+  step_dummy(Simplified_Etiology)
+## Recipe for all predictors
+### Lump small proportion into "other" using step_other
+### Create dummy code for nominal variables
+hosp_all_rec=recipe(Hospitalizations ~.,data=hosp_data)%>%
+  step_other(State,Location,`IFSAC Category`, Simplified_Etiology,threshold = 0.01)%>%
+  step_dummy(all_nominal_predictors())
+### Checking processed data set
+hosp_all_rec%>%
+  prep()%>%
+  bake(new_data=NULL)
+
+# Model specification
+## Linear Regression
 lm_spec = linear_reg() %>%
   set_engine(engine = "lm")
-## Modeling with Main Predictor `Simplified_Etiology`
-lm_fit3 = lm_spec %>%
-  fit(Hospitalizations ~ Simplified_Etiology, data = hosp_data)
+
+# Creating workflow
+## Main Predictor `Simplified_Etiology`
+lm_wf3 = workflow() %>%
+ add_recipe(hosp_main_rec)%>%
+  add_model(lm_spec)
 ## Modeling with All Predictors
-lm_fit4 = lm_spec %>%
-  fit(Hospitalizations ~ ., data = hosp_data)
-
-# Model Specification and Fitting for Poisson Regression Model
+lm_wf4 = workflow() %>%
+  add_recipe(hosp_all_rec)%>%
+  add_model(lm_spec)
+## Poisson Regression
 ## Modeling with Main Predictor `Simplified_Etiology`
-poisson_wf3 = workflow(Hospitalizations ~ Simplified_Etiology, poisson_reg())
-## Modeling with all predictors
-poisson_wf4=workflow(Hospitalizations~., poisson_reg())
-## Fitting models
-poisson_fit3 = fit(poisson_wf3,data = hosp_data)
-poisson_fit4 = fit(poisson_wf4,data = hosp_data)
+poisson_wf3 = workflow()%>%
+  add_recipe(hosp_main_rec)%>%
+  add_model(poisson_reg())
+## Modeling with All Predictors
+poisson_wf4 = workflow()%>%
+  add_recipe(hosp_all_rec)%>%
+  add_model(poisson_reg())
 ```
+## Model fitting
+```{r}
+## Linear regression
+### Main predictor
+set.seed(2345)
+lm_rs3=lm_wf3%>%
+fit_resamples(resamples=hosp_fold,
+    control=control_resamples(save_pred=TRUE))
 
+### All predictors
+lm_rs4=lm_wf4%>%
+  fit_resamples(resamples=hosp_fold,
+  control=control_resamples(save_pred=TRUE))
+
+## Poisson regression
+### Main predictor
+poisson_rs3 = poisson_wf3%>%
+  fit_resamples(resamples=hosp_fold,
+    control=control_resamples(save_pred=TRUE))
+
+### All predictors
+poisson_rs4 = poisson_wf4%>%
+  fit_resamples(resamples=hosp_fold,
+    control=control_resamples(save_pred=TRUE))
+```
 ### Model Evaluation
 ```{r}
-Result = lm_fit3 %>%
- predict(new_data = hosp_data) %>%
- mutate(.pred = round(.pred), true_value = hosp_data$Hospitalizations,
-        model= "lm_single") %>% 
-  bind_rows(lm_fit4 %>% 
-              predict(new_data=hosp_data) %>% 
-              mutate (.pred=round(.pred), 
-                      true_value=hosp_data$Hospitalizations, 
-                      model= "lm_multiple") %>% 
-              bind_rows(poisson_fit1 %>% 
-                        predict(new_data = hosp_data) %>%
-                        mutate(true_value = hosp_data$Hospitalizations, 
-                               model= "glm_single") %>% 
-                          bind_rows(poisson_fit2 %>% 
-                                      predict(new_data= hosp_data) %>% 
-                                      mutate(true_value = hosp_data$Hospitalizations, 
-                                             model= "glm_multiple")))
-)
+# Checking metrics for Linear Regression Model
+lm_rs3%>%
+  collect_metrics()
+lm_rs4%>%
+  collect_metrics()
+# Checking metrics for poisson regression model
+poisson_rs3%>%
+  collect_metrics()
+poisson_rs4%>%
+  collect_metrics()
+# Checking Parameters for Linear Regression Model
+lm_fit3=lm_wf3%>%
+  fit(hosp_data)%>%
+  tidy()%>%
+  arrange(-estimate)
 
-Result <- Result %>%
-  group_by(model)%>%
-  rmse(truth = true_value, estimate = .pred) %>%
-  rename(hospital_model = model)
+lm_fit4=lm_wf4%>%
+  fit(hosp_data)%>%
+  tidy()%>%
+  arrange(-estimate)
 
-saveRDS(Result, file = here("results", "hospital_model_evaluation.rds"))
+# Checking Parameters for Poisson Regression Model
+poisson_fit3=poisson_wf3%>%
+  fit(hosp_data)%>%
+  tidy()%>%
+  arrange(-estimate)
+
+poisson_fit4=poisson_wf4%>%
+  fit(hosp_data)%>%
+  tidy()%>%
+  arrange(-estimate)
+
+# Plotting predictions vs Hospitalizations for Linear model
+lm_rs3%>%
+  collect_predictions()%>%
+  #filter(Hospitalizations<50)%>%
+  ggplot(aes(Hospitalizations,.pred,color=id2))+
+  geom_point()+
+  geom_smooth(se=FALSE)+
+  labs(y="Predicted Hospitalizations",title="Predicted Hospitalizations VS Hospitalizations \nby linear regression with main predictor",color="Fold")
+ggsave("Predicted Hospitalizations VS Hospitalizations by linear regression with main predictor.png",path=images_stats_path,width=3000,height=2000,units="px")
+lm_rs4%>%
+  collect_predictions()%>%
+  #filter(Hospitalizations<50)%>%
+  ggplot(aes(Hospitalizations,.pred,color=id2))+
+  geom_point()+
+  geom_smooth(se=FALSE)+
+  labs(y="Predicted Hospitalizations",title="Predicted Hospitalizations VS Hospitalizations \nby linear regression with all predictors",color="Fold")
+ggsave("Predicted Hospitalizations VS Hospitalizations by linear regression with all predictors.png",path=images_stats_path,width=3000,height=2000,units="px")
+# Plotting predictions vs Hospitalizations for Poisson model
+poisson_rs3%>%
+  collect_predictions()%>%
+  #filter(Hospitalizations<50)%>%
+  ggplot(aes(Hospitalizations,.pred,color=id2))+
+  geom_point()+
+  geom_smooth(se=FALSE)+
+  labs(y="Predicted Hospitalizations",title="Predicted Hospitalizations VS Hospitalizations \nby linear regression with main predictor",color="Fold")
+ggsave("Predicted Hospitalizations VS Hospitalizations by poisson regression with main predictor.png",path=images_stats_path,width=3000,height=2000,units="px")
+poisson_rs4%>%
+  collect_predictions()%>%
+  #filter(Hospitalizations<50)%>%
+  ggplot(aes(Hospitalizations,.pred,color=id2))+
+  geom_point()+
+  geom_smooth(se=FALSE)+
+  labs(y="Predicted Hospitalizations",title="Predicted Hospitalizations VS Hospitalizations \nby linear regression with all predictors",color="Fold")
+ggsave("Predicted Hospitalizations VS Hospitalizations by poisson regression with all predictors.png",path=images_stats_path,width=3000,height=2000,units="px")
 
 ```
 
-According to the result, the model built using linear regression with multiple predictors seems to have the smallest root mean squared error.
+According to the result, the model built using Poisson regression with multiple predictors seems to have the smallest root mean squared error and highest R^2 (34%). But again, outliers (Hospitalizations > 100) can not be predicted well by none of those models
+
+## Machine learning approach
+## Random Forest
+### Predicting First Outcome `Illnesses` using all predictors
+```{r}
+# Model Specification
+rf_spec=rand_forest(mtry=tune(),min_n=tune(),trees=1000)%>%
+  set_engine("ranger")%>%
+  set_mode("regression")
+illness_all_rec=recipe(Illnesses~.,data=illness_data)%>%
+  step_other(State,Location,`IFSAC Category`,Simplified_Etiology,threshold = 0.01)%>%
+  step_dummy(all_nominal())
+# Creating workflow
+rf_wf1=workflow()%>%
+  add_recipe(illness_all_rec)%>%
+  add_model(rf_spec)
+# Training and tuning model using space filling design
+set.seed(345)
+doParallel::registerDoParallel()
+rf_tune1=rf_wf1%>%
+  tune_grid(
+    resamples=illness_fold,
+    grid=15,
+    control=control_grid(save_pred=TRUE),
+    metrics = metric_set(rmse)
+  )
+```
+### Model evaluation
+```{r}
+rf_tune1%>%
+  autoplot()
+rf_best1=rf_tune1%>%
+  select_best()
+rf_final1=rf_wf1%>%
+  finalize_workflow(rf_best1)
+rf_fit1=rf_final1%>%
+  fit(illness_data)
+rf_predict1=rf_fit1%>%
+  predict(illness_data)
+illness_data%>%
+  select(Illnesses)%>%
+  bind_cols(rf_predict1)%>%
+  ggplot(aes(Illnesses,.pred))+
+  geom_point()+
+  geom_abline(intercept = 0,slope=1)+
+  geom_smooth(se=FALSE)+
+  labs(y="Predicted Illnesses",title="Predicted illnesses VS illnesses by random forest model")
+ggsave("Predicted illnesses VS illnesses by random forest model.png",path=images_stats_path,width=3000,height=2000,units="px")
+```
+
+### Predicting second outcome `Hospitalizations` using all predictors
+```{r}
+
+# Creating workflow
+rf_wf2=workflow()%>%
+  add_recipe(hosp_all_rec)%>%
+  add_model(rf_spec)
+# Training and tuning model
+doParallel::registerDoParallel()
+set.seed(456)
+rf_tune2=rf_wf2%>%
+  tune_grid(
+    resamples=hosp_fold,
+    grid=15,
+    control=control_grid(save_pred=TRUE),
+    metrics = metric_set(rmse)
+  )
+```
+
+### Model evaluation
+```{r}
+rf_tune2%>%
+  autoplot()
+rf_tune2%>%
+  show_best()
+rf_best2=rf_tune2%>%
+  select_best()
+rf_final2=rf_wf2%>%
+  finalize_workflow(rf_best2)
+rf_fit2=rf_final2%>%
+  fit(hosp_data)
+rf_predict2=rf_fit2%>%
+  predict(hosp_data)
+hosp_data%>%
+  select(Hospitalizations)%>%
+  bind_cols(rf_predict2)%>%
+  ggplot(aes(Hospitalizations,.pred))+
+  geom_point()+
+  geom_abline(intercept = 0,slope=1)+
+  geom_smooth(se=FALSE)+
+  labs(y="Predicted Hospitalizations",title="Predicted Hospitalizations VS Hospitalizations by random forest model")
+ggsave("Predicted Hospitalizations VS Hospitalizations by random forest model.png",path=images_stats_path,width=3000,height=2000,units="px")
+```
+## Overall, random forest model has the lowesr rmse among those selected models when training data is fitted; Also, the random forest model outperforms other models in predicting outliers.
+
+## Fast and Frugal Trees
+## Organize four models performance and choose the best one
+## fit testing data
