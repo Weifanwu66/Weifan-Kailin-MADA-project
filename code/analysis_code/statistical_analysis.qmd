@@ -17,6 +17,8 @@ library(poissonreg)
 library(ranger)
 library(knitr)
 library(skimr)
+library(vip)
+library(caret)
 ```
 ## Load Data
 ```{r}
@@ -163,13 +165,31 @@ poisson_fit2=poisson_wf2%>%
   tidy()%>%
   arrange(-estimate)
 
+# Checking variable importance for Linear and Poisson regression models
+lm_wf1%>%
+  fit(illness_data)%>%
+  extract_fit_engine()%>%
+  vip()
+lm_wf2%>%
+  fit(illness_data)%>%
+  extract_fit_engine()%>%
+  vip()
+poisson_wf1%>%
+  fit(illness_data)%>%
+  extract_fit_engine()%>%
+  vip()
+poisson_wf2%>%
+  fit(illness_data)%>%
+  extract_fit_engine()%>%
+  vip()
 # Plotting predictions vs Illnesses for Linear model
 lm_rs1%>%
   collect_predictions()%>%
-  filter(Illnesses<300)%>%
+  #filter(Illnesses<300)%>%
   ggplot(aes(Illnesses,.pred,color=id2,group=id2))+
   geom_point()+
   geom_smooth(se=FALSE)+
+  geom_abline(intercept=0,slope=1)+
   labs(y="Predicted Illnesses",title="Predicted Illnesses VS Illnesses by linear regression with main predictor")
 ggsave("Predicted Illnesses VS Illnesses by linear regression with main predictor.png",path=images_stats_path,width=3000,height=2000,units="px")
 lm_rs2%>%
@@ -178,6 +198,7 @@ lm_rs2%>%
   ggplot(aes(Illnesses,.pred,color=id2,group=id2))+
   geom_point()+
   geom_smooth(se=FALSE)+
+  geom_abline(intercept=0,slope=1)+
   labs(y="Predicted Illnesses",title="Predicted Illnesses VS Illnesses by linear regression with all predictors")
 ggsave("Predicted Illnesses VS Illnesses by linear regression with all predictors.png",path=images_stats_path,width=3000,height=2000,units="px")
 # Plotting predictions vs Illnesses for Poisson model
@@ -187,6 +208,7 @@ poisson_rs1%>%
   ggplot(aes(Illnesses,.pred,color=id2,group=id2))+
   geom_point()+
   geom_smooth(se=FALSE)+
+  geom_abline(intercept=0,slope=1)+
   labs(y="Predicted Illnesses",title="Predicted Illnesses VS Illnesses by linear regression with main predictor")
 ggsave("Predicted Illnesses VS Illnesses by poisson regression with main predictor.png",path=images_stats_path,width=3000,height=2000,units="px")
 poisson_rs2%>%
@@ -195,6 +217,7 @@ poisson_rs2%>%
   ggplot(aes(Illnesses,.pred,color=id2,group=id2))+
   geom_point()+
   geom_smooth(se=FALSE)+
+  geom_abline(intercept=0,slope=1)+
   labs(y="Predicted Illnesses",title="Predicted Illnesses VS Illnesses by linear regression with all predictors")
 ggsave("Predicted Illnesses VS Illnesses by poisson regression with all predictors.png",path=images_stats_path,width=3000,height=2000,units="px")
 
@@ -312,26 +335,44 @@ poisson_rs3%>%
 poisson_rs4%>%
   collect_metrics()
 # Checking Parameters for Linear Regression Model
-lm_fit3=lm_wf3%>%
+lm_wf3%>%
   fit(hosp_data)%>%
   tidy()%>%
   arrange(-estimate)
 
-lm_fit4=lm_wf4%>%
+lm_wf4%>%
   fit(hosp_data)%>%
   tidy()%>%
   arrange(-estimate)
 
 # Checking Parameters for Poisson Regression Model
-poisson_fit3=poisson_wf3%>%
+poisson_wf3%>%
   fit(hosp_data)%>%
   tidy()%>%
   arrange(-estimate)
 
-poisson_fit4=poisson_wf4%>%
+poisson_wf4%>%
   fit(hosp_data)%>%
   tidy()%>%
   arrange(-estimate)
+
+# Checking variable importance for linear and Poisson regression models
+lm_wf3%>%
+  fit(hosp_data)%>%
+  extract_fit_engine()%>%
+  vip()
+lm_wf4%>%
+  fit(hosp_data)%>%
+  extract_fit_engine()%>%
+  vip()
+poisson_wf3%>%
+  fit(hosp_data)%>%
+  extract_fit_engine()%>%
+  vip()
+poisson_wf4%>%
+  fit(hosp_data)%>%
+  extract_fit_engine()%>%
+  vip()
 
 # Plotting predictions vs Hospitalizations for Linear model
 lm_rs3%>%
@@ -340,6 +381,7 @@ lm_rs3%>%
   ggplot(aes(Hospitalizations,.pred,color=id2))+
   geom_point()+
   geom_smooth(se=FALSE)+
+  geom_abline(intercept=0,slope=1)+
   labs(y="Predicted Hospitalizations",title="Predicted Hospitalizations VS Hospitalizations \nby linear regression with main predictor",color="Fold")
 ggsave("Predicted Hospitalizations VS Hospitalizations by linear regression with main predictor.png",path=images_stats_path,width=3000,height=2000,units="px")
 lm_rs4%>%
@@ -348,6 +390,7 @@ lm_rs4%>%
   ggplot(aes(Hospitalizations,.pred,color=id2))+
   geom_point()+
   geom_smooth(se=FALSE)+
+  geom_abline(intercept=0,slope=1)+
   labs(y="Predicted Hospitalizations",title="Predicted Hospitalizations VS Hospitalizations \nby linear regression with all predictors",color="Fold")
 ggsave("Predicted Hospitalizations VS Hospitalizations by linear regression with all predictors.png",path=images_stats_path,width=3000,height=2000,units="px")
 # Plotting predictions vs Hospitalizations for Poisson model
@@ -357,6 +400,7 @@ poisson_rs3%>%
   ggplot(aes(Hospitalizations,.pred,color=id2))+
   geom_point()+
   geom_smooth(se=FALSE)+
+  geom_abline(intercept=0,slope=1)+
   labs(y="Predicted Hospitalizations",title="Predicted Hospitalizations VS Hospitalizations \nby linear regression with main predictor",color="Fold")
 ggsave("Predicted Hospitalizations VS Hospitalizations by poisson regression with main predictor.png",path=images_stats_path,width=3000,height=2000,units="px")
 poisson_rs4%>%
@@ -365,6 +409,7 @@ poisson_rs4%>%
   ggplot(aes(Hospitalizations,.pred,color=id2))+
   geom_point()+
   geom_smooth(se=FALSE)+
+  geom_abline(intercept=0,slope=1)+
   labs(y="Predicted Hospitalizations",title="Predicted Hospitalizations VS Hospitalizations \nby linear regression with all predictors",color="Fold")
 ggsave("Predicted Hospitalizations VS Hospitalizations by poisson regression with all predictors.png",path=images_stats_path,width=3000,height=2000,units="px")
 
@@ -378,7 +423,7 @@ According to the result, the model built using Poisson regression with multiple 
 ```{r}
 # Model Specification
 rf_spec=rand_forest(mtry=tune(),min_n=tune(),trees=1000)%>%
-  set_engine("ranger")%>%
+  set_engine("ranger",importance = 'impurity')%>%
   set_mode("regression")
 illness_all_rec=recipe(Illnesses~.,data=illness_data)%>%
   step_other(State,Location,`IFSAC Category`,Simplified_Etiology,threshold = 0.01)%>%
@@ -408,6 +453,7 @@ rf_final1=rf_wf1%>%
   finalize_workflow(rf_best1)
 rf_fit1=rf_final1%>%
   fit(illness_data)
+# Plotting predicted illness VS Illnesses
 rf_predict1=rf_fit1%>%
   predict(illness_data)
 illness_data%>%
