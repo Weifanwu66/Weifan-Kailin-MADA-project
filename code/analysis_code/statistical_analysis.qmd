@@ -634,7 +634,8 @@ bag_training_illness <- bagging(formula = Illnesses ~ .,
                         coob = TRUE,
                         control = rpart.control(minsplit = 2, cp = 0))
 
-bag_training_illness
+# Get RMSE
+bag_training_illness$err
 ```
 
 ### Hospitalizations
@@ -647,36 +648,81 @@ bag_training_hosp <- bagging(formula = Hospitalizations ~ .,
                         coob = TRUE,
                         control = rpart.control(minsplit = 2, cp = 0))
 
-bag_training_hosp
+# Get RMSE
+bag_training_hosp$err
 ```
 
 ## Organize Model Performance and Choose the Best One
 ### Illnesses
 ```{r}
-# Linear Regression
-lm_complex_resampled_illness %>%
-  collect_metrics()
-
-# Poisson Regression
-poisson_complex_resampled_illness %>%
-  collect_metrics()
-
-# Random Forest
-random_forest_illness_predict %>%
-  collect_metrics()
-
 # Make Dataframe of Model RMSEs
+illness_model_dataframe <- lm_complex_resampled_illness %>%
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% select(mean) %>% rename(RMSE = mean) %>% 
+  mutate(Model = "Linear Regression") %>% 
+  full_join(poisson_complex_resampled_illness %>% 
+              collect_metrics() %>% 
+              filter(.metric == "rmse") %>% select(mean) %>% 
+              rename(RMSE = mean) %>% mutate(Model = "Poisson Regression")) %>%
+  full_join(random_forest_illness_tuned %>% 
+              show_best("rmse") %>% top_n(-1, mean) %>% select(mean) %>%
+              rename(RMSE = mean) %>% mutate(Model = "Random Forest")
+            ) %>%
+  full_join(data.frame(bag_training_illness$err, "Bagging") %>% 
+  rename(RMSE = bag_training_illness.err) %>% rename(Model = X.Bagging.)) %>%
+  arrange(RMSE)
 
+illness_model_dataframe
 
 ```
 
 ### Hospitalizations
 ```{r}
-# Linear Regression
-# Poisson Regression
-# Random Forest
+hosp_model_dataframe <- lm_complex_resampled_hosp %>%
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% select(mean) %>% rename(RMSE = mean) %>% 
+  mutate(Model = "Linear Regression") %>% 
+  full_join(poisson_complex_resampled_hosp %>% 
+              collect_metrics() %>% 
+              filter(.metric == "rmse") %>% select(mean) %>% 
+              rename(RMSE = mean) %>% mutate(Model = "Poisson Regression")) %>%
+  full_join(random_forest_hosp_tuned %>% 
+              show_best("rmse") %>% top_n(-1, mean) %>% select(mean) %>%
+              rename(RMSE = mean) %>% mutate(Model = "Random Forest")
+            ) %>%
+  full_join(data.frame(bag_training_hosp$err, "Bagging") %>% 
+  rename(RMSE = bag_training_hosp.err) %>% rename(Model = X.Bagging.)) %>%
+  arrange(RMSE)
 
+hosp_model_dataframe
 
 ```
 
-## Fit Testing Data
+Given the above results, the random forest machine learning model is the best model for both health outcomes.
+
+# Modifying Test Data Variables to Maintain Compatibility
+```{r}
+test_data_final
+```
+
+
+# Fit Testing Data
+```{r}
+# Illness
+placeholder_illnesses <- random_forest_illness_final %>%
+  fit(test_data_final) %>% predict(test_data_final)
+placeholder_illnesses <- placeholder_illnesses[1:1922, ]
+
+test_data_final %>% select(Illnesses) %>% 
+  bind_cols(placeholder_illnesses) %>% rmse(Illnesses, .pred)
+
+# Hospitalizations
+placeholder_hosp <- random_forest_hosp_final %>%
+  fit(test_data_final) %>% predict(test_data_final)
+placeholder_hosp <- placeholder_hosp[1:1922, ]
+
+test_data_final %>% select(Hospitalizations) %>% 
+  bind_cols(placeholder_hosp) %>% rmse(Hospitalizations, .pred)
+
+```
+
