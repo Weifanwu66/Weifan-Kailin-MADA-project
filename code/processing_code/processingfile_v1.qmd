@@ -134,8 +134,8 @@ training_data_fin <- training_data %>%
 ```{r}
 unique(training_data_fin$Species)
 # Separate the rows for coninfections
-training_data_fin=training_data_fin%>%
-  separate_rows(Species,sep=";")
+training_data_fin <- training_data_fin %>%
+  separate_rows(Species, sep= ";")
 # Create lists for pathogen types
 Pathogen_Bacteria <- c("Bacillus", "Brucella", "Campylobacter", "Clostridium", "Staphylococcus", "Escherichia", "Listeria", "Salmonella", "Vibrio", "Cholera", "Enterococcus", "Bacterium", "Shigella", "Yersinia","Streptococcus")
 Pathogen_Parasite <- c("Cryptosporidium", "Cyclospora", "Entamoeba", "Giardia", "Parasite", "Toxoplasma", "Trichinella")
@@ -143,7 +143,7 @@ Pathogen_Virus <- c("Astrovirus", "Norovirus", "Rotavirus","Hepatitis","Virus")
 Pathogen_Poison <- c("Poison", "Toxin", "Metal","Pesticide","Ciguatoxin","Scombroidtoxin")
 # simplify "Escherichia coli, Shiga toxin-producing" to "Escherichia coli"
 # Create two new columns: Pathogen_type & Simplified_Etiology
-training_data_fin=training_data_fin%>%
+training_data_fin <- training_data_fin %>%
   mutate(Pathogen_Type = case_when(
     grepl(paste(Pathogen_Virus,
                 collapse="|"), Species,ignore.case = TRUE) ~ "Virus",
@@ -165,8 +165,15 @@ training_data_fin=training_data_fin%>%
 ```{r}
 # Checking Location Names and Separate Multiple Names
 unique(training_data_fin$Location)
-training_data_fin=training_data_fin %>%
- separate_rows(Location,sep="; ")
+training_data_fin <- training_data_fin %>%
+ separate_rows(Location,sep = "; ")
+
+# Simplify Location
+training_data_fin <- training_data_fin %>% mutate(Location = case_when(
+  grepl("Buffet", Location, ignore.case = TRUE) ~ "Restaurant",
+  grepl("Nursing Home", Location, ignore.case = TRUE) ~ "Nursing Home/Assisted Living Facility",
+  grepl("Fast Food", Location, ignore.case = TRUE) ~ "Restaurant",
+  TRUE ~ Location))
 ```
 
 The variable for location appears to be clean now.
@@ -195,34 +202,54 @@ training_data_fin <- training_data_fin %>%
 Everything else not included in vectors will be categorized as "Other".
 
 ```{r}
-# unique(analysis_data_fin$`IFSAC Category`)
+# unique(testing_data_fin$`IFSAC Category`)
 # unique(training_data_fin$Food)
-Desserts=c("Cookie","Cream","Canoli","Cake","Pudding")
-Beef=c("Beef","Steak")
-Poultry=c("Chicken","Turkey")
-Pork=c("Pork","Sausage","Hot Dog","Deli","Spam","Strawberries","Blueberries","Pig","Ribs")
-Dairy=c("Milk","Cheese","Parsley")
-Crusteaceans=c("Lobster","Crab","Shrimp")
-Fish=c("Fish","Tuna","Salmon")
-Mollusks=c("Clams","Oysters")
-Fruits=c("Tomato","Banana","Melon","Grapes","Mango")
-`Grains-Beans`=c("Rice","Peas","Beans","wheat")
-`Vegetable-Row-Crops`=c("Lettuce","artichokes","broccoli","asparagus","celeries","spinach")
-`Root-underground-vegetables`=c("Roots","carrots","Beets","Onion","Tubers","yams","Garlic","Potatos","taro")
-Sprouts=c("alfalfa","mung")
-Salad=c("Salad")
+
+# Dairy
+Desserts <- c("Cookie","Cream","Canoli","Cake","Pudding")
+Dairy <- c("Milk","Cheese","Parsley")
+
+# Meat & Protein
+Beef <- c("Beef","Steak")
+Poultry <- c("Chicken","Turkey")
+Pork <- c("Pork", 
+          "Sausage",
+          "Hot Dog", 
+          "Deli", 
+          "Spam", 
+          "Strawberries", 
+          "Blueberries", 
+          "Pig", 
+          "Ribs")
+Crusteaceans <- c("Lobster","Crab","Shrimp")
+Fish <- c("Fish","Tuna","Salmon")
+Mollusks <- c("Clams","Oysters")
+Game <- c("Bear")
+`other meat` <- c("Lamb")
+
+# Plant-Based Foods
+Fruits <- c("Tomato","Banana","Melon","Grapes","Mango")
+`Grains-Beans` <- c("Rice","Peas","Beans","wheat")
+`Vegetable-Row-Crops` <- c("Lettuce", "artichokes", "broccoli", "asparagus", 
+                           "celeries", "spinach")
+`Root-underground-vegetables` <- c("Roots", "carrots", "Beets", "Onion", 
+                                   "Tubers", "yams", "Garlic", "Potatos", 
+                                   "taro")
+Sprouts <- c("alfalfa","mung")
+Salad <- c("Salad")
+
 # Other=c("Ice","Alcohol","Eggnog")
-Game=c("Bear")
-Herbs=c("basil","cilantro")
-Fungi=c("Mushroom","portabellas")
-`Nuts-Seeds`=c("peanuts","almonds","Seasames")
-Eggs=c("Egg")
-`Seeded-Vegetables`=c("Peppers","Squashes","Cucumbers","Okras","Corn")
-`other meat`=c("Lamb")
+
+
+Herbs <- c("basil","cilantro")
+Fungi <- c("Mushroom","portabellas")
+`Nuts-Seeds` <- c("peanuts","almonds","Seasames")
+Eggs <- c("Egg")
+`Seeded-Vegetables` <- c("Peppers","Squashes","Cucumbers","Okras","Corn")
 
 training_data_fin <- training_data_fin %>%
   mutate(`IFSAC Category` = case_when(
-    grepl("Salad",Food, ignore.case = TRUE) ~ "Salad",
+    grepl("Salad", Food, ignore.case = TRUE) ~ "Salad",
     grepl(paste(Desserts, 
                 collapse = "|"), Food,ignore.case = TRUE) ~ "Dessert",
     grepl(paste(Poultry,
@@ -258,15 +285,17 @@ training_data_fin <- training_data_fin %>%
                 collapse = "|"), Food, ignore.case = TRUE) ~ "Nuts-Seeds",
     grepl(paste(`Seeded-Vegetables`,
                 collapse = "|"), Food, ignore.case = TRUE) ~ "Seeded-Vegetables",
-    grepl("eggs",Food,ignore.case = TRUE)~"Eggs",
-    grepl("Lamb",Food)~"Other Meat",
+    grepl("eggs", Food, ignore.case = TRUE)~"Eggs",
+    grepl("Lamb", Food) ~ "Other Meat",
     TRUE ~ if_else(is.na(Food),"","Other")
    ))%>%
   mutate(`IFSAC Category` = na_if(`IFSAC Category`, ""))%>%
   relocate(`IFSAC Category`, .after = Food)
-training_data_fin=training_data_fin%>%
-  mutate(`IFSAC Category`=case_when(
-    grepl(";",Food)~"Multiple",TRUE~`IFSAC Category`))
+
+training_data_fin <- training_data_fin %>%
+  mutate(`IFSAC Category`= case_when(
+    grepl(";", Food) ~ "Multiple",
+    TRUE ~ `IFSAC Category`))
 ```
 
 ## Analysis Data
@@ -302,7 +331,6 @@ testing_data_fin <- testing_data_fin %>%
 
 ### Column for Type of Pathogen
 ```{r}
-
 testing_data_fin <- testing_data_fin %>%
   mutate(Pathogen_Type = case_when(
     grepl(paste(Pathogen_Poison, 
@@ -314,29 +342,75 @@ testing_data_fin <- testing_data_fin %>%
     grepl(paste(Pathogen_Virus, 
                 collapse = "|"), Etiology) ~ "Virus"
     )) %>%
-  mutate(Simplified_Etiology = word(Etiology,1)) %>%
+  mutate(Simplified_Etiology = word(Etiology, 1)) %>%
       mutate(Simplified_Etiology = case_when(
         Simplified_Etiology == "Escherichia" ~ "E. coli",
         Simplified_Etiology == "Heavy" ~ "Heavy Metals",
         TRUE ~ Simplified_Etiology))
 ```
-###Column for Location
+
+### Column for Location
 ```{r}
-testing_data_fin <- testing_data_fin %>%
-  rename(Location=Setting)%>%
-  mutate(Location=case_when(
-    grepl("Restaurant",Location)~"Restaurant",TRUE~Location))%>%
-    separate_rows(Location,sep="; ")
 testing_data_fin
+
+# Create Column
+testing_data_fin <- testing_data_fin %>%
+  rename(Location = Setting)%>%
+  mutate(Location = case_when(
+    grepl("Restaurant", Location) ~ "Restaurant", 
+    TRUE ~ Location)) %>%
+    separate_rows(Location, sep = "; ")
+
+# Match Training Data Format
+testing_data_fin <- testing_data_fin %>%
+  mutate(Location = case_when(
+    grepl("Private Home/Residence", Location, ignore.case = TRUE) ~ "Private Home/Residence",
+    grepl("Caterer", Location, ignore.case = TRUE) ~ "Catering Service",
+    grepl("Office/Indoor Workspace", Location, ignore.case = TRUE) ~ "Office/Indoor Workspace",
+    grepl("Banquet", Location, ignore.case = TRUE) ~ "Banquet Facility",
+    grepl("Fair", Location, ignore.case = TRUE) ~ "Fair/Festival",
+    grepl("Religious", Location, ignore.case = TRUE) ~ "Religious Facility",
+    grepl("Grocery Store", Location, ignore.case = TRUE) ~ "Grocery Store",
+    grepl("School/College/University", Location, ignore.case = TRUE) ~ "School/College/University",
+    grepl("Prison/Jail", Location, ignore.case = TRUE) ~ "Prison/Jail",
+    grepl("Long-Term Care", Location, ignore.case = TRUE) ~ "Nursing Home/Assisted Living Facility",
+    grepl("Child", Location, ignore.case = TRUE) ~ "Child Daycare",
+    grepl("Farm/Dairy", Location, ignore.case = TRUE) ~ "Farm/Dairy",
+    grepl("Hotel/Motel", Location, ignore.case = TRUE) ~ "Hotel/Motel",
+    TRUE ~ Location))
+```
+
+## Ensure Training and Test Data Have Same Columns
+
+To ensure compatibility for evaluating model or machine learning performance between the two datasets, column names must be the same.
+
+```{r}
+colnames(training_data_fin)
+colnames(testing_data_fin)
+
+training_data_fin <- training_data_fin %>%
+  select(Year, State, Month, Numeric_Month, State, Location, 
+         Food, `IFSAC Category`, 
+         Illnesses, Hospitalizations, Pathogen_Type, Simplified_Etiology)
+
+testing_data_fin <- testing_data_fin %>%
+  rename(Food = `Food Vehicle`) %>%
+  select(Year, State, Month, State, Location, 
+         Food, `IFSAC Category`, 
+         Illnesses, Hospitalizations, Pathogen_Type, Simplified_Etiology)
+
+colnames(training_data_fin)
+colnames(testing_data_fin)
 ```
 
 # Drop Rows Containing NA
 ```{r}
-training_data_final=training_data_fin%>%
+training_data_final <- training_data_fin %>%
+  mutate(Simplified_Etiology = na_if(Simplified_Etiology, "")) %>%
   drop_na()
-testing_data_final=testing_data_fin%>%
+testing_data_final <- testing_data_fin %>%
+  mutate(Simplified_Etiology = na_if(Simplified_Etiology, "")) %>%
   drop_na()
-
 ```
 
 ## Check Data Structure Again
