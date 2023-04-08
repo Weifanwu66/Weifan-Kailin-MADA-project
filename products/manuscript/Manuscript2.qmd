@@ -1,0 +1,112 @@
+---
+title: "Manuscript for Foodborne-Outbreak Project"
+author: "Weifan Wu & Kailin (Kai) Chen"
+date: "May 2023"
+format:
+  docx
+bibliography: ../references.bib
+csl: ../apa.csl
+---
+
+```{r echo = FALSE, warning = FALSE, paged.print = TRUE}
+# Load Libraries
+library(here)
+library(knitr)
+library(tidyverse)
+library(broom)
+library(ggtext)
+```
+
+# Summary/Abstract
+
+# Introduction
+
+## General Background Information
+
+Foodborne pathogens typically cause serious gastrointestinal infections. On average, 1 in 6 Americans will acquire foodborne illness each year; 128,000 will be hospitalized, and 3,000 will die [@centerforfoodsafetyandappliednutrition2022]. Economic loss associated with foodborne illness is estimated to be greater than 50 billion US dollars annually. Restaurants are frequently sites attributed to mass-outbreaks, and typical foods associated with these outbreaks include improperly-prepared meats and vegetables [@mun2020; @sarno2021]. Disease etiologies range from bacteria (ex: *Salmonella* spp. and *E. coli*) to viruses (norovirus and rotavirus), to parasites (*Cryptosporidium* spp. and *Cyclospora* spp. [@cdc2022]. To verify pathogens of greatest concern, common settings associated with foodborne illness, and foods typically associated with such outbreaks, this study was launched as a research project at the University of Georgia using information gathered over a 17-year period from the Centers for Disease Control and Prevention (CDC).
+
+### Questions & Hypotheses
+
+From this research project, we would like to answer the following questions: - What are the most frequent locations that foodborne outbreaks occur? - What pathogen species are most frequently associated with foodborne outbreaks? - What type of food is most often seen for foodborne outbreaks?
+
+In other words, immediate outcomes of interest are location, disease etiology, and food category. These will act as predictors for the health outcomes of interest: illnesses and hospitalizations.
+
+Our hypotheses include: - Outbreaks occur most often in homes rather than restaurants. - The most common pathogen associated with foodborne disease outbreaks is *E. coli*. - The food most commonly associated with foodborne outbreaks consists of salad.
+
+# Methods
+
+## Data Sources, Acquisition, and Description
+
+Two datasets were adopted for this research. The first dataset--which was used to build statistical models for the study--was uploaded onto *Kaggle* in 2017, with 12 variables and more than 16,950 observations [@cdc2017a]. The second dataset--which was used for machine learning--was retrieved from the CDC's National Outbreak Reporting System (NORS) website. This second dataset covers reports of foodborne and waterborne disease outbreaks, as well as enteric disease outbreaks spread by contact with environmental sources, infected animals or persons, and other means from 2009 to 2020.
+
+## Data Importation and Cleaning
+
+The datasets were downloaded from their respective sites and imported into R/RStudio using the `tidyverse` and `readxl` packages. Afterwards, the data structure for each file was analyzed, including how many "NA" values were present for each column in the dataset. Only observations pertaining to foodborne disease were kept. Variables containing less than 80% "NA" values, including predictors and outcomes of interest, were retained. For the designated "training data", cases that did not have laboratory-confirmed tests were filtered out. Variables for pathogen type (virus, bacteria, parasite, and poison) and `Simplified Etiology` were created based on pathogen species. For both datasets, `Location` was formatted identically to maintain compatibility for eventual machine learning. `IFSAC Category` was also created in the training data based on the formatting of the "test data" and modified to include salads, desserts, and poultry. To address coinfections, observations containing multiple pathogen etiologies were separated into different rows. Finally, both datasets were modified to contain identical columns prior to being saved as "processed data" in the appropriate subdirectory.
+
+For more information, please see the "processingfile_v1.qmd" file located in the "processing_code" folder of the "code" subdirectory.
+
+## Statistical Analysis
+
+### Exploratory
+
+After processing procedures, an exploratory data analysis was performed to view general relationships between predictors (time, pathogen type, pathogen etiology, state, and food type) and the health outcomes of interest (illnesses and hospitalizations).
+
+### Machine Learning
+
+Linear and Poisson regression models were afterwards constructed using the aforementioned predictors and outcomes from the training data. Data was resampled using the bootstrapping approach 1,000 times for better estimates of accuracy and variability of model coefficients. Random forest and bagging models were also trained to predict health outcomes using the Kaggle dataset for the NORS-CDC data. RMSE was used to compare each of the models. The best model built from the training data was then employed for the test data.
+
+For more information, please refer to the "statistical_analysis.qmd" file inside the "analysis_code" folder of the "code" subdirectory.
+
+# Results
+
+## Exploratory Analysis
+
+### Training Data
+
+![Figure 2: Hospitalizations by Food Type.](images/Food_type_v_hospitalization-01.png)
+
+```{r Visualization of Hospitalizations by State}
+rmarkdown::paged_table(readRDS("../../results/state_v_hospitalization_training.rds"))
+```
+
+### Test Data
+
+![Figure 1. Year vs Illnesses Caused by Pathogen Type](images/time_v_illness_pathogen_type.png)
+
+![Figure 3. Illnesses by outbreak location.](images/Location_v_Illness.png)
+
+![Figure 4. Bacterial etiology by outbreak frequency.](images/bacterial_etiology_v_outbreak_frequency.png)
+
+## Statistical Analysis
+
+### Basic
+
+Between simple and multivariate regressions, multivariate models performed better with lower associated RMSEs. For both health outcomes, the multivariate linear regression models (RMSE = 58.4, 5.50) constructed performed better than multivariate poisson regression models (RMSE = 59.7, 5.64).
+
+![Figure 5. Predicted illnesses versus actual illness count for multivariate linear regression model.](images/Predicted%20Illnesses%20VS%20Illnesses%20by%20linear%20regression%20with%20all%20predictors.png){fig-align="center"}
+
+### Machine Learning
+
+```{r Model RMSE Comparison, paged.print=TRUE} 
+# Illness Models 
+rmarkdown::paged_table(readRDS("../../results/illness_rmse_models.rds"))
+
+# Hospitalization Models
+rmarkdown::paged_table(readRDS("../../results/hospital_rmse_models.rds"))
+```
+
+Overall, between itself and the other models (linear regression, poisson regression, and bagging) generated, the random forest model performed the best for both health outcomes with the lowest RMSEs (55.7, 5.05).
+
+### Final Fit with Test Data
+
+Fitting the finalized random forest model to the test data resulted in RMSEs of 36.6 and 6.70 for the health outcomes of illnesses and hospitalizations, respectively.
+
+# Discussion
+
+## Summary and Interpretations
+
+## Strengths and Limitations
+
+# Conclusion
+
+# References

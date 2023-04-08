@@ -1,18 +1,18 @@
 ---
-title: "Manuscript for foodborne-outbreak Project"
-subtitle: ""
-author: Weifan Wu and Kailin Chen
-date: "`r Sys.Date()`"
-format:
-  docx:
-    toc: false
-    number-sections: true
-    highlight-style: github
-bibliography: ../references.bib
-csl: ../apa.csl
-editor: 
-  markdown: 
-    wrap: sentence
+title: "Manuscript for Foodborne-Outbreak Project"
+# subtitle: ""
+author: "Weifan Wu and Kailin Chen"
+# date: "`r Sys.Date()`"
+format: 
+  docx
+#    toc: false
+#    number-sections: true
+#    highlight-style: github
+# bibliography: ../references.bib
+# csl: ../apa.csl
+# editor: 
+#  markdown: 
+#    wrap: sentence
 ---
 
 ```{r, echo=FALSE, message=FALSE}

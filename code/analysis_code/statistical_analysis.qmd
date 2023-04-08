@@ -700,12 +700,6 @@ hosp_model_dataframe
 
 Given the above results, the random forest machine learning model is the best model for both health outcomes.
 
-# Modifying Test Data Variables to Maintain Compatibility
-```{r}
-test_data_final
-```
-
-
 # Fit Testing Data
 ```{r}
 # Illness
@@ -724,5 +718,17 @@ placeholder_hosp <- placeholder_hosp[1:1922, ]
 test_data_final %>% select(Hospitalizations) %>% 
   bind_cols(placeholder_hosp) %>% rmse(Hospitalizations, .pred)
 
+```
+
+# Save RDS Files
+
+```{r}
+# Illness
+save_location <- here("results", "illness_rmse_models.rds")
+saveRDS(illness_model_dataframe, file = save_location)
+
+# Hospitalizations
+save_location <- here("results", "hospital_rmse_models.rds")
+saveRDS(hosp_model_dataframe, file = save_location)
 ```
 
