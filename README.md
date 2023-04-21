@@ -12,5 +12,5 @@ The *data* folder contains subdirectories for raw data and cleaned data.
 The *products* folder contains files pertinent to our manuscript output.
 
 ## Results
-The *results* folder contains tables and graphs generated from exploratory data analysis.
+The *results* folder contains tables and graphs generated from exploratory data analysis and statistical analysis.
 
