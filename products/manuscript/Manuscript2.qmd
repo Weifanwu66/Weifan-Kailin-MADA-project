@@ -3,7 +3,7 @@ title: "Manuscript for Foodborne-Outbreak Project"
 author: "Weifan Wu & Kailin (Kai) Chen"
 date: "May 2023"
 format:
-  docx
+  html
 bibliography: ../references.bib
 csl: ../apa.csl
 ---
@@ -15,6 +15,7 @@ library(knitr)
 library(tidyverse)
 library(broom)
 library(ggtext)
+library(flextable)
 ```
 
 # Summary/Abstract
@@ -23,21 +24,35 @@ library(ggtext)
 
 ## General Background Information
 
-Foodborne pathogens typically cause serious gastrointestinal infections. On average, 1 in 6 Americans will acquire foodborne illness each year; 128,000 will be hospitalized, and 3,000 will die [@centerforfoodsafetyandappliednutrition2022]. Economic loss associated with foodborne illness is estimated to be greater than 50 billion US dollars annually. Restaurants are frequently sites attributed to mass-outbreaks, and typical foods associated with these outbreaks include improperly-prepared meats and vegetables [@mun2020; @sarno2021]. Disease etiologies range from bacteria (ex: *Salmonella* spp. and *E. coli*) to viruses (norovirus and rotavirus), to parasites (*Cryptosporidium* spp. and *Cyclospora* spp. [@cdc2022]. To verify pathogens of greatest concern, common settings associated with foodborne illness, and foods typically associated with such outbreaks, this study was launched as a research project at the University of Georgia using information gathered over a 17-year period from the Centers for Disease Control and Prevention (CDC).
+Foodborne pathogens can cause serious gastrointestinal infections. About 600 million cases of foodborne disease are reported worldwide, with almost 1/10 of these cases caused by contaminated food [@he2023]. On average within the United States each year, 1 in 6 Americans will acquire foodborne illness; 128,000 will be hospitalized, and 3,000 will die [@centerforfoodsafetyandappliednutrition2022]. Economic loss associated with food poisoning is estimated to be greater than 50 billion US dollars annually. Restaurants are frequently sites attributed to mass-outbreaks, and typical foods associated with these outbreaks include improperly-prepared meats and vegetables [@mun2020; @sarno2021]. Disease etiologies range from bacteria (ex: *Salmonella* spp. and *E. coli*) to viruses (norovirus and rotavirus), to parasites (*Cryptosporidium* spp. and *Cyclospora* spp. [@cdc2022]. Environmental factors such as heavy metals can also cause foodborne illness.
 
 ### Questions & Hypotheses
 
-From this research project, we would like to answer the following questions: - What are the most frequent locations that foodborne outbreaks occur? - What pathogen species are most frequently associated with foodborne outbreaks? - What type of food is most often seen for foodborne outbreaks?
+To verify pathogens of greatest concern, common settings associated with food poisoning, and foods typically associated with such outbreaks, this study was launched as a research project at the University of Georgia using information gathered over a 17-year period from the Centers for Disease Control and Prevention (CDC).
+
+From this research project, we would like to answer the following questions:
+
+-   What are the most frequent locations that foodborne outbreaks occur?
+
+-   What pathogen species are most frequently associated with foodborne outbreaks?
+
+-   What type of food is most often seen for foodborne outbreaks?
 
 In other words, immediate outcomes of interest are location, disease etiology, and food category. These will act as predictors for the health outcomes of interest: illnesses and hospitalizations.
 
-Our hypotheses include: - Outbreaks occur most often in homes rather than restaurants. - The most common pathogen associated with foodborne disease outbreaks is *E. coli*. - The food most commonly associated with foodborne outbreaks consists of salad.
+Our hypotheses include:
+
+-   Outbreaks occur most often in homes rather than restaurants.
+
+-   The most common pathogen associated with foodborne disease outbreaks is *E. coli*.
+
+-   The food most commonly associated with foodborne outbreaks consists of salad.
 
 # Methods
 
 ## Data Sources, Acquisition, and Description
 
-Two datasets were adopted for this research. The first dataset--which was used to build statistical models for the study--was uploaded onto *Kaggle* in 2017, with 12 variables and more than 16,950 observations [@cdc2017a]. The second dataset--which was used for machine learning--was retrieved from the CDC's National Outbreak Reporting System (NORS) website. This second dataset covers reports of foodborne and waterborne disease outbreaks, as well as enteric disease outbreaks spread by contact with environmental sources, infected animals or persons, and other means from 2009 to 2020.
+Two datasets were adopted for this research. The first dataset--which was used to build statistical models for the study--was uploaded onto *Kaggle* in 2017, with 12 variables and more than 16,950 observations spanning almost two decades from 1998 to 2015 [@cdc2017a]. The second dataset--which was used for machine learning--was retrieved from the CDC's National Outbreak Reporting System (NORS) website. This second dataset covers reports of foodborne and waterborne disease outbreaks, as well as enteric disease outbreaks spread by contact with environmental sources, infected animals or persons, and other means from 2009 to 2020.
 
 ## Data Importation and Cleaning
 
@@ -63,19 +78,35 @@ For more information, please refer to the "statistical_analysis.qmd" file inside
 
 ### Training Data
 
-![Figure 2: Hospitalizations by Food Type.](images/Food_type_v_hospitalization-01.png)
+```{r Table of Hospitalizations by State}
+first_table <- readRDS("../../results/state_v_hospitalization_training.rds") %>% 
+  rename(Hospitalizations = all_hospitalizations)
+first_table <- flextable(first_table)
+first_table <- theme_vanilla(first_table)
+first_table <- set_caption(first_table, caption = as_paragraph(colorize("Table 1. Hospitalizations by state from 1998 to 2015.", color = "black")))
+first_table <- set_table_properties(first_table, layout = "autofit")
+first_table
+```
 
-```{r Visualization of Hospitalizations by State}
-rmarkdown::paged_table(readRDS("../../results/state_v_hospitalization_training.rds"))
+![Figure 1. Hospitalizations by food type from 1998-2015.](images/Food_type_v_hospitalization-01.png)
+
+```{r}
+second_table <- readRDS("../../results/training_food_vs_illnesses.rds") %>% 
+  select(`IFSAC Category`, all_illnesses) %>% 
+  rename(Illnesses = all_illnesses)
+second_table <- flextable(second_table)
+second_table <- theme_vanilla(second_table)
+second_table <- set_caption(second_table, caption = as_paragraph(colorize("Table 2. Illnesses by food type from 1998 to 2015.", color = "black")))
+second_table
 ```
 
 ### Test Data
 
-![Figure 1. Year vs Illnesses Caused by Pathogen Type](images/time_v_illness_pathogen_type.png)
+![Figure 2. Illness over time by pathogen type (2009-2020).](images/time_v_illness_pathogen_type.png)
 
-![Figure 3. Illnesses by outbreak location.](images/Location_v_Illness.png)
+![Figure 3. Illnesses by outbreak location (2009-2020).](images/Location_v_Illness-01.png)
 
-![Figure 4. Bacterial etiology by outbreak frequency.](images/bacterial_etiology_v_outbreak_frequency.png)
+![Figure 4. Bacterial etiology by outbreak frequency (2009-2020).](images/bacterial_etiology_v_outbreak_frequency.png)
 
 ## Statistical Analysis
 
@@ -87,7 +118,7 @@ Between simple and multivariate regressions, multivariate models performed bette
 
 ### Machine Learning
 
-```{r Model RMSE Comparison, paged.print=TRUE} 
+```{r Model RMSE Comparison, paged.print=TRUE}
 # Illness Models 
 rmarkdown::paged_table(readRDS("../../results/illness_rmse_models.rds"))
 
@@ -105,8 +136,22 @@ Fitting the finalized random forest model to the test data resulted in RMSEs of 
 
 ## Summary and Interpretations
 
+Exploratory data visualization demonstrates bacteria contribute to the majority outbreaks, and all outbreaks with illnesses numbering over 1,000 and hospitalizations over 100 are attributed to bacteria. From all pathogen types, bacteria are thus associated with worse health outcomes when it comes to food poisoning.
+
+From 1998 to 2015, multistate outbreaks caused the most illnesses (N = 18,617) and hospitalizations (3,506) than any in-state outbreak. The fact that multistate outbreaks were seen more often than in any individual state for illnesses and hospitalizations suggests that these disease outbreaks typically involve a regional or national ingredient distributor. Hence, it would be reasonable to suggest laboratory sampling of goods, especially for bacteria, as a safety benchmark upon arrival at their destinations.
+
+In terms of food categories, poultry was identified to have caused the most hospitalizations (N = 770), followed closely by fruits and beef. Interestingly, however, salads were found to cause the most illnesses (N = 11,493). Upon addition of total hospitalizations and illnesses for both poultry and salads, salads were determined to have the highest number of cases in total, which confirms our original hypothesis.
+
+The remaining two of the three initial hypotheses were proved incorrect. Instead of *E. coli*, results overall indicated that *Salmonella* spp. are the most common pathogens linked to foodborne disease; these bacteria contribute to the greatest amount of illnesses and hospitalizations in comparison to other disease agents for our data. Finally, we also see that food poisoning is most frequently linked to restaurants instead of private households.
+
+\[Something about machine learning here???\]
+
+These results offer insight into common disease characteristics across food poisoning cases, which is greatly useful for epidemiologists and other public health professionals to anticipate which areas to investigate first for future outbreaks.
+
 ## Strengths and Limitations
 
 # Conclusion
+
+Food poisoning in the United States poses a great concern to public health in terms of both morbidity and economic costs. Previous surveillance data points to *Salmonella* bacteria and salads as the main cause and medium for foodborne disease outbreaks, along with the most common setting for such outbreaks being a restaurant. These findings will also give future outbreak investigators a first direction to consider in the field.
 
 # References

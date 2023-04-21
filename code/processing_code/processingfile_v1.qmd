@@ -366,7 +366,7 @@ testing_data_fin <- testing_data_fin %>%
   mutate(Location = case_when(
     grepl("Private Home/Residence", Location, ignore.case = TRUE) ~ "Private Home/Residence",
     grepl("Caterer", Location, ignore.case = TRUE) ~ "Catering Service",
-    grepl("Office/Indoor Workspace", Location, ignore.case = TRUE) ~ "Office/Indoor Workspace",
+    grepl("Office/Indoor", Location, ignore.case = TRUE) ~ "Office/Indoor Workplace",
     grepl("Banquet", Location, ignore.case = TRUE) ~ "Banquet Facility",
     grepl("Fair", Location, ignore.case = TRUE) ~ "Fair/Festival",
     grepl("Religious", Location, ignore.case = TRUE) ~ "Religious Facility",
@@ -377,7 +377,11 @@ testing_data_fin <- testing_data_fin %>%
     grepl("Child", Location, ignore.case = TRUE) ~ "Child Daycare",
     grepl("Farm/Dairy", Location, ignore.case = TRUE) ~ "Farm/Dairy",
     grepl("Hotel/Motel", Location, ignore.case = TRUE) ~ "Hotel/Motel",
+    grepl("Ship/Boat", Location, ignore.case = TRUE) ~ "Ship/Boat",
     TRUE ~ Location))
+
+unique(testing_data_fin$Location)
+unique(training_data_fin$Location)
 ```
 
 ## Ensure Training and Test Data Have Same Columns
