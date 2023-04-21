@@ -1,0 +1,782 @@
+---
+title: "Statistical analysis script"
+author: "Weifan Wu and Kailin Chen"
+date: "03/16/2023"
+output: html_document
+---
+
+
+# Load Libraries
+
+```{r}
+# Pathing
+library(here)
+
+# Data Handling and Modeling
+library(tidyverse)
+library(tidymodels)
+library(poissonreg)
+library(knitr)
+library(skimr)
+library(vip)
+## For Decision Trees
+library(ranger)
+library(caret)
+library(rpart)
+library(ipred)
+library(e1071)
+```
+
+# Load Data
+
+```{r}
+# Import Training Data
+data_location <- here(
+  "data","processed_data","processed_training_data.rds")
+training_data_final <- readRDS(data_location)
+skim(training_data_final)
+
+# Import Test Data
+data_location <- here(
+  "data","processed_data","processed_testing_data.rds")
+test_data_final <- readRDS(data_location)
+skim(test_data_final)
+
+```
+
+```{r}
+# Set Image Path
+images_stats_path <- here("results","images_statistic_analysis")
+
+# Checking General Illness Distribution
+training_data_final %>%
+  ggplot(aes(Illnesses)) +
+  geom_histogram() +
+  scale_x_continuous(trans = scales::pseudo_log_trans(base = 10))
+## Save Histogram
+ggsave("histogram_Illnesses.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
+
+# Checking General Hospitalization Distribution
+training_data_final %>%
+  ggplot(aes(Hospitalizations)) +
+  geom_histogram() +
+  scale_x_continuous(trans=scales::pseudo_log_trans(base = 10))
+## Save Generated Histogram
+ggsave("histogram_Hospitalizations.png", path = images_stats_path)
+```
+
+
+# Create Tibbles for Illness & Hospitalizations
+
+```{r}
+process_datasets_to_tibbles <- function(dataset) {
+  dataset %>%
+    filter(!`IFSAC Category` %in% c("Multiple", "Other"), 
+           Location!= "Unknown") %>%
+    mutate_if(is.character, as.factor) %>%
+    select(!Pathogen_Type)
+}
+
+illness_data <- process_datasets_to_tibbles(training_data_final) %>%
+  select(!Month) %>%
+  rename(Month = Numeric_Month) %>%
+  select(!Food) %>% select(!Hospitalizations)
+
+hosp_data <- process_datasets_to_tibbles(training_data_final) %>%
+  select(!Month) %>%
+  rename(Month = Numeric_Month) %>%
+  select(!Food) %>% select(!Illnesses)
+
+skim(illness_data)
+skim(hosp_data)
+
+test_data_final <- process_datasets_to_tibbles(test_data_final) %>%
+  select(!Food)
+
+skim(test_data_final)
+```
+
+
+The two health outcomes of interest are illnesses and hospitalizations.
+
+Predictors
+-   Time (Month, Year)
+-   Pathogen Type
+-   Etiology
+-   Location
+-   State
+-   Food Type (IFSAC Category)
+
+# Modeling Illness
+
+Since the outcome is counts/frequency and the event occurs independently, it follows a Poisson distribution. To create a workflow for poisson regression model, the default *glm* engine will be used.
+
+
+```{r}
+# Set Seed for Reproducibility
+set.seed(123)
+
+# Cross-Validation Setup
+illness_fold <- vfold_cv(illness_data, repeats = 2, strata = Illnesses)
+
+# Additional Preprocessing to Deal with Variables with > 50 Categories
+preprocessing_recipe <- function(anterior) {
+  anterior %>%
+    step_dummy(Simplified_Etiology) %>%
+    step_dummy(State) %>%
+    step_dummy(`IFSAC Category`)
+}
+
+## Simple Recipe for Illnesses
+illness_simple_recipe <- recipe(Illnesses ~ Simplified_Etiology, 
+                                data = illness_data) %>%
+  step_dummy(Simplified_Etiology)
+
+## Recipe with All Predictors for Illnesses
+illness_complex_recipe <- recipe(Illnesses ~ ., data = illness_data) %>%
+  preprocessing_recipe()
+
+### Lump small proportion into "other" using step_other
+### Create dummy code for nominal variables
+#illness_all_rec=recipe(Illnesses~.,data=illness_data)%>%
+#  step_other(State,Location,`IFSAC Category`,Simplified_Etiology,threshold = 0.01)%>%
+#  step_dummy(all_nominal())
+
+### Check Processed Dataset
+illness_complex_recipe %>% prep() %>% bake(new_data = NULL)
+
+# Model Specification
+## Linear Regression
+linear_model <- linear_reg() %>%
+  set_engine(engine = "lm")
+
+# Create Workflow
+## Main Predictor `Simplified_Etiology`
+linear_workflow_simple_illness <- workflow() %>%
+  add_recipe(illness_simple_recipe) %>%
+  add_model(linear_model)
+
+## All Predictors
+linear_workflow_complex_illness <- workflow() %>%
+  add_recipe(illness_complex_recipe)%>%
+  add_model(linear_model)
+
+## Poisson Regression
+## Modeling with Main Predictor `Simplified_Etiology`
+poisson_workflow_simple_illness <- workflow() %>%
+  add_recipe(illness_simple_recipe) %>%
+  add_model(poisson_reg())
+
+## Modeling with All Predictors
+poisson_workflow_complex_illness <- workflow() %>%
+  add_recipe(illness_complex_recipe) %>%
+  add_model(poisson_reg())
+```
+
+
+## Linear Regression
+### Model Fitting
+
+```{r}
+set.seed(234)
+
+## Linear Regression
+### Simple Model
+lm_simple_resampled_illness <- linear_workflow_simple_illness %>%
+  fit_resamples(resamples = illness_fold, control = control_resamples(save_pred = TRUE))
+
+### All Predictors
+lm_complex_resampled_illness <- linear_workflow_complex_illness %>%
+  fit_resamples(resamples = illness_fold, control = control_resamples(save_pred = TRUE))
+```
+
+
+### Model Evaluation
+
+```{r}
+# Check Metrics
+## Simple Regression
+lm_simple_resampled_illness %>%
+  collect_metrics()
+## Multivariate Regression
+lm_complex_resampled_illness %>%
+  collect_metrics()
+
+# Check Parameters for Linear Regression Model
+## Simple Regression
+linear_model_simple_fit_illness <- linear_workflow_simple_illness %>%
+  fit(illness_data) %>%
+  tidy() %>%
+  arrange(-estimate)
+## Multivariate Regression
+linear_model_complex_fit_illness <- linear_workflow_complex_illness %>%
+  fit(illness_data) %>%
+  tidy() %>%
+  arrange(-estimate)
+
+# Check Variable Importance
+## Simple Regression
+linear_workflow_simple_illness %>%
+  fit(illness_data) %>%
+  extract_fit_engine() %>%
+  vip()
+## Multivariate Regression
+linear_workflow_complex_illness %>%
+  fit(illness_data) %>%
+  extract_fit_engine() %>%
+  vip()
+
+# Plotting Predicted Values vs True Values (Illnesses)
+lm_simple_resampled_illness %>%
+  collect_predictions() %>%
+  # filter(Illnesses < 300) %>%
+  ggplot(aes(Illnesses, .pred, color = id2, group = id2)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  geom_abline(intercept = 0,slope = 1) +
+  labs(y = "Predicted Illnesses", 
+       title = "Predicted Illnesses VS Illnesses via Simple Linear Regression")
+
+ggsave("Predicted Illnesses VS Illnesses by linear regression with main predictor.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
+
+lm_complex_resampled_illness %>%
+  collect_predictions() %>%
+  # filter(Illnesses < 300) %>%
+  ggplot(aes(Illnesses, .pred, color = id2, group = id2)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  geom_abline(intercept = 0, slope = 1) +
+  labs(y = "Predicted Illnesses", title = "Predicted Illnesses VS Illnesses via Multivariate Linear Regression")
+
+ggsave("Predicted Illnesses VS Illnesses by linear regression with all predictors.png", path=images_stats_path, width = 3000, height = 2000, units = "px")
+
+```
+
+
+## Poisson Regression
+### Model Fitting
+
+```{r}
+## Poisson Regression
+### Simple
+poisson_simple_resampled_illness <- poisson_workflow_simple_illness %>%
+  fit_resamples(resamples = illness_fold,
+    control = control_resamples(save_pred = TRUE))
+
+### Multivariate
+poisson_complex_resampled_illness <- poisson_workflow_complex_illness %>%
+  fit_resamples(resamples = illness_fold,
+    control = control_resamples(save_pred = TRUE))
+```
+
+
+### Model Evaluation
+
+```{r}
+# Metrics
+## Simple
+poisson_simple_resampled_illness %>%
+  collect_metrics()
+## Complex
+poisson_complex_resampled_illness %>%
+  collect_metrics()
+
+# Check Parameters
+## Simple
+poisson_simple_fit_illness <- poisson_workflow_simple_illness %>%
+  fit(illness_data) %>%
+  tidy() %>%
+  arrange(-estimate)
+## Complex
+poisson_complex_fit_illness <- poisson_workflow_complex_illness %>%
+  fit(illness_data) %>%
+  tidy() %>%
+  arrange(-estimate)
+
+# Check Variable Importance
+## Simple
+poisson_workflow_simple_illness %>%
+  fit(illness_data) %>%
+  extract_fit_engine() %>%
+  vip()
+## Complex
+poisson_workflow_complex_illness %>%
+  fit(illness_data) %>%
+  extract_fit_engine() %>%
+  vip()
+
+# Plotting Predictions vs Illnesses
+## Simple
+poisson_simple_resampled_illness %>%
+  collect_predictions() %>%
+  # filter(Illnesses < 300) %>%
+  ggplot(aes(Illnesses, .pred, color = id2, group = id2)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  geom_abline(intercept = 0, slope = 1) +
+  labs(y = "Predicted Illnesses", title = "Predicted Illnesses VS Illnesses by Simple Poisson Regression")
+
+ggsave("Predicted Illnesses VS Illnesses by poisson regression with main predictor.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
+
+## Complex
+poisson_complex_resampled_illness %>%
+  collect_predictions() %>%
+  # filter(Illnesses < 500) %>%
+  ggplot(aes(Illnesses, .pred, color = id2, group = id2)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  geom_abline(intercept = 0,slope = 1) +
+  labs(y = "Predicted Illnesses", title = "Predicted Illnesses VS Illnesses by linear regression with all predictors")
+
+ggsave("Predicted Illnesses VS Illnesses by poisson regression with all predictors.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
+
+```
+
+According to the result, the model built using multivariate linear regression seems to have the smallest root mean squared error and highest R^2. However, none of those models can catch outliers (Illness > 1000).
+
+# Modeling Hospitilizations
+
+To create a workflow for the Poisson regression model, we will use the default *glm* engine again. 
+
+
+```{r}
+# Cross-Validation
+hosp_fold <- vfold_cv(hosp_data, repeats = 2, strata = Hospitalizations)
+
+# Data Preprocessing
+## Simple Regression Recipe
+hosp_simple_recipe <- recipe(Hospitalizations ~ Simplified_Etiology, data = hosp_data) %>%
+  step_dummy(Simplified_Etiology)
+
+## Multivariate Regression Recipe
+hosp_complex_recipe <- recipe(Hospitalizations ~ ., data = hosp_data) %>%
+  preprocessing_recipe()
+
+## Recipe for all predictors
+### Lump small proportion into "other" using step_other
+### Create dummy code for nominal variables
+# hosp_all_rec=recipe(Hospitalizations ~.,data=hosp_data)%>%
+#  step_other(State,Location,`IFSAC Category`, Simplified_Etiology,threshold = 0.01)%>%
+#  step_dummy(all_nominal_predictors())
+
+# Check Preprocessed Dataset
+hosp_complex_recipe %>%
+  prep() %>%
+  bake(new_data = NULL)
+
+# Create Workflows
+## Simple
+linear_workflow_simple_hosp <- workflow() %>%
+  add_recipe(hosp_simple_recipe) %>%
+  add_model(linear_model)
+poisson_workflow_simple_hosp <- workflow() %>%
+  add_recipe(hosp_simple_recipe) %>%
+  add_model(poisson_reg())
+## Multivariate
+linear_workflow_complex_hosp <- workflow() %>%
+  add_recipe(hosp_complex_recipe) %>%
+  add_model(linear_model)
+poisson_workflow_complex_hosp <- workflow() %>%
+  add_recipe(hosp_complex_recipe) %>%
+  add_model(poisson_reg())
+```
+
+
+## Linear Regression
+
+```{r}
+set.seed(234)
+```
+
+
+### Model Fitting
+
+```{r}
+# Simple
+lm_simple_resampled_hosp <- linear_workflow_simple_hosp %>%
+  fit_resamples(resamples = hosp_fold,
+    control = control_resamples(save_pred = TRUE))
+
+# Complex
+lm_complex_resampled_hosp <- linear_workflow_complex_hosp %>%
+  fit_resamples(resamples = hosp_fold,
+    control = control_resamples(save_pred = TRUE))
+```
+
+
+### Model Evaluation
+
+```{r}
+# Metrics
+lm_simple_resampled_hosp %>%
+  collect_metrics()
+lm_complex_resampled_hosp %>%
+  collect_metrics()
+
+# Check Parameters
+linear_workflow_simple_hosp %>%
+  fit(hosp_data) %>%
+  tidy() %>%
+  arrange(-estimate)
+linear_workflow_complex_hosp %>%
+  fit(hosp_data) %>%
+  tidy() %>%
+  arrange(-estimate)
+
+## Visualizing Variable Importance
+linear_workflow_simple_hosp %>%
+  fit(hosp_data) %>%
+  extract_fit_engine() %>%
+  vip()
+linear_workflow_complex_hosp %>%
+  fit(hosp_data) %>%
+  extract_fit_engine() %>%
+  vip()
+
+# Plotting predictions vs Hospitalizations
+lm_simple_resampled_hosp %>%
+  collect_predictions() %>%
+  # filter(Hospitalizations < 50) %>%
+  ggplot(aes(Hospitalizations, .pred, color = id2))+
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  geom_abline(intercept = 0, slope = 1) +
+  labs(y = "Predicted Hospitalizations", 
+       title = "Predicted Hospitalizations VS Hospitalizations \by Simple Linear Regression", color = "Fold")
+
+ggsave("Predicted Hospitalizations VS Hospitalizations by linear regression with main predictor.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
+
+lm_complex_resampled_hosp %>%
+  collect_predictions() %>%
+  #filter(Hospitalizations < 50) %>%
+  ggplot(aes(Hospitalizations, .pred, color = id2))+
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  geom_abline(intercept = 0, slope = 1) +
+  labs(y = "Predicted Hospitalizations", 
+       title="Predicted Hospitalizations VS Hospitalizations \by Multivariate Linear Regression", color = "Fold")
+
+ggsave("Predicted Hospitalizations VS Hospitalizations by linear regression with all predictors.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
+```
+
+## Poisson Regression
+### Model Fitting
+
+```{r}
+## Poisson Regression
+### Simple
+poisson_simple_resampled_hosp <- poisson_workflow_simple_hosp %>%
+  fit_resamples(resamples = hosp_fold,
+    control = control_resamples(save_pred = TRUE))
+
+### Multivariate
+poisson_complex_resampled_hosp <- poisson_workflow_complex_hosp %>%
+  fit_resamples(resamples = hosp_fold,
+    control = control_resamples(save_pred = TRUE))
+```
+
+
+### Model Evaluation
+
+```{r}
+# Metrics
+poisson_simple_resampled_hosp %>%
+  collect_metrics()
+poisson_complex_resampled_hosp %>%
+  collect_metrics()
+
+# Check Parameters
+poisson_workflow_simple_hosp %>%
+  fit(hosp_data) %>%
+  tidy() %>%
+  arrange(-estimate)
+
+poisson_workflow_complex_hosp %>%
+  fit(hosp_data) %>%
+  tidy() %>%
+  arrange(-estimate)
+
+# Variable Importance
+poisson_workflow_simple_hosp %>%
+  fit(hosp_data) %>%
+  extract_fit_engine() %>%
+  vip()
+poisson_workflow_complex_hosp %>%
+  fit(hosp_data) %>%
+  extract_fit_engine() %>%
+  vip()
+
+# Predictions vs Hospitalizations
+poisson_simple_resampled_hosp %>%
+  collect_predictions() %>%
+  # filter(Hospitalizations < 50) %>%
+  ggplot(aes(Hospitalizations, .pred, color = id2)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  geom_abline(intercept = 0,slope = 1) +
+  labs(y = "Predicted Hospitalizations", 
+       title = "Predicted Hospitalizations VS Hospitalizations \by Simple Linear Regression", color = "Fold")
+
+ggsave("Predicted Hospitalizations VS Hospitalizations by poisson regression with main predictor.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
+
+poisson_complex_resampled_hosp %>%
+  collect_predictions() %>%
+  # filter(Hospitalizations < 50) %>%
+  ggplot(aes(Hospitalizations, .pred, color = id2)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  geom_abline(intercept = 0, slope = 1) +
+  labs(y = "Predicted Hospitalizations", title = "Predicted Hospitalizations VS Hospitalizations \by Multivariate Linear Regression", color = "Fold")
+
+ggsave("Predicted Hospitalizations VS Hospitalizations by poisson regression with all predictors.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
+
+```
+
+According to the results, the model built using multivariate linear regression seems to have the smallest root mean squared error and highest R^2 (14%). But again, outliers (Hospitalizations > 100) cannot be predicted well by any of those models.
+
+# Machine Learning Approach
+
+```{r}
+set.seed(345)
+```
+
+
+## Random Forest
+### Predicting First Outcome `Illnesses` Using All Predictors
+
+```{r}
+# Model Specification
+rf_spec <- rand_forest(mtry = tune(), min_n = tune(), trees = 1000) %>%
+  set_engine("ranger", importance = 'impurity') %>%
+  set_mode("regression")
+
+# illness_all_rec <- recipe(Illnesses~.,data=illness_data) %>%
+#  step_other(State,Location,`IFSAC Category`,Simplified_Etiology,threshold = 0.01)%>%
+#  step_dummy(all_nominal())
+
+# Workflow
+random_forest_illness_workflow <- workflow() %>%
+  add_recipe(illness_complex_recipe) %>%
+  add_model(rf_spec)
+
+# Training and Tuning Model
+doParallel::registerDoParallel()
+random_forest_illness_tuned <- random_forest_illness_workflow %>%
+  tune_grid(
+    resamples = illness_fold,
+    grid = 15,
+    control = control_grid(save_pred = TRUE),
+    metrics = metric_set(rmse)
+  )
+```
+
+
+### Model Evaluation
+
+```{r}
+# Plot
+random_forest_illness_tuned %>%
+  autoplot()
+# Final Specifications
+random_forest_illness_tuned_best <- random_forest_illness_tuned %>%
+  select_best()
+random_forest_illness_final <- random_forest_illness_workflow %>%
+  finalize_workflow(random_forest_illness_tuned_best)
+random_forest_illness_fit <- random_forest_illness_final %>%
+  fit(illness_data)
+# Plotting Predicted Illness VS Illnesses
+random_forest_illness_predict <- random_forest_illness_fit %>%
+  predict(illness_data)
+
+illness_data %>%
+  select(Illnesses) %>%
+  bind_cols(random_forest_illness_predict) %>%
+  ggplot(aes(Illnesses, .pred)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_smooth(se = FALSE) +
+  labs(y = "Predicted Illnesses", 
+       title = "Predicted Illnesses VS Illnesses by Random Forest Model")
+ggsave("Predicted illnesses VS illnesses by random forest model.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
+```
+
+
+### Predicting Second Outcome `Hospitalizations` Using All Predictors
+
+```{r}
+set.seed(456)
+
+# Creating workflow
+random_forest_hosp_workflow <- workflow() %>%
+  add_recipe(hosp_complex_recipe) %>%
+  add_model(rf_spec)
+# Training and tuning model
+doParallel::registerDoParallel()
+random_forest_hosp_tuned <- random_forest_hosp_workflow %>%
+  tune_grid(
+    resamples = hosp_fold,
+    grid = 15,
+    control = control_grid(save_pred = TRUE),
+    metrics = metric_set(rmse)
+  )
+```
+
+
+### Model Evaluation
+
+```{r}
+# Plot
+random_forest_hosp_tuned %>%
+  autoplot()
+
+# Final Specifications
+random_forest_hosp_tuned %>%
+  show_best()
+random_forest_hosp_best <- random_forest_hosp_tuned %>%
+  select_best()
+
+random_forest_hosp_final <- random_forest_hosp_workflow %>%
+  finalize_workflow(random_forest_hosp_best)
+
+random_forest_hosp_fit <- random_forest_hosp_final %>%
+  fit(hosp_data)
+
+random_forest_hosp_predict <- random_forest_hosp_fit %>%
+  predict(hosp_data)
+
+hosp_data %>%
+  select(Hospitalizations) %>%
+  bind_cols(random_forest_hosp_predict) %>%
+  ggplot(aes(Hospitalizations, .pred)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_smooth(se = FALSE) +
+  labs(y = "Predicted Hospitalizations",
+       title = "Predicted Hospitalizations VS Hospitalizations by Random Forest")
+
+ggsave("Predicted Hospitalizations VS Hospitalizations by random forest model.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
+```
+
+
+Overall, random forest model has the lowest rmse among those selected models when training data is fitted; Also, the random forest model outperforms other models in predicting outliers.
+
+## Bagging
+### Illnesses
+
+```{r}
+bag_training_illness <- bagging(formula = Illnesses ~ .,
+                        data = illness_data,
+                        method = "treebag",
+                        trControl = trainControl(method = "cv", number = 30),
+                        nbagg = 500,
+                        coob = TRUE,
+                        control = rpart.control(minsplit = 2, cp = 0))
+
+# Get RMSE
+bag_training_illness$err
+```
+
+
+### Hospitalizations
+
+```{r}
+bag_training_hosp <- bagging(formula = Hospitalizations ~ .,
+                        data = hosp_data,
+                        method = "treebag",
+                        trControl = trainControl(method = "cv", number = 30),
+                        nbagg = 500,
+                        coob = TRUE,
+                        control = rpart.control(minsplit = 2, cp = 0))
+
+# Get RMSE
+bag_training_hosp$err
+```
+
+
+## Organize Model Performance and Choose the Best One
+### Illnesses
+
+```{r}
+# Make Dataframe of Model RMSEs
+illness_model_dataframe <- lm_complex_resampled_illness %>%
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% select(mean) %>% rename(RMSE = mean) %>% 
+  mutate(Model = "Linear Regression") %>% 
+  full_join(poisson_complex_resampled_illness %>% 
+              collect_metrics() %>% 
+              filter(.metric == "rmse") %>% select(mean) %>% 
+              rename(RMSE = mean) %>% mutate(Model = "Poisson Regression")) %>%
+  full_join(random_forest_illness_tuned %>% 
+              show_best("rmse") %>% top_n(-1, mean) %>% select(mean) %>%
+              rename(RMSE = mean) %>% mutate(Model = "Random Forest")
+            ) %>%
+  full_join(data.frame(bag_training_illness$err, "Bagging") %>% 
+  rename(RMSE = bag_training_illness.err) %>% rename(Model = X.Bagging.)) %>%
+  arrange(RMSE)
+
+illness_model_dataframe
+
+```
+
+
+### Hospitalizations
+
+```{r}
+hosp_model_dataframe <- lm_complex_resampled_hosp %>%
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% select(mean) %>% rename(RMSE = mean) %>% 
+  mutate(Model = "Linear Regression") %>% 
+  full_join(poisson_complex_resampled_hosp %>% 
+              collect_metrics() %>% 
+              filter(.metric == "rmse") %>% select(mean) %>% 
+              rename(RMSE = mean) %>% mutate(Model = "Poisson Regression")) %>%
+  full_join(random_forest_hosp_tuned %>% 
+              show_best("rmse") %>% top_n(-1, mean) %>% select(mean) %>%
+              rename(RMSE = mean) %>% mutate(Model = "Random Forest")
+            ) %>%
+  full_join(data.frame(bag_training_hosp$err, "Bagging") %>% 
+  rename(RMSE = bag_training_hosp.err) %>% rename(Model = X.Bagging.)) %>%
+  arrange(RMSE)
+
+hosp_model_dataframe
+
+```
+
+
+Given the above results, the random forest machine learning model is the best model for both health outcomes.
+
+# Fit Testing Data
+
+```{r}
+# Illness
+placeholder_illnesses <- random_forest_illness_final %>%
+  fit(test_data_final) %>% predict(test_data_final)
+placeholder_illnesses <- placeholder_illnesses[1:1922, ]
+
+test_data_final %>% select(Illnesses) %>% 
+  bind_cols(placeholder_illnesses) %>% rmse(Illnesses, .pred)
+
+# Hospitalizations
+placeholder_hosp <- random_forest_hosp_final %>%
+  fit(test_data_final) %>% predict(test_data_final)
+placeholder_hosp <- placeholder_hosp[1:1922, ]
+
+test_data_final %>% select(Hospitalizations) %>% 
+  bind_cols(placeholder_hosp) %>% rmse(Hospitalizations, .pred)
+
+```
+
+
+# Save RDS Files
+
+
+```{r}
+# Illness
+save_location <- here("results", "illness_rmse_models.rds")
+saveRDS(illness_model_dataframe, file = save_location)
+
+# Hospitalizations
+save_location <- here("results", "hospital_rmse_models.rds")
+saveRDS(hosp_model_dataframe, file = save_location)
+```
+

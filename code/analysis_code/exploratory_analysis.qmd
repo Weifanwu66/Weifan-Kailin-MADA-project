@@ -39,33 +39,34 @@ analysis_data_final <- readRDS(data_location)
 ## Training Data
 
 The outcome of interest we will explore for the training data is hospitalizations.
+### Template Setup
+```{r}
+# Template Graph
+theme_set(theme_classic())
+theme_update(plot.title = element_text(face = "bold", size = 12))
+theme_update(plot.title = element_text(hjust = 0.5))
+```
+
 
 ### Pathogen Type + Etiology vs Hospitalization
-```{r fig.height=8,fig.width=8}
-# Pathogen Type + Etiology vs Hospitalization
+```{r}
+# Pathogen Type vs Hospitalization
 ggplot(training_data_final %>% 
-         group_by(Pathogen_Type, Simplified_Etiology, Hospitalizations) %>% 
+         group_by(Pathogen_Type, Hospitalizations) %>% 
          count() %>% mutate(true_hospitalization = n * Hospitalizations), 
        aes(x = Pathogen_Type, y = true_hospitalization, 
-           group = Simplified_Etiology, fill = Simplified_Etiology)) +
+           )) +
   geom_col() + 
   labs(x = "Pathogen Type", y = "Hospitalizations", 
-       title = "Stacked Bar Chart of Hospitalizations by Pathogen & Etiology") +
+       title = "Bar Chart of Hospitalizations by Pathogen type") +
   theme_classic() + 
   theme(plot.title = element_text(face = "bold", size = 11, hjust = 0.5))
 
 ## Save Graph
 image_path <- here("results","images_EDA")
-ggsave("pathogen_type_etiology_v_hospitalizations.png", path = image_path, width = 3000, height = 2000, units = "px")
+ggsave("pathogen_type_v_hospitalizations.png", path = image_path, width = 3000, height = 2000, units = "px")
 ```
 
-### Template Setup
-```{r}
-# Template Graph
-theme_set(theme_bw())
-theme_update(plot.title = element_text(face = "bold", size = 12))
-theme_update(plot.title = element_text(hjust = 0.5))
-```
 
 ### Time vs Hospitalizations
 ```{r}
@@ -84,7 +85,7 @@ theme_update(plot.title = element_text(hjust = 0.5))
 #   facet_wrap(~ Pathogen_Type) +
 #   theme(legend.position = "none")
 
-## Hospitalizations
+## Hospitalizations VS year
 ggplot(training_data_final %>% 
          group_by(Year, Pathogen_Type, Hospitalizations) %>% 
          count() %>% 
@@ -99,7 +100,21 @@ ggplot(training_data_final %>%
   theme(legend.position = "none")
 
 ## Save Graph
-ggsave("time_v_hospitalization_pathogen_type.png", path = image_path, width = 3000, height = 2000, units = "px")
+ggsave("year_v_hospitalization.png", path = image_path, width = 3000, height = 2000, units = "px")
+
+## Hospitalizations VS month
+ggplot(training_data_final %>% 
+         group_by(Numeric_Month, Hospitalizations) %>% 
+         count() %>% 
+         mutate(true_hospitalization = n * Hospitalizations), 
+       aes(x = as.factor(Numeric_Month), y = true_hospitalization)) +
+  geom_boxplot() +
+  labs(x = "Month", y = "Hospitalizations", 
+       title = "Scatter Plot of Hospitalizations by Month") + 
+  theme(legend.position = "none")
+
+## Save Graph
+ggsave("month_v_hospitalization.png", path = image_path, width = 3000, height = 2000, units = "px")
 ```
 
 ### Bacterial Etiologies for Outbreaks
@@ -107,29 +122,33 @@ ggsave("time_v_hospitalization_pathogen_type.png", path = image_path, width = 30
 # General
 ggplot(training_data_final %>% 
          select(Pathogen_Type, Simplified_Etiology, Hospitalizations) %>%
-         filter(Pathogen_Type == "Bacteria"), 
-       aes(x = Simplified_Etiology)) + geom_bar() + 
+         filter(Pathogen_Type == "Bacteria")%>%
+         group_by(Simplified_Etiology)%>%
+         mutate(all_hospitalizations=sum(Hospitalizations)),
+       aes(x = fct_reorder(Simplified_Etiology,all_hospitalizations))) + geom_bar() + 
   labs(x = "Bacteria", y = "Hospitalizations", 
        title = "Bar Chart of Bacteria Frequency") + coord_flip()
 
 ggsave("bacterial_etiology_v_hospitalization_frequency.png", path = image_path, width = 3000, height = 2000, units = "px")
 
-# Salmonella
-Salmonella_Hosp <- training_data_final %>%
+#  Top 3 Bacterial Etiology: Salmonella, E. coli, and Clostridium
+Top_Hosp <- training_data_final %>%
   select(Simplified_Etiology, Hospitalizations, `IFSAC Category`) %>%
   group_by(Simplified_Etiology, Hospitalizations, `IFSAC Category`) %>%
-  filter(Simplified_Etiology == "Salmonella") %>%
+  filter(Simplified_Etiology %in% c("Salmonella","Clostridium","E. coli")) %>%
   filter(`IFSAC Category` != "Multiple") %>%
   filter(`IFSAC Category` != "Other") %>%
   count() %>%
-  mutate(total_hospitalizations = n * Hospitalizations) %>%
-  arrange(desc(total_hospitalizations))
+  mutate(total_hospitalizations = n * Hospitalizations) 
 
-ggplot(Salmonella_Hosp, aes(x=`IFSAC Category`, y = total_hospitalizations))+
-  geom_boxplot() + labs(x = "Total Hospitalizations", y = "Food Type", 
-                        title = "Hospitalizations by Food Type for Salmonella") +
+ggplot(Top_Hosp, aes(x=fct_reorder(`IFSAC Category`, total_hospitalizations),y = total_hospitalizations))+
+  geom_boxplot() + labs(x = "Food Type", y = "Total Hospitalizations", 
+                        title = "Hospitalizations by Food Type for Top 3 Bacterial Etiology") +
+  facet_wrap(vars(Simplified_Etiology))+
   coord_flip()
+ggsave("top3_bacterial_etiology_v_food_hospitalization_frequency.png", path = image_path, width = 3000, height = 2000, units = "px")
 ```
+
 ### Hospitalizations by State
 ```{r}
 # States vs Hospitalization
@@ -195,9 +214,9 @@ ggplot(training_data_final %>%
          filter(`IFSAC Category` != "Other") %>%
          group_by(`IFSAC Category`) %>% 
          mutate(all_hospitalizations = sum(Hospitalizations)) %>%
-         count(all_hospitalizations) %>% arrange(desc(all_hospitalizations)), 
-       aes(x = `IFSAC Category`, y = all_hospitalizations, 
-           fill = `IFSAC Category`)) + 
+         count(all_hospitalizations), 
+       aes(x = fct_reorder(`IFSAC Category`,all_hospitalizations), y = all_hospitalizations, 
+           )) + 
   geom_col() + 
   labs(x = "Food Type", y = "Hospitalizations", title = "Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'") +
   coord_flip() + theme(legend.position = "none")
@@ -218,8 +237,12 @@ saveRDS(training_data_food_and_illnesses, file = table_path)
 ```
 
 ### Locations and Hospitalizations
-```{r fig.height=8,fig.width=8}
-Location_v_Hospitalization <- ggplot(training_data_final, aes(x = Location, y = Hospitalizations)) +
+```{r}
+Location_v_Hospitalization <- training_data_final%>%
+  group_by(Location)%>%
+  mutate(all_hospitalizations = sum(Hospitalizations)) %>%
+         count(all_hospitalizations)%>%
+  ggplot(aes(x = fct_reorder(Location,all_hospitalizations), y = all_hospitalizations)) +
   geom_col() + 
   labs(x = "Locations", y = "Hospitalizations", title = "Outbreak Location versus Hospitalizations") +
   coord_flip()
@@ -267,8 +290,9 @@ ggsave("pathogen_type_etiology_v_illness.png", path = image_path, width = 3000, 
 ### Bacterial Etiologies
 ```{r}
 ggplot(analysis_data_final %>% 
-         group_by(Pathogen_Type, Simplified_Etiology, Illnesses) %>% 
-         filter(Pathogen_Type == "Bacteria"), aes(x = Simplified_Etiology)) + 
+         group_by(Simplified_Etiology) %>% 
+         mutate(Illnesses=sum(Illnesses))%>%
+         filter(Pathogen_Type == "Bacteria"), aes(x = fct_reorder(Simplified_Etiology,Illnesses))) + 
   geom_bar() + 
   labs(x = "Bacteria", y = "Cases", title = "Bar Chart of Bacteria Frequency for Illnesses")+
   coord_flip()
@@ -295,8 +319,13 @@ rmarkdown::paged_table(state_v_illness_analysis)
 
 ### Food Type and Illnesses
 ```{r}
-ggplot(analysis_data_final %>% filter(`IFSAC Category` != "Multiple") %>% filter(`IFSAC Category` != "Other"), aes(x = `IFSAC Category`, y = Illnesses)) + 
+analysis_data_final %>% filter(!`IFSAC Category` %in% c("Multiple", "Other"))%>%
+  filter(Illnesses>0)%>%
+  group_by(`IFSAC Category`)%>%
+  mutate(Illnesses=sum(Illnesses))%>%
+ggplot(aes(x = fct_reorder(`IFSAC Category`,Illnesses), y = Illnesses)) + 
   geom_col() + 
+  scale_y_log10()+
   labs(x = "Food Type", y = "Illnesses", title = "Illnesses by Food Type, Excluding 'Multiple' and 'Other'")+
   coord_flip()
 
@@ -309,7 +338,7 @@ ggsave("food_type_v_illness_frequency.png", path = image_path, width = 3000, hei
 # Locations and Illnesses
 ggplot(analysis_data_final %>% group_by(Location) %>% 
          mutate(all_illnesses = sum(Illnesses)) %>%
-         count(all_illnesses) %>% arrange(desc(all_illnesses)), aes(x = Location, y = all_illnesses)) +
+         count(all_illnesses), aes(x = fct_reorder(Location,all_illnesses), y = all_illnesses)) +
   geom_col() + 
   labs(x = "Locations", y = "Illnesses", title = "Illnesses by Location")+
   coord_flip()
