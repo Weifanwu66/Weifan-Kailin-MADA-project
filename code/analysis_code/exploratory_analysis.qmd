@@ -120,6 +120,7 @@ ggsave("month_v_hospitalization.png", path = image_path, width = 3000, height = 
 ### Bacterial Etiologies for Outbreaks
 ```{r}
 # General
+## Hospitalizations
 ggplot(training_data_final %>% 
          select(Pathogen_Type, Simplified_Etiology, Hospitalizations) %>%
          filter(Pathogen_Type == "Bacteria")%>%
@@ -130,6 +131,18 @@ ggplot(training_data_final %>%
        title = "Bar Chart of Bacteria Frequency") + coord_flip()
 
 ggsave("bacterial_etiology_v_hospitalization_frequency.png", path = image_path, width = 3000, height = 2000, units = "px")
+
+## Illnesses
+ggplot(training_data_final %>% 
+         select(Pathogen_Type, Simplified_Etiology, Illnesses) %>%
+         filter(Pathogen_Type == "Bacteria")%>%
+         group_by(Simplified_Etiology)%>%
+         mutate(all_Illnesses=sum(Illnesses)),
+       aes(x = fct_reorder(Simplified_Etiology,all_Illnesses))) + geom_bar() + 
+  labs(x = "Bacteria", y = "Illnesses", 
+       title = "Bar Chart of Bacteria Frequency") + coord_flip()
+
+ggsave("bacterial_etiology_v_Illnesses_frequency.png", path = image_path, width = 3000, height = 2000, units = "px")
 
 #  Top 3 Bacterial Etiology: Salmonella, E. coli, and Clostridium
 Top_Hosp <- training_data_final %>%
@@ -209,13 +222,17 @@ ggsave("State_hospitalization_map.png", path = image_path, width = 3000, height 
 ### Food Type and Hospitalizations
 ```{r}
 # Food Type and Hospitalizations
-ggplot(training_data_final %>% 
+food_hosp=training_data_final %>% 
          filter(`IFSAC Category` != "Multiple") %>% 
          filter(`IFSAC Category` != "Other") %>%
          group_by(`IFSAC Category`) %>% 
          mutate(all_hospitalizations = sum(Hospitalizations)) %>%
-         count(all_hospitalizations), 
-       aes(x = fct_reorder(`IFSAC Category`,all_hospitalizations), y = all_hospitalizations, 
+         count(all_hospitalizations)%>%
+  arrange(desc(all_hospitalizations))
+save_location <- here("results","tables", "food_v_hospitalizations.rds")
+saveRDS(food_hosp,file = save_location)
+
+  ggplot(food_hosp,aes(x = fct_reorder(`IFSAC Category`,all_hospitalizations), y = all_hospitalizations, 
            )) + 
   geom_col() + 
   labs(x = "Food Type", y = "Hospitalizations", title = "Hospitalizations by Food Type, Excluding 'Multiple' and 'Other'") +

@@ -315,6 +315,22 @@ poisson_complex_resampled_illness %>%
 ggsave("Predicted Illnesses VS Illnesses by poisson regression with all predictors.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
 
 ```
+### Organize performances metrics for single variate models
+```{r}
+
+simp_illness_metric=lm_simple_resampled_illness%>%
+    collect_metrics() %>%
+  mutate(model="linear")%>%
+  filter(.metric=='rmse')%>%
+  bind_rows(poisson_simple_resampled_illness %>%
+  collect_metrics() %>%
+  filter(.metric=='rmse')%>%
+    mutate(model="Poisson"))
+
+save_location <- here("results", "tables","illness_simple_rmse.rds")
+saveRDS(simp_illness_metric, file = save_location)
+```
+
 According to the result, the model built using multivariate linear regression seems to have the smallest root mean squared error and highest R^2. However, none of those models can catch outliers (Illness > 1000).
 
 # Modeling Hospitilizations
@@ -503,6 +519,22 @@ poisson_complex_resampled_hosp %>%
 ggsave("Predicted Hospitalizations VS Hospitalizations by poisson regression with all predictors.png", path = images_stats_path, width = 3000, height = 2000, units = "px")
 
 ```
+
+### Organize performances metrics for single variate models
+```{r}
+simp_hospital_metric=lm_simple_resampled_hosp%>%
+    collect_metrics() %>%
+  filter(.metric=='rmse')%>%
+  mutate(model="linear")%>%
+  bind_rows(poisson_simple_resampled_hosp%>%
+  collect_metrics() %>%
+  filter(.metric=='rmse')%>%
+    mutate(model="poisson"))
+
+save_location <- here("results", "tables","hospital_simple_rmse.rds")
+saveRDS(simp_hospital_metric, file = save_location)
+```
+
 According to the results, the model built using multivariate linear regression seems to have the smallest root mean squared error and highest R^2 (14%). But again, outliers (Hospitalizations > 100) cannot be predicted well by any of those models.
 
 # Machine Learning Approach
@@ -722,11 +754,14 @@ test_data_final %>% select(Hospitalizations) %>%
 
 ```{r}
 # Illness
-save_location <- here("results", "illness_rmse_models.rds")
+# Univariate
+
+# Multivariate
+save_location <- here("results","tables", "illness_rmse_models.rds")
 saveRDS(illness_model_dataframe, file = save_location)
 
 # Hospitalizations
-save_location <- here("results", "hospital_rmse_models.rds")
+save_location <- here("results", "tables","hospital_rmse_models.rds")
 saveRDS(hosp_model_dataframe, file = save_location)
 ```
 
