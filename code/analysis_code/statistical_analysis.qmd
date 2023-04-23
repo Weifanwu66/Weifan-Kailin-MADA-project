@@ -753,9 +753,6 @@ test_data_final %>% select(Hospitalizations) %>%
 # Save RDS Files
 
 ```{r}
-# Illness
-# Univariate
-
 # Multivariate
 save_location <- here("results","tables", "illness_rmse_models.rds")
 saveRDS(illness_model_dataframe, file = save_location)
