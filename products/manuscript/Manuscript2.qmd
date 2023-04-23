@@ -87,7 +87,11 @@ data_location=here("results","tables","hospital_rmse_models.rds")
 hosp_rmse<-readRDS(data_location)
 
 # Final model metrics
+data_location <- here("results", "tables", "final_illness_fit.rds")
+final_illness_fit <- readRDS(data_location)
 
+data_location <- here("results", "tables", "final_hosp_fit.rds")
+final_hosp_fit <- readRDS(data_location)
 ```
 
 # Summary/Abstract
@@ -156,7 +160,7 @@ Overall, between itself and the other models (linear regression, poisson regress
 
 ### Final Fit with Test Data
 
-Fitting the finalized random forest model to the test data resulted in RMSEs of 36.6 and 6.70 for the health outcomes of illnesses and hospitalizations, respectively.
+Fitting the finalized random forest model to the test data resulted in RMSEs of `r final_illness_fit$.estimate[1]` and `r final_hosp_fit$.estimate[1]` for the health outcomes of illnesses and hospitalizations, respectively.
 
 # Discussion
 
