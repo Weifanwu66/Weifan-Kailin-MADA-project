@@ -737,7 +737,7 @@ placeholder_illnesses <- random_forest_illness_final %>%
   fit(test_data_final) %>% predict(test_data_final)
 placeholder_illnesses <- placeholder_illnesses[1:1922, ]
 
-test_data_final %>% select(Illnesses) %>% 
+final_illness_fit <- test_data_final %>% select(Illnesses) %>% 
   bind_cols(placeholder_illnesses) %>% rmse(Illnesses, .pred)
 
 # Hospitalizations
@@ -745,20 +745,30 @@ placeholder_hosp <- random_forest_hosp_final %>%
   fit(test_data_final) %>% predict(test_data_final)
 placeholder_hosp <- placeholder_hosp[1:1922, ]
 
-test_data_final %>% select(Hospitalizations) %>% 
+final_hosp_fit <- test_data_final %>% 
+  select(Hospitalizations) %>% 
   bind_cols(placeholder_hosp) %>% rmse(Hospitalizations, .pred)
-
 ```
 
 # Save RDS Files
 
 ```{r}
+<<<<<<< HEAD
 # Multivariate
+=======
+# Illness
+>>>>>>> master
 save_location <- here("results","tables", "illness_rmse_models.rds")
 saveRDS(illness_model_dataframe, file = save_location)
+
+save_location <- here("results", "tables", "final_illness_fit.rds")
+saveRDS(final_illness_fit, file = save_location)
 
 # Hospitalizations
 save_location <- here("results", "tables","hospital_rmse_models.rds")
 saveRDS(hosp_model_dataframe, file = save_location)
+
+save_location <- here("results", "tables", "final_hosp_fit.rds")
+saveRDS(final_hosp_fit, file = save_location)
 ```
 
