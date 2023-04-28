@@ -9,7 +9,7 @@ The *code* folder contains subdirectories for data cleaning/preprocessing (proce
 The *data* folder contains subdirectories for raw data and cleaned data.
 
 ## Products
-The *products* folder contains files pertinent to our manuscript output.
+The *products* folder contains manuscript itself and tables & plots in images file pertinent to our manuscript output.
 
 ## Results
 The *results* folder contains tables and graphs generated from exploratory data analysis and statistical analysis.
