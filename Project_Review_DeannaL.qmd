@@ -1,0 +1,163 @@
+---
+title: Project Review Weifan and Kai
+author: Deanna Lanier
+date: "`r file.mtime(knitr::current_input())`"
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+---
+
+# Overview
+
+Title of project: Foodborne-Outbreak
+
+Name of project author(s): Weifan Wu & Kailin (Kai) Chen
+
+Name of project reviewer: Deanna Lanier
+
+# Specific project content evaluation
+Evaluate the different parts of the project by filling in the sections below.
+
+
+## Background, Context and Motivation
+How well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?
+
+### Feedback and Comments
+
+The background does a good job of describing your topic. I would have liked to see more on previous or related work, or a statement saying that there is no previous work prior to this study.
+
+### Summary assessment (PICK ONE, DELETE THE OTHERS)
+* some contextualization and motivation
+
+
+## Question description
+How well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?
+
+
+### Feedback and Comments
+
+The questions and hypothesis were clearly stated and well explained. They relate to the data and the background well and are applicable to the analysis.
+
+### Summary assessment
+* question/hypotheses fully clear
+
+
+## Data description
+How well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is? 
+
+### Feedback and Comments
+
+The data are described in the data sources section and clearly explain where the data were obtained. There is no meta-information provided on the data sources so it is hard to be clear on what the variables are. I would recommend including an additional spreadsheet with your data dictionary so it is easier for other users to interpret. 
+
+### Summary assessment
+* source and overall structure of data somewhat explained
+
+
+## Data wrangling and exploratory analysis
+How well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?
+
+### Feedback and Comments
+
+The data processing was very comprehensive and well explained. I especially liked the Pareto Chart with Missing Values figures in your processing script. While I do think there could have been more documentation for the steps you took to clean with some rational, I think all of the steps were reasonable. For the exploratory analysis, the figures look great and all the results presented are related to the overarching study. I would like to have seen some sentences to explain the exploration and the figures provided. There were no 'takeaways' from the exploratory analysis just by reading the manuscript. The sentences found at the end of your exploratory analysis code would be a great addition to the manuscript to just give some general overview of what you are visualizing and the importance.
+
+### Summary assessment
+* essentially no weaknesses in wrangling and exploratory component
+
+
+
+## Appropriateness of Analysis
+Were the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?
+
+### Feedback and Comments
+
+Great analysis! You this statistical analysis was very appropriate for the questions and hypothesis and you utilized multiple models and included an great model interpretation with some performance metrics. I would help to include some model interpretation that relates back to the questions and hypothesis.
+
+### Summary assessment
+* strong and reasonable analysis
+
+## Presentation
+How well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality? 
+
+### Feedback and Comments
+
+The figures are off to a great start. For all of you figures, I would increase the size of the text for the title, axis labels, axis titles and legend. There are too small to read without having to zoom in. Additionally, for figures 2 and 3, I would make the axis labels at an angle so that they are not overlapping. THe overlap makes the figure difficult to read. 
+
+### Summary assessment
+* results are presented ok, with room for improvement
+
+
+## Discussion/Conclusions
+Are the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?
+
+### Feedback and Comments
+
+The discussion was not included in the manuscript so I am unable to give feedback. 
+
+### Summary assessment
+* major parts of discussion missing or wrong 
+
+
+## Further comments
+
+Overall I think the project is great and I love the topic and dataset you all chose. You are asking great questions and have a great start to your analysis. I would only recommend making those edits to the figures and tying everything together in the discussion and results section so we can see the findings of your analysis.
+
+
+# Overall project content evaluation
+Evaluate overall features of the project  by filling in the sections below.
+
+
+## Structure
+Is the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all "junk" files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?
+
+### Feedback and Comments
+
+The project repository is well structured and all of the files and folders are given reasonable names. There are no junk files or folders that do not need to be there. Even without the instructions in the readme, it was very easy to know how everything fit together and which code to run first just based on the names.
+
+### Summary assessment
+* well structured
+
+
+## Documentation 
+How well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files? 
+
+### Feedback and Comments
+
+This project could benefit from a lot more comments in the scripts. There are very few comments that explain what you are doing in the code chunks and that would be something helpful to add.
+
+### Summary assessment
+* decently documented with some gaps
+
+
+## Reproducibility
+Are all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?
+
+### Feedback and Comments
+
+The README.md files could be more comprehensive. The one in the primary folder gives no information on the steps required to reproduce the results and the ones in the sub folders are not helpful either. All of the results are fully reproducible and there were no manual additions required for the scripts to run in their entirety. The only error I had was with the last lines in the statistical analysis (starting at line 756) which was saving the files. This did not affect any of the manuscript or figures though. I would fix that chunk so there are no errors and all results save properly. 
+
+
+### Summary assessment
+* fully reproducible without issues
+
+
+## Thoroughness
+How thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?
+
+### Feedback and Comments
+
+I think this is a thorough study up to this point and there were different models used. The questions and hypothesis were not thoroughly addressed as there was no discussion section and that was not addressed in the results section.
+
+### Summary assessment
+* decent level of thoroughness
+
+
+## Further comments
+
+Overall, I think this a great project so far. I would just add in the discussion and tie everything together. Great job!
+
+
+
+
+
