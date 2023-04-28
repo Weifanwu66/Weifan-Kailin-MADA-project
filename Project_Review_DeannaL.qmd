@@ -26,10 +26,11 @@ How well is the context of the project described? Is a comprehensive background,
 
 ### Feedback and Comments
 
-The background does a good job of describing your topic. I would have liked to see more on previous or related work, or a statement saying that there is no previous work prior to this study.
+The background does a good job of describing your topic and the previous related studies. There a relevant references and it is well documented why the project was undertaken and the new information it will provide
 
 ### Summary assessment (PICK ONE, DELETE THE OTHERS)
-* some contextualization and motivation
+* strong contextualization and motivation
+
 
 
 ## Question description
@@ -60,7 +61,7 @@ How well is the data cleaned/processed and explored? Are all steps reasonable an
 
 ### Feedback and Comments
 
-The data processing was very comprehensive and well explained. I especially liked the Pareto Chart with Missing Values figures in your processing script. While I do think there could have been more documentation for the steps you took to clean with some rational, I think all of the steps were reasonable. For the exploratory analysis, the figures look great and all the results presented are related to the overarching study. I would like to have seen some sentences to explain the exploration and the figures provided. There were no 'takeaways' from the exploratory analysis just by reading the manuscript. The sentences found at the end of your exploratory analysis code would be a great addition to the manuscript to just give some general overview of what you are visualizing and the importance.
+The data processing was very comprehensive and well explained. I especially liked the Pareto Chart with Missing Values figures in your processing script. I think all of the steps were reasonable. For the exploratory analysis, the figures look great and all the results presented are related to the overarching study. The meaningful results from the exploration are explained and documented. 
 
 ### Summary assessment
 * essentially no weaknesses in wrangling and exploratory component
@@ -72,7 +73,7 @@ Were the analysis methods appropriate for the data? Was the analysis done proper
 
 ### Feedback and Comments
 
-Great analysis! You this statistical analysis was very appropriate for the questions and hypothesis and you utilized multiple models and included an great model interpretation with some performance metrics. I would help to include some model interpretation that relates back to the questions and hypothesis.
+Great analysis! You started with explain the findings from our exploratory analysis and linked that to the rational behind your statistical analysis which was very helpful. You this statistical analysis was very appropriate for the questions and hypothesis and you utilized multiple models and included an great model interpretation with some performance metrics. The model results were also explained well and additional preprocessing steps were described. 
 
 ### Summary assessment
 * strong and reasonable analysis
@@ -82,7 +83,7 @@ How well are results presented? Are tables and figures easy to read and understa
 
 ### Feedback and Comments
 
-The figures are off to a great start. For all of you figures, I would increase the size of the text for the title, axis labels, axis titles and legend. There are too small to read without having to zoom in. Additionally, for figures 2 and 3, I would make the axis labels at an angle so that they are not overlapping. THe overlap makes the figure difficult to read. 
+The figures are well presented. They include legible titles, descriptions, and are relevant to the analysis. The axis titles could be slightly larger but overall, they are great quality. I would recommend making the titles of your figure have consistent formatting. Some include the figure number and others do not and the last figure did not include a title at all. For the tables, I would recommend having all of the captions and formatting done in a different .qmd or .r file so that we do not see the code you used to add the caption and section criteria.
 
 ### Summary assessment
 * results are presented ok, with room for improvement
@@ -93,15 +94,15 @@ Are the study findings properly discussed? Are strengths and limitations acknowl
 
 ### Feedback and Comments
 
-The discussion was not included in the manuscript so I am unable to give feedback. 
+The findings are proper discussed. The hypothesis stated earlier in the manuscript were mentioned in the discussion as to whether the analysis supported or did not support them. I also liked that other findings from previous studies were included and related to the results from this project. There was a dedicated section for strengths and limitations, however it seemed to focus more on future directions of the study. You should definitely keep the future directions, but add the strengths and limitations. The conclusion was concise and all of the findings seem to be interpreted properly. 
 
 ### Summary assessment
-* major parts of discussion missing or wrong 
+* strong, complete and clear discussion
 
 
 ## Further comments
 
-Overall I think the project is great and I love the topic and dataset you all chose. You are asking great questions and have a great start to your analysis. I would only recommend making those edits to the figures and tying everything together in the discussion and results section so we can see the findings of your analysis.
+Overall I think the project is great and I love the topic and dataset you all chose. This is a great analysis and it seems like a lot of consideration was put into the methods of analysis and the model interpretation. Great work!
 
 
 # Overall project content evaluation
@@ -147,15 +148,15 @@ How thorough was the overall study? Were alternatives (e.g. different ways of pr
 
 ### Feedback and Comments
 
-I think this is a thorough study up to this point and there were different models used. The questions and hypothesis were not thoroughly addressed as there was no discussion section and that was not addressed in the results section.
+This was a thorough study overall. Four different models were compared for the analysis and they used the performance metrics to determine the best model for analysis. The questions and hypotheses were all thoroughly addressed in the discussion and conclusion section. They found that 2 of the 3 hypotheses were not supported after the analysis and all of the questions were addressed through out the project. 
 
 ### Summary assessment
-* decent level of thoroughness
+* strong level of thorougness
 
 
 ## Further comments
 
-Overall, I think this a great project so far. I would just add in the discussion and tie everything together. Great job!
+Overall this is a great analysis and very comprehensive. My only suggestions would be to adjust your axis labels and title sizes and to incorporate more descriptive README.md files to make reproducing your results more easier. Great work!
 
 
 
