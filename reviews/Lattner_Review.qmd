@@ -1,0 +1,164 @@
+---
+title: Wu/Chen Project Review 
+author: Seth Lattner
+date: "`r file.mtime(knitr::current_input())`"
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+---
+
+# Overview
+
+Title of project: Foodborne-Outbreak Project
+
+Name of project author(s): Weifan Wu and Kai Chen
+
+Name of project reviewer: Seth Lattner
+
+
+# Specific project content evaluation
+Evaluate the different parts of the project by filling in the sections below.
+
+
+## Background, Context and Motivation
+How well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?
+
+### Feedback and Comments
+
+The background does a good job of contextualizing the project. The literature referenced in the introduction supports the importance of the study and guides the reader towards the objectives of the report. 
+
+### Summary assessment
+
+* strong contextualization and motivation
+
+## Question description
+
+How well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?
+
+### Feedback and Comments
+
+The questions addressed in this manuscript are clearly defined, as are the hypotheses. Both the questions and the hypotheses seem relevant to the data, and can be answered feasibly.
+
+### Summary assessment
+
+* question/hypotheses fully clear
+
+## Data description
+How well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is? 
+
+### Feedback and Comments
+
+The data source is clearly described and referenced throughout the project. I was unable to find a codebook defining each variable used in the analysis. While most of the variables are easy to understand, a codebook would be useful in defining terms. However, the authors do a good job of describing the data throughout the project, especially in the processing script. 
+
+### Summary assessment
+
+* source and overall structure of data somewhat explained
+
+## Data wrangling and exploratory analysis
+How well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?
+
+### Feedback and Comments
+
+Data wrangling was clearly explained and done very well. The authors were very thorough in cleaning and preparing the data for analysis and did a great job. The figures created in the exploratory analysis were impressive, and the authors clearly did their due diligence exploring and preparing the data. My only suggestion would be to add in a supplementary materials file where a lot of these exploratory results can be stored and shared. 
+
+### Summary assessment
+
+* essentially no weaknesses in wrangling and exploratory component
+
+## Appropriateness of Analysis
+
+Were the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?
+
+### Feedback and Comments
+
+I found the statistical analysis to be appropriate based on the data at hand. The response and predictor variables seemed appropriate for the questions being answered. Multiple modeling approaches were implemented and compared. Overall, the analysis was done very well.
+
+### Summary assessment
+
+* strong and reasonable analysis
+
+## Presentation
+How well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality? 
+
+### Feedback and Comments
+
+Results are presented clearly and effectively. Figures and tables are professional and informative. Numbering and captioning all figures would be helpful in keeping up with what is found in the written results, however.
+
+### Summary assessment
+
+* results are very well presented
+
+## Discussion/Conclusions
+Are the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?
+
+### Feedback and Comments
+
+The discussion and interpretation of the results is very thorough. Implications of the findings are addressed, and conclusions are drawn appropriately. More detail could be given in limitations resulting from the study design, available data, etc. Discussion about the modeling approaches was especially interesting.
+
+### Summary assessment
+
+* strong, complete and clear discussion
+
+## Further comments
+
+_Add any other comments regarding the different aspects of the project here. Write anything you think can help your classmate improve their project._
+
+Great work!
+
+# Overall project content evaluation
+Evaluate overall features of the project  by filling in the sections below.
+
+
+## Structure
+Is the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all "junk" files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?
+
+### Feedback and Comments
+
+For the most part the structure is straightforward and clear. However, there were a few things that I found to be confusing. In the analysis code folder, there are various R, Rmd, and Qmd files that appear to do similar things, but not quite the same thing. Several "junk" files are still found in the project folders. The manuscript files are also confusing to me. There are 2 differnt manuscript Qmd files that have slightly different output and material. Neither currently renders into the Word doc that is in the manuscript folder. I am basing this review of the .html output, as that seems to be the most up-to-date.
+
+### Summary assessment
+
+* mostly clear, but some confusing parts (e.g. useless files, things in the wrong folders)
+
+## Documentation 
+How well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files? 
+
+### Feedback and Comments
+
+Comments are descriptive and helpful. The documentation is clear and explains each line of code, as well as justifying decisions in data processing and analysis.
+
+### Summary assessment
+
+* fully and well documented
+
+## Reproducibility
+Are all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?
+
+### Feedback and Comments
+
+I was able to fully reproduce the analysis without any issues. Removing some of the superfluous files would make it even easier, however, the documentation was sufficient for me to follow their process.
+
+### Summary assessment
+
+* fully reproducible without issues
+
+## Thoroughness
+How thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?
+
+### Feedback and Comments
+
+This study was very thoroughly conducted throughout the whole process. Ample documentation, description, and discussion was provided both in the code and the manuscript. Several modeling approaches were taken and compared, and the questions and hypotheses were fully addressed. 
+
+### Summary assessment
+
+* strong level of thorougness
+
+## Further comments
+
+_Add any other comments regarding the overall project here. Write anything you think can help your classmate improve their project._
+
+Overall a really good job! Tidying up the directory would be helpful, but otherwise it is in great shape.
+
+
