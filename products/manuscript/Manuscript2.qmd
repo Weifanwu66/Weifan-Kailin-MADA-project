@@ -202,7 +202,22 @@ Food poisoning in the United States poses a great concern to public health in te
 
 ![Figure 2. Common contaminated food linked to hospitalizations from 1998-2015.](images/Food_type_v_hospitalization.png)
 
-![Figure 3. Pathogen types and Hospitalizations.](images/pathogen_type_v_hospitalizations.png) ![Figure 4. Common bacterial etiology causing hospitalizations from 1998-2015.](images/bacterial_etiology_v_hospitalization_frequency.png) ![Figure 5. Top 3 bacterial pathogens and their common food carrier month from 1998-2015.](images/top3_bacterial_etiology_v_food_hospitalization_frequency.png) ![Figure 5. Leading locations that result in hospitalizations](images/Location_v_hospitalization.png) ![Figure 6. Illness over time by pathogen type (2009-2020).](images/time_v_illness_pathogen_type.png) ![Figure 7. Illnesses by outbreak location (2009-2020).](images/Location_v_Illness.png) ![Figure 8. Bacterial etiology by outbreak frequency (2009-2020).](images/bacterial_etiology_v_outbreak_frequency.png) ![Figure 9. Food by outbreak frequency (2009-2020).](images/food_type_v_illness_frequency.png)
+![Figure 3. Pathogen types and Hospitalizations.](images/pathogen_type_v_hospitalizations.png) 
+
+![Figure 4. Common bacterial etiology causing hospitalizations from 1998-2015.](images/bacterial_etiology_v_hospitalization_frequency.png)
+
+![Figure 5. Top 3 bacterial pathogens and their common food carrier month from 1998-2015.](images/top3_bacterial_etiology_v_food_hospitalization_frequency.png) 
+
+![Figure 5. Leading locations that result in hospitalizations](images/Location_v_hospitalization.png) 
+
+![Figure 6. Illness over time by pathogen type (2009-2020).](images/time_v_illness_pathogen_type.png) 
+
+![Figure 7. Illnesses by outbreak location (2009-2020).](images/Location_v_Illness.png) 
+
+![Figure 8. Bacterial etiology by outbreak frequency (2009-2020).](images/bacterial_etiology_v_outbreak_frequency.png)
+
+![Figure 9. Food by outbreak frequency (2009-2020).](images/food_type_v_illness_frequency.png)
+
 ![Figure 10. Variable importance in determining hospitalization predictions using random forest.](images/variable importance in predicting hospitalizations by random forest model.png)
 
 ```{r}

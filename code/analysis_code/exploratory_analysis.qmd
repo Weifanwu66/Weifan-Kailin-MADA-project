@@ -47,7 +47,6 @@ theme_update(plot.title = element_text(face = "bold", size = 12))
 theme_update(plot.title = element_text(hjust = 0.5))
 ```
 
-
 ### Pathogen Type + Etiology vs Hospitalization
 ```{r}
 # Pathogen Type vs Hospitalization
@@ -58,7 +57,7 @@ ggplot(training_data_final %>%
            )) +
   geom_col() + 
   labs(x = "Pathogen Type", y = "Hospitalizations", 
-       title = "Bar Chart of Hospitalizations by Pathogen type") +
+       title = "Bar Chart of Hospitalizations by Pathogen Type") +
   theme_classic() + 
   theme(plot.title = element_text(face = "bold", size = 11, hjust = 0.5))
 

@@ -116,7 +116,7 @@ Is the project well structured? Are files in well labeled folders? Do files have
 
 ### Feedback and Comments
 
-For the most part the structure is straightforward and clear. However, there were a few things that I found to be confusing. In the analysis code folder, there are various R, Rmd, and Qmd files that appear to do similar things, but not quite the same thing. Several "junk" files are still found in the project folders. The manuscript files are also confusing to me. There are 2 differnt manuscript Qmd files that have slightly different output and material. Neither currently renders into the Word doc that is in the manuscript folder. I am basing this review of the .html output, as that seems to be the most up-to-date.
+For the most part the structure is straightforward and clear. However, there were a few things that I found to be confusing. In the analysis code folder, there are various R, Rmd, and Qmd files that appear to do similar things, but not quite the same thing. Several "junk" files are still found in the project folders. The manuscript files are also confusing to me. There are 2 different manuscript Qmd files that have slightly different output and material. Neither currently renders into the Word doc that is in the manuscript folder. I am basing this review of the .html output, as that seems to be the most up-to-date.
 
 ### Summary assessment
 
